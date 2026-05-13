@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国語単語一覧</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #001858;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    color: #001858;
+  }
+  .lesson-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .lesson-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 10px 12px;
+    border: 2px solid #e65100;
+    background: #fff;
+    color: #e65100;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lesson-btn.active {
+    background: #ff9800;
+    color: #fff;
+    border-color: #ff9800;
+  }
+  .search-box {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #ffcc80;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    font-family: inherit;
+    background: #fff;
+  }
+  .search-box:focus {
+    outline: none;
+    border-color: #ff9800;
+  }
+  .summary {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  .lesson-section {
+    margin-bottom: 24px;
+  }
+  .lesson-header {
+    background: #ff9800;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 12px 12px 0 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .word-table {
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(230, 81, 0, 0.1);
+  }
+  .word-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 2fr 50px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid #fff3e0;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .word-row:last-child { border-bottom: none; }
+  .word-row:hover { background: #fff8e1; }
+  .word-row.header {
+    background: #fff3e0;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #e65100;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .col-hanzi {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #001858;
+    word-break: break-all;
+  }
+  .col-pinyin {
+    font-size: 0.95rem;
+    color: #d81b60;
+    font-weight: 500;
+    word-break: break-all;
+  }
+  .col-meaning {
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.4;
+  }
+  .audio-btn {
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.4);
+    justify-self: center;
+    transition: transform 0.1s;
+  }
+  .audio-btn:active { transform: scale(0.88); }
+  .audio-btn.playing {
+    background: #d81b60;
+    animation: pulse 0.8s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .no-results {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 1rem;
+  }
+  .speed-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .speed-label {
+    font-size: 0.85rem;
+    color: #555;
+    margin-right: 4px;
+  }
+  .speed-btn {
+    padding: 6px 14px;
+    border: 2px solid #ffcc80;
+    background: #fff;
+    color: #e65100;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .speed-btn.active { background: #ffcc80; }
+
+  /* スマホ用レイアウト */
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    h1 { font-size: 1.3rem; }
+    .word-row {
+      grid-template-columns: 1fr 44px;
+      grid-template-rows: auto auto auto;
+      gap: 4px;
+      padding: 12px;
+    }
+    .word-row.header { display: none; }
+    .col-hanzi {
+      grid-column: 1;
+      grid-row: 1;
+      font-size: 1.2rem;
+    }
+    .audio-btn {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      align-self: center;
+    }
+    .col-pinyin {
+      grid-column: 1;
+      grid-row: 2;
+      font-size: 0.9rem;
+    }
+    .col-meaning {
+      grid-column: 1;
+      grid-row: 3;
+      font-size: 0.85rem;
+      color: #555;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 中国語単語一覧</h1>
+
+  <div class="lesson-selector">
+    <button class="lesson-btn active" data-lesson="all">全課</button>
+    <button class="lesson-btn" data-lesson="1">第1課</button>
+    <button class="lesson-btn" data-lesson="2">第2課</button>
+    <button class="lesson-btn" data-lesson="3">第3課</button>
+  </div>
+
+  <input type="text" class="search-box" id="search" placeholder="🔍 簡体字・ピンイン・日本語で検索...">
+
+  <div class="speed-bar">
+    <span class="speed-label">読み上げ速度:</span>
+    <button class="speed-btn" data-speed="0.6">遅い</button>
+    <button class="speed-btn active" data-speed="0.85">普通</button>
+    <button class="speed-btn" data-speed="1.0">速い</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div id="content"></div>
+</div>
+
+<script>
+const data = {
+  1: [
+    {h:"山田太郎",p:"Shāntián Tàiláng",j:"山田太郎"},
+    {h:"所",p:"suǒ",j:"（建物などを数える）"},
+    {h:"为了",p:"wèile",j:"〜のために"},
+    {h:"尽快",p:"jǐnkuài",j:"なるべく早く"},
+    {h:"提高",p:"tígāo",j:"高める、向上させる"},
+    {h:"自己",p:"zìjǐ",j:"自分"},
+    {h:"水平",p:"shuǐpíng",j:"レベル"},
+    {h:"打算",p:"dǎsuan",j:"〜するつもりだ"},
+    {h:"不过",p:"búguò",j:"ただし、でも"},
+    {h:"想好",p:"xiǎnghǎo",j:"よく考える"},
+    {h:"城市",p:"chéngshì",j:"都市、都会"},
+    {h:"建议",p:"jiànyì",j:"提案する、意見を出す"},
+    {h:"历史",p:"lìshǐ",j:"歴史"},
+    {h:"悠久",p:"yōujiǔ",j:"悠久である"},
+    {h:"政治",p:"zhèngzhì",j:"政治"},
+    {h:"文化",p:"wénhuà",j:"文化"},
+    {h:"中心",p:"zhōngxīn",j:"中心、センター"},
+    {h:"不但~而且~",p:"búdàn~érqiě~",j:"〜だけでなく〜"},
+    {h:"许多",p:"xǔduō",j:"多い、たくさん"},
+    {h:"长城",p:"Chángchéng",j:"（万里の）長城"},
+    {h:"故宫",p:"Gùgōng",j:"故宮"},
+    {h:"颐和园",p:"Yíhéyuán",j:"頤和園"},
+    {h:"王府井大街",p:"Wángfǔjǐng dàjiē",j:"王府井大街"},
+    {h:"等",p:"děng",j:"など"},
+    {h:"名胜古迹",p:"míngshèng gǔjì",j:"名所旧跡"},
+    {h:"跟~一说",p:"gēn~yì shuō",j:"〜にちょっと話すと"},
+    {h:"父母",p:"fùmǔ",j:"父母、両親"},
+    {h:"认为",p:"rènwéi",j:"〜と考える、〜と思う"},
+    {h:"选择",p:"xuǎnzé",j:"選択する、選ぶ"},
+    {h:"参考",p:"cānkǎo",j:"参考にする"},
+    {h:"决定",p:"juédìng",j:"決める、決定する"},
+    {h:"~以后",p:"~yǐhòu",j:"〜した後、〜してから"},
+    {h:"除了~以外",p:"chúle~yǐwài",j:"〜を除いて、〜以外、〜のほか"},
+    {h:"利用",p:"lìyòng",j:"利用する"},
+    {h:"节假日",p:"jiéjiàrì",j:"祝日と休日、休みの日"},
+    {h:"到处",p:"dàochù",j:"至る所、あちこち"},
+    {h:"转",p:"zhuàn",j:"回転する、（周囲を）回る"},
+    {h:"品尝",p:"pǐncháng",j:"味をみる、味わう"},
+    {h:"地道",p:"dìdao",j:"本場の、正真正銘の"},
+    {h:"中餐",p:"zhōngcān",j:"中華料理、中国料理"},
+    {h:"另外",p:"lìngwài",j:"そのほか、それから"},
+    {h:"期间",p:"qījiān",j:"期間、間"},
+    {h:"学会",p:"xuéhuì",j:"マスターする、身につける"},
+    {h:"包",p:"bāo",j:"包む、（ギョーザを）作る"}
+  ],
+  2: [
+    {h:"好长",p:"hǎo cháng",j:"とても長い、大変長い"},
+    {h:"时间",p:"shíjiān",j:"時間"},
+    {h:"只好",p:"zhǐhǎo",j:"しかたなく、〜するほかない"},
+    {h:"复习",p:"fùxí",j:"復習する"},
+    {h:"忙着",p:"mángzhe",j:"〜するのに忙しい"},
+    {h:"功课",p:"gōngkè",j:"授業、宿題、勉強"},
+    {h:"有时",p:"yǒushí",j:"時には、時々"},
+    {h:"学到",p:"xuédào",j:"〜まで学ぶ、〜まで勉強する"},
+    {h:"凌晨",p:"língchén",j:"夜明け、早朝、朝"},
+    {h:"才",p:"cái",j:"ようやく、やっと"},
+    {h:"停",p:"tíng",j:"停止する、やめる、止める"},
+    {h:"~下来",p:"~xiàlai",j:"動作が安定的な状態に落ち着く場合に用いる"},
+    {h:"躺",p:"tǎng",j:"横になる"},
+    {h:"把",p:"bǎ",j:"〜を"},
+    {h:"课文",p:"kèwén",j:"教科書の本文"},
+    {h:"单词",p:"dāncí",j:"単語"},
+    {h:"语法",p:"yǔfǎ",j:"文法"},
+    {h:"记住",p:"jìzhù",j:"覚える、記憶する"},
+    {h:"所以",p:"suǒyǐ",j:"だから"},
+    {h:"心情",p:"xīnqíng",j:"気持ち、気分、心情"},
+    {h:"饭馆",p:"fànguǎn",j:"レストラン"},
+    {h:"改善",p:"gǎishàn",j:"改善する、よくする"},
+    {h:"雷阵雨",p:"léizhènyǔ",j:"雷を伴うにわか雨"},
+    {h:"不管~还是~",p:"bùguǎn~háishi~",j:"〜だろうが〜だろうが"},
+    {h:"刮风",p:"guā fēng",j:"風が吹く"},
+    {h:"提前",p:"tíqián",j:"繰り上げる、早める"},
+    {h:"争取",p:"zhēngqǔ",j:"（実現を目指して）努力する"},
+    {h:"考",p:"kǎo",j:"試験を受ける、試験する"},
+    {h:"成绩",p:"chéngjì",j:"成績"},
+    {h:"放",p:"fàng",j:"置く、（休みに）なる"},
+    {h:"不用",p:"búyòng",j:"〜する必要がない、〜しなくてもよい"},
+    {h:"担心",p:"dānxīn",j:"心配する、懸念する"},
+    {h:"自由自在地",p:"zìyóu zìzài de",j:"自由自在に、自由気ままに、思い切り"},
+    {h:"旅游",p:"lǚyóu",j:"旅行する、観光する"}
+  ],
+  3: [
+    {h:"京都",p:"Jīngdū",j:"京都"},
+    {h:"大阪",p:"Dàbǎn",j:"大阪"},
+    {h:"奈良",p:"Nàiliáng",j:"奈良"},
+    {h:"神户",p:"Shénhù",j:"神戸"},
+    {h:"城市",p:"chéngshì",j:"都市、都会"},
+    {h:"~中",p:"~zhōng",j:"〜の中、〜しているところだ"},
+    {h:"最",p:"zuì",j:"最も、いちばん"},
+    {h:"感兴趣",p:"gǎn xìngqù",j:"興味がある"},
+    {h:"金阁寺",p:"Jīngésì",j:"金閣寺"},
+    {h:"二条城",p:"Èrtiáochéng",j:"二条城"},
+    {h:"银阁寺",p:"Yíngésì",j:"銀閣寺"},
+    {h:"清水寺",p:"Qīngshuǐsì",j:"清水寺"},
+    {h:"及",p:"jí",j:"および"},
+    {h:"平安神宫",p:"Píng'ān shéngōng",j:"平安神宮"},
+    {h:"虽然~但(是)~",p:"suīrán~dàn(shì)~",j:"〜ではあるが〜、〜にもかかわらず"},
+    {h:"非常",p:"fēicháng",j:"非常に、大変"},
+    {h:"值得",p:"zhídé",j:"〜する価値がある、〜する値打ちがある"},
+    {h:"那天",p:"nà tiān",j:"あの日、その日"},
+    {h:"尽管~但(是)~",p:"jǐnguǎn~dàn(shì)~",j:"〜にもかかわらず、〜ではあるが"},
+    {h:"游客",p:"yóukè",j:"旅行客、観光客"},
+    {h:"其中",p:"qízhōng",j:"その中、そのうち"},
+    {h:"有的~有的~",p:"yǒude~yǒude~",j:"〜である人もいれば〜である人もいる"},
+    {h:"照相机",p:"zhàoxiàngjī",j:"カメラ"},
+    {h:"一边~一边~",p:"yìbiān~yìbiān~",j:"〜しながら〜する"},
+    {h:"跟在",p:"gēnzài",j:"〜につき従う"},
+    {h:"导游",p:"dǎoyóu",j:"ガイド"},
+    {h:"后边",p:"hòubian",j:"後ろ"},
+    {h:"认真地",p:"rènzhēn de",j:"真剣に、まじめに"},
+    {h:"讲解",p:"jiǎngjiě",j:"説明する、解説する"},
+    {h:"古迹",p:"gǔjì",j:"遺跡、旧跡"}
+  ]
+};
+
+let currentLesson = "all";
+let speed = 0.85;
+let chineseVoice = null;
+let voicesLoaded = false;
+let currentPlayingBtn = null;
+
+function loadChineseVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) return false;
+  const preferredOrder = [
+    v => v.lang === "zh-CN",
+    v => v.lang === "zh_CN",
+    v => v.lang.toLowerCase().startsWith("cmn"),
+    v => v.lang.toLowerCase().startsWith("zh-hans"),
+    v => v.lang.toLowerCase().startsWith("zh"),
+  ];
+  for (const matcher of preferredOrder) {
+    const found = voices.find(matcher);
+    if (found) {
+      chineseVoice = found;
+      voicesLoaded = true;
+      return true;
+    }
+  }
+  voicesLoaded = true;
+  return false;
+}
+
+function playWord(text, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert("お使いのブラウザは音声合成に対応していません。");
+    return;
+  }
+  if (!voicesLoaded) loadChineseVoice();
+  if (!chineseVoice) loadChineseVoice();
+  if (!chineseVoice) {
+    alert("中国語の音声が見つかりません。\n端末の設定から中国語(中文/简体)の音声データをインストールしてください。");
+    return;
+  }
+  // 直前の再生をキャンセル
+  window.speechSynthesis.cancel();
+  if (currentPlayingBtn) currentPlayingBtn.classList.remove("playing");
+
+  const cleanText = text.replace(/[~〜～()（）]/g, "");
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.voice = chineseVoice;
+  utterance.lang = chineseVoice.lang;
+  utterance.rate = speed;
+  utterance.pitch = 1.0;
+
+  btn.classList.add("playing");
+  currentPlayingBtn = btn;
+  utterance.onend = () => {
+    btn.classList.remove("playing");
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
+  };
+  utterance.onerror = () => {
+    btn.classList.remove("playing");
+    if (currentPlayingBtn === btn) currentPlayingBtn = null;
+  };
+  window.speechSynthesis.speak(utterance);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function render() {
+  const searchTerm = document.getElementById("search").value.trim().toLowerCase();
+  const lessonsToShow = currentLesson === "all" ? ["1", "2", "3"] : [currentLesson];
+  const content = document.getElementById("content");
+  let totalCount = 0;
+  let html = "";
+
+  lessonsToShow.forEach(lesson => {
+    const words = data[lesson].filter(w => {
+      if (!searchTerm) return true;
+      return w.h.toLowerCase().includes(searchTerm) ||
+             w.p.toLowerCase().includes(searchTerm) ||
+             w.j.toLowerCase().includes(searchTerm);
+    });
+    if (words.length === 0) return;
+    totalCount += words.length;
+
+    html += `<div class="lesson-section">`;
+    html += `<div class="lesson-header"><span>第${lesson}課</span><span>${words.length}語</span></div>`;
+    html += `<div class="word-table">`;
+    html += `<div class="word-row header"><div>簡体字</div><div>ピンイン</div><div>日本語訳</div><div>音声</div></div>`;
+    words.forEach((w, i) => {
+      html += `<div class="word-row">
+        <div class="col-hanzi">${escapeHtml(w.h)}</div>
+        <div class="col-pinyin">${escapeHtml(w.p)}</div>
+        <div class="col-meaning">${escapeHtml(w.j)}</div>
+        <button class="audio-btn" data-text="${escapeHtml(w.h)}">🔊</button>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  if (totalCount === 0) {
+    html = `<div class="no-results">該当する単語が見つかりませんでした</div>`;
+    document.getElementById("summary").textContent = "";
+  } else {
+    document.getElementById("summary").textContent = `全 ${totalCount} 語${searchTerm ? `（"${searchTerm}" で検索中）` : ""}`;
+  }
+  content.innerHTML = html;
+
+  // 音声ボタンのイベントを登録
+  content.querySelectorAll(".audio-btn").forEach(btn => {
+    btn.addEventListener("click", () => playWord(btn.dataset.text, btn));
+  });
+}
+
+document.querySelectorAll(".lesson-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentLesson = btn.dataset.lesson;
+    document.querySelectorAll(".lesson-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render();
+  });
+});
+
+document.getElementById("search").addEventListener("input", render);
+
+document.querySelectorAll(".speed-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    speed = parseFloat(btn.dataset.speed);
+    document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
+
+// 音声リスト読み込み
+if ('speechSynthesis' in window) {
+  loadChineseVoice();
+  window.speechSynthesis.onvoiceschanged = () => loadChineseVoice();
+  window.speechSynthesis.getVoices();
+  setTimeout(loadChineseVoice, 500);
+  setTimeout(loadChineseVoice, 1500);
+}
+
+render();
+</script>
+</body>
+</html>
