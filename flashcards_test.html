@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>中国語リスニングテスト</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2dfdb 100%);
+    min-height: 100vh;
+    padding: 16px;
+    color: #001858;
+  }
+  .container { max-width: 600px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    color: #001858;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 16px;
+  }
+  .lesson-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .lesson-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 10px 12px;
+    border: 2px solid #00695c;
+    background: #fff;
+    color: #00695c;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lesson-btn.active {
+    background: #00897b;
+    color: #fff;
+    border-color: #00897b;
+  }
+  .progress {
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #00695c;
+  }
+  .score {
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0, 105, 92, 0.15);
+    border: 3px solid #00897b;
+    min-height: 420px;
+  }
+  .stage-label {
+    font-size: 0.8rem;
+    color: #00897b;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+  .big-play-btn {
+    display: block;
+    margin: 12px auto 20px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #00897b;
+    color: #fff;
+    border: none;
+    font-size: 2.4rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 137, 123, 0.4);
+    transition: transform 0.15s;
+  }
+  .big-play-btn:active { transform: scale(0.93); }
+  .speed-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .speed-btn {
+    padding: 6px 14px;
+    border: 2px solid #b2dfdb;
+    background: #fff;
+    color: #00695c;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .speed-btn.active { background: #b2dfdb; }
+  .input-area {
+    margin-bottom: 16px;
+  }
+  .input-label {
+    font-size: 0.85rem;
+    color: #00695c;
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .answer-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #b2dfdb;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-family: inherit;
+  }
+  .answer-input:focus {
+    outline: none;
+    border-color: #00897b;
+  }
+  .reveal-btn {
+    width: 100%;
+    padding: 14px;
+    background: #00897b;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .reveal-btn:active { transform: scale(0.98); }
+  .answer-area {
+    background: #f1f8f7;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .answer-area.shown { display: block; }
+  .answer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #b2dfdb;
+  }
+  .answer-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .answer-label {
+    font-size: 0.75rem;
+    color: #888;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+  .answer-value {
+    font-size: 1.1rem;
+    color: #001858;
+    font-weight: bold;
+    text-align: right;
+    flex: 1;
+    word-break: break-all;
+  }
+  .answer-value.pinyin { color: #d81b60; }
+  .answer-value.hanzi { font-size: 1.5rem; }
+  .judge-buttons {
+    display: none;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .judge-buttons.shown { display: flex; }
+  .judge-btn {
+    flex: 1;
+    padding: 14px 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .judge-correct { background: #66bb6a; color: #fff; }
+  .judge-wrong { background: #ef5350; color: #fff; }
+  .judge-btn:active { transform: scale(0.96); }
+  .controls {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .ctrl-btn {
+    flex: 1;
+    padding: 14px 8px;
+    border: none;
+    background: #001858;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .ctrl-btn:active { transform: scale(0.96); }
+  .ctrl-btn:disabled { background: #aaa; cursor: not-allowed; }
+  .shuffle-btn {
+    width: 100%;
+    padding: 12px;
+    background: #d81b60;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    color: #d81b60;
+    border: 2px solid #d81b60;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .meaning-display {
+    text-align: center;
+    color: #555;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-style: italic;
+  }
+  @media (max-width: 400px) {
+    .answer-value.hanzi { font-size: 1.3rem; }
+    .big-play-btn { width: 80px; height: 80px; font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>中国語リスニングテスト</h1>
+  <div class="subtitle">🎧 ピンインを聞いて、簡体字とピンインを書き取ろう</div>
+
+  <div class="lesson-selector">
+    <button class="lesson-btn active" data-lesson="1">第1課</button>
+    <button class="lesson-btn" data-lesson="2">第2課</button>
+    <button class="lesson-btn" data-lesson="3">第3課</button>
+    <button class="lesson-btn" data-lesson="all">全課</button>
+  </div>
+
+  <div class="progress" id="progress">1 / 1</div>
+  <div class="score" id="score">正解: 0 / 0</div>
+
+  <div class="card">
+    <div class="stage-label">🔊 STEP 1: 音声を聞いてください</div>
+    <button class="big-play-btn" id="play-btn">▶</button>
+    <div class="speed-controls">
+      <button class="speed-btn" data-speed="0.6">遅い</button>
+      <button class="speed-btn active" data-speed="0.85">普通</button>
+      <button class="speed-btn" data-speed="1.0">速い</button>
+    </div>
+
+    <div class="input-area">
+      <label class="input-label">📝 簡体字（書いて練習用）</label>
+      <input type="text" class="answer-input" id="input-hanzi" placeholder="聞こえた中国語を入力...">
+      <label class="input-label">📝 ピンイン（声調記号は省略OK）</label>
+      <input type="text" class="answer-input" id="input-pinyin" placeholder="例: ni hao または nǐ hǎo">
+    </div>
+
+    <button class="reveal-btn" id="reveal-btn">答えを見る</button>
+
+    <div class="answer-area" id="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">簡体字</span>
+        <span class="answer-value hanzi" id="ans-hanzi">―</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">ピンイン</span>
+        <span class="answer-value pinyin" id="ans-pinyin">―</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">日本語訳</span>
+        <span class="answer-value" id="ans-meaning">―</span>
+      </div>
+      <div class="meaning-display" id="ans-example">―</div>
+    </div>
+
+    <div class="judge-buttons" id="judge-buttons">
+      <button class="judge-btn judge-wrong" id="wrong-btn">✗ 不正解</button>
+      <button class="judge-btn judge-correct" id="correct-btn">✓ 正解</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="prev-btn">← 前へ</button>
+    <button class="ctrl-btn" id="next-btn">次へ →</button>
+  </div>
+  <button class="shuffle-btn" id="shuffle-btn">🔀 シャッフル</button>
+  <button class="reset-btn" id="reset-btn">スコアをリセット</button>
+</div>
+
+<script>
+const data = {
+  1: [
+    {h:"山田太郎",p:"Shāntián Tàiláng",j:"山田太郎",eh:"我叫山田太郎，是日本人。",ep:"Wǒ jiào Shāntián Tàiláng, shì Rìběnrén.",ej:"私は山田太郎、日本人です。"},
+    {h:"所",p:"suǒ",j:"（建物などを数える）",eh:"我家附近有两所学校。",ep:"Wǒ jiā fùjìn yǒu liǎng suǒ xuéxiào.",ej:"家の近くに学校が2つあります。"},
+    {h:"为了",p:"wèile",j:"〜のために",eh:"为了学好汉语，我去中国留学。",ep:"Wèile xuéhǎo Hànyǔ, wǒ qù Zhōngguó liúxué.",ej:"中国語を習得するため、中国に留学します。"},
+    {h:"尽快",p:"jǐnkuài",j:"なるべく早く",eh:"请你尽快回复我。",ep:"Qǐng nǐ jǐnkuài huífù wǒ.",ej:"なるべく早く返信してください。"},
+    {h:"提高",p:"tígāo",j:"高める、向上させる",eh:"我想提高我的汉语水平。",ep:"Wǒ xiǎng tígāo wǒ de Hànyǔ shuǐpíng.",ej:"中国語のレベルを上げたいです。"},
+    {h:"自己",p:"zìjǐ",j:"自分",eh:"这件事我自己来做。",ep:"Zhè jiàn shì wǒ zìjǐ lái zuò.",ej:"この件は自分でやります。"},
+    {h:"水平",p:"shuǐpíng",j:"レベル",eh:"他的汉语水平很高。",ep:"Tā de Hànyǔ shuǐpíng hěn gāo.",ej:"彼の中国語のレベルは高いです。"},
+    {h:"打算",p:"dǎsuan",j:"〜するつもりだ",eh:"我打算明年去中国。",ep:"Wǒ dǎsuan míngnián qù Zhōngguó.",ej:"来年中国に行くつもりです。"},
+    {h:"不过",p:"búguò",j:"ただし、でも",eh:"我想去，不过没有时间。",ep:"Wǒ xiǎng qù, búguò méiyǒu shíjiān.",ej:"行きたいですが、時間がありません。"},
+    {h:"想好",p:"xiǎnghǎo",j:"よく考える",eh:"你想好了再决定吧。",ep:"Nǐ xiǎnghǎo le zài juédìng ba.",ej:"よく考えてから決めましょう。"},
+    {h:"城市",p:"chéngshì",j:"都市、都会",eh:"北京是中国的大城市。",ep:"Běijīng shì Zhōngguó de dà chéngshì.",ej:"北京は中国の大都市です。"},
+    {h:"建议",p:"jiànyì",j:"提案する、意見を出す",eh:"我建议你去北京留学。",ep:"Wǒ jiànyì nǐ qù Běijīng liúxué.",ej:"北京に留学することを提案します。"},
+    {h:"历史",p:"lìshǐ",j:"歴史",eh:"中国有悠久的历史。",ep:"Zhōngguó yǒu yōujiǔ de lìshǐ.",ej:"中国には悠久の歴史があります。"},
+    {h:"悠久",p:"yōujiǔ",j:"悠久である",eh:"这座城市的历史很悠久。",ep:"Zhè zuò chéngshì de lìshǐ hěn yōujiǔ.",ej:"この都市の歴史は悠久です。"},
+    {h:"政治",p:"zhèngzhì",j:"政治",eh:"我对政治很感兴趣。",ep:"Wǒ duì zhèngzhì hěn gǎn xìngqù.",ej:"政治にとても興味があります。"},
+    {h:"文化",p:"wénhuà",j:"文化",eh:"我喜欢中国文化。",ep:"Wǒ xǐhuan Zhōngguó wénhuà.",ej:"中国文化が好きです。"},
+    {h:"中心",p:"zhōngxīn",j:"中心、センター",eh:"北京是中国的政治中心。",ep:"Běijīng shì Zhōngguó de zhèngzhì zhōngxīn.",ej:"北京は中国の政治の中心です。"},
+    {h:"不但~而且~",p:"búdàn~érqiě~",j:"〜だけでなく〜",eh:"他不但会说英语，而且会说汉语。",ep:"Tā búdàn huì shuō Yīngyǔ, érqiě huì shuō Hànyǔ.",ej:"彼は英語だけでなく中国語も話せます。"},
+    {h:"许多",p:"xǔduō",j:"多い、たくさん",eh:"北京有许多名胜古迹。",ep:"Běijīng yǒu xǔduō míngshèng gǔjì.",ej:"北京にはたくさんの名所旧跡があります。"},
+    {h:"长城",p:"Chángchéng",j:"（万里の）長城",eh:"我想去看长城。",ep:"Wǒ xiǎng qù kàn Chángchéng.",ej:"長城を見に行きたいです。"},
+    {h:"故宫",p:"Gùgōng",j:"故宮",eh:"故宫非常有名。",ep:"Gùgōng fēicháng yǒumíng.",ej:"故宮はとても有名です。"},
+    {h:"颐和园",p:"Yíhéyuán",j:"頤和園",eh:"颐和园是北京的名胜。",ep:"Yíhéyuán shì Běijīng de míngshèng.",ej:"頤和園は北京の名所です。"},
+    {h:"王府井大街",p:"Wángfǔjǐng dàjiē",j:"王府井大街",eh:"王府井大街很热闹。",ep:"Wángfǔjǐng dàjiē hěn rènao.",ej:"王府井大街はとても賑やかです。"},
+    {h:"等",p:"děng",j:"など",eh:"我喜欢苹果、香蕉等水果。",ep:"Wǒ xǐhuan píngguǒ, xiāngjiāo děng shuǐguǒ.",ej:"リンゴ、バナナなどの果物が好きです。"},
+    {h:"名胜古迹",p:"míngshèng gǔjì",j:"名所旧跡",eh:"中国有很多名胜古迹。",ep:"Zhōngguó yǒu hěn duō míngshèng gǔjì.",ej:"中国には多くの名所旧跡があります。"},
+    {h:"跟~一说",p:"gēn~yì shuō",j:"〜にちょっと話すと",eh:"我跟父母一说，他们就同意了。",ep:"Wǒ gēn fùmǔ yì shuō, tāmen jiù tóngyì le.",ej:"両親に話したら、すぐ同意してくれました。"},
+    {h:"父母",p:"fùmǔ",j:"父母、両親",eh:"我的父母都是老师。",ep:"Wǒ de fùmǔ dōu shì lǎoshī.",ej:"私の両親はどちらも先生です。"},
+    {h:"认为",p:"rènwéi",j:"〜と考える",eh:"我认为他说得对。",ep:"Wǒ rènwéi tā shuō de duì.",ej:"彼の言う通りだと思います。"},
+    {h:"选择",p:"xuǎnzé",j:"選択する、選ぶ",eh:"你的选择是对的。",ep:"Nǐ de xuǎnzé shì duì de.",ej:"あなたの選択は正しいです。"},
+    {h:"参考",p:"cānkǎo",j:"参考にする",eh:"这本书可以参考。",ep:"Zhè běn shū kěyǐ cānkǎo.",ej:"この本は参考になります。"},
+    {h:"决定",p:"juédìng",j:"決める、決定する",eh:"我决定去中国留学。",ep:"Wǒ juédìng qù Zhōngguó liúxué.",ej:"中国に留学することを決めました。"},
+    {h:"~以后",p:"~yǐhòu",j:"〜した後",eh:"下课以后我们一起去吃饭。",ep:"Xiàkè yǐhòu wǒmen yìqǐ qù chīfàn.",ej:"授業の後、一緒にご飯を食べに行きましょう。"},
+    {h:"除了~以外",p:"chúle~yǐwài",j:"〜を除いて、〜のほか",eh:"除了我以外，大家都去了。",ep:"Chúle wǒ yǐwài, dàjiā dōu qù le.",ej:"私以外、みんな行きました。"},
+    {h:"利用",p:"lìyòng",j:"利用する",eh:"我想利用周末学习。",ep:"Wǒ xiǎng lìyòng zhōumò xuéxí.",ej:"週末を利用して勉強したいです。"},
+    {h:"节假日",p:"jiéjiàrì",j:"祝日と休日",eh:"节假日我常常去旅游。",ep:"Jiéjiàrì wǒ chángcháng qù lǚyóu.",ej:"休日にはよく旅行に行きます。"},
+    {h:"到处",p:"dàochù",j:"至る所、あちこち",eh:"北京到处都是人。",ep:"Běijīng dàochù dōu shì rén.",ej:"北京はどこも人だらけです。"},
+    {h:"转",p:"zhuàn",j:"回転する、（周囲を）回る",eh:"我们去公园转转吧。",ep:"Wǒmen qù gōngyuán zhuànzhuan ba.",ej:"公園をぶらぶら散歩しましょう。"},
+    {h:"品尝",p:"pǐncháng",j:"味をみる、味わう",eh:"我想品尝地道的中餐。",ep:"Wǒ xiǎng pǐncháng dìdao de zhōngcān.",ej:"本場の中華料理を味わいたいです。"},
+    {h:"地道",p:"dìdao",j:"本場の、正真正銘の",eh:"这家店的中餐很地道。",ep:"Zhè jiā diàn de zhōngcān hěn dìdao.",ej:"この店の中華料理はとても本場の味です。"},
+    {h:"中餐",p:"zhōngcān",j:"中華料理",eh:"我最喜欢吃中餐。",ep:"Wǒ zuì xǐhuan chī zhōngcān.",ej:"中華料理が一番好きです。"},
+    {h:"另外",p:"lìngwài",j:"そのほか、それから",eh:"另外，我还想去看长城。",ep:"Lìngwài, wǒ hái xiǎng qù kàn Chángchéng.",ej:"それから、長城も見に行きたいです。"},
+    {h:"期间",p:"qījiān",j:"期間、間",eh:"留学期间我学了很多。",ep:"Liúxué qījiān wǒ xué le hěn duō.",ej:"留学期間中に多くのことを学びました。"},
+    {h:"学会",p:"xuéhuì",j:"マスターする、身につける",eh:"我学会了包饺子。",ep:"Wǒ xuéhuì le bāo jiǎozi.",ej:"餃子を作れるようになりました。"},
+    {h:"包",p:"bāo",j:"包む、（ギョーザを）作る",eh:"妈妈在厨房包饺子。",ep:"Māma zài chúfáng bāo jiǎozi.",ej:"母は台所で餃子を作っています。"}
+  ],
+  2: [
+    {h:"好长",p:"hǎo cháng",j:"とても長い",eh:"我等了好长时间。",ep:"Wǒ děng le hǎo cháng shíjiān.",ej:"とても長い時間待ちました。"},
+    {h:"时间",p:"shíjiān",j:"時間",eh:"我没有时间。",ep:"Wǒ méiyǒu shíjiān.",ej:"時間がありません。"},
+    {h:"只好",p:"zhǐhǎo",j:"しかたなく",eh:"下雨了，我只好回家。",ep:"Xiàyǔ le, wǒ zhǐhǎo huíjiā.",ej:"雨が降ったので、仕方なく帰りました。"},
+    {h:"复习",p:"fùxí",j:"復習する",eh:"考试以前要好好复习。",ep:"Kǎoshì yǐqián yào hǎohǎo fùxí.",ej:"試験の前にちゃんと復習しなければなりません。"},
+    {h:"忙着",p:"mángzhe",j:"〜するのに忙しい",eh:"我忙着准备考试。",ep:"Wǒ mángzhe zhǔnbèi kǎoshì.",ej:"試験の準備で忙しいです。"},
+    {h:"功课",p:"gōngkè",j:"授業、宿題、勉強",eh:"今天的功课很多。",ep:"Jīntiān de gōngkè hěn duō.",ej:"今日の宿題は多いです。"},
+    {h:"有时",p:"yǒushí",j:"時には、時々",eh:"我有时去图书馆学习。",ep:"Wǒ yǒushí qù túshūguǎn xuéxí.",ej:"時々図書館に勉強しに行きます。"},
+    {h:"学到",p:"xuédào",j:"〜まで学ぶ",eh:"我们学到第三课了。",ep:"Wǒmen xué dào dì sān kè le.",ej:"第3課まで学習しました。"},
+    {h:"凌晨",p:"língchén",j:"夜明け、早朝",eh:"我学习到凌晨两点。",ep:"Wǒ xuéxí dào língchén liǎng diǎn.",ej:"明け方2時まで勉強しました。"},
+    {h:"才",p:"cái",j:"ようやく、やっと",eh:"他十点才来。",ep:"Tā shí diǎn cái lái.",ej:"彼は10時にやっと来ました。"},
+    {h:"停",p:"tíng",j:"停止する、止める",eh:"雨停了。",ep:"Yǔ tíng le.",ej:"雨が止みました。"},
+    {h:"~下来",p:"~xiàlai",j:"動作が安定する",eh:"请安静下来。",ep:"Qǐng ānjìng xiàlai.",ej:"静かにしてください。"},
+    {h:"躺",p:"tǎng",j:"横になる",eh:"我累了，想躺一会儿。",ep:"Wǒ lèi le, xiǎng tǎng yíhuìr.",ej:"疲れたので、少し横になりたいです。"},
+    {h:"把",p:"bǎ",j:"〜を",eh:"请把书打开。",ep:"Qǐng bǎ shū dǎkāi.",ej:"本を開けてください。"},
+    {h:"课文",p:"kèwén",j:"教科書の本文",eh:"请大家读课文。",ep:"Qǐng dàjiā dú kèwén.",ej:"皆さん本文を読んでください。"},
+    {h:"单词",p:"dāncí",j:"単語",eh:"我每天背单词。",ep:"Wǒ měitiān bèi dāncí.",ej:"毎日単語を覚えています。"},
+    {h:"语法",p:"yǔfǎ",j:"文法",eh:"汉语语法不太难。",ep:"Hànyǔ yǔfǎ bú tài nán.",ej:"中国語の文法はそれほど難しくありません。"},
+    {h:"记住",p:"jìzhù",j:"覚える、記憶する",eh:"我记住了这个单词。",ep:"Wǒ jìzhù le zhège dāncí.",ej:"この単語を覚えました。"},
+    {h:"所以",p:"suǒyǐ",j:"だから",eh:"我感冒了，所以没去学校。",ep:"Wǒ gǎnmào le, suǒyǐ méi qù xuéxiào.",ej:"風邪をひいたので、学校に行きませんでした。"},
+    {h:"心情",p:"xīnqíng",j:"気持ち、気分",eh:"我今天心情很好。",ep:"Wǒ jīntiān xīnqíng hěn hǎo.",ej:"今日は気分がとてもいいです。"},
+    {h:"饭馆",p:"fànguǎn",j:"レストラン",eh:"我们去饭馆吃饭吧。",ep:"Wǒmen qù fànguǎn chīfàn ba.",ej:"レストランに食事に行きましょう。"},
+    {h:"改善",p:"gǎishàn",j:"改善する",eh:"要改善学习方法。",ep:"Yào gǎishàn xuéxí fāngfǎ.",ej:"勉強方法を改善しなければなりません。"},
+    {h:"雷阵雨",p:"léizhènyǔ",j:"雷を伴うにわか雨",eh:"今天下午有雷阵雨。",ep:"Jīntiān xiàwǔ yǒu léizhènyǔ.",ej:"今日の午後は雷雨があります。"},
+    {h:"不管~还是~",p:"bùguǎn~háishi~",j:"〜だろうが〜だろうが",eh:"不管下雨还是刮风，我都去。",ep:"Bùguǎn xiàyǔ háishi guāfēng, wǒ dōu qù.",ej:"雨でも風でも、私は行きます。"},
+    {h:"刮风",p:"guā fēng",j:"風が吹く",eh:"今天刮大风。",ep:"Jīntiān guā dà fēng.",ej:"今日は強い風が吹いています。"},
+    {h:"提前",p:"tíqián",j:"繰り上げる、早める",eh:"我们提前一个小时出发。",ep:"Wǒmen tíqián yí gè xiǎoshí chūfā.",ej:"1時間早めに出発します。"},
+    {h:"争取",p:"zhēngqǔ",j:"努力する",eh:"我要争取考好。",ep:"Wǒ yào zhēngqǔ kǎo hǎo.",ej:"いい点を取れるよう努力します。"},
+    {h:"考",p:"kǎo",j:"試験を受ける",eh:"明天我要考试。",ep:"Míngtiān wǒ yào kǎoshì.",ej:"明日試験があります。"},
+    {h:"成绩",p:"chéngjì",j:"成績",eh:"他的成绩很好。",ep:"Tā de chéngjì hěn hǎo.",ej:"彼の成績はとてもいいです。"},
+    {h:"放",p:"fàng",j:"置く、（休みに）なる",eh:"明天放假。",ep:"Míngtiān fàngjià.",ej:"明日は休みです。"},
+    {h:"不用",p:"búyòng",j:"〜する必要がない",eh:"你不用担心。",ep:"Nǐ búyòng dānxīn.",ej:"心配する必要はありません。"},
+    {h:"担心",p:"dānxīn",j:"心配する",eh:"妈妈担心我的身体。",ep:"Māma dānxīn wǒ de shēntǐ.",ej:"母は私の体を心配しています。"},
+    {h:"自由自在地",p:"zìyóu zìzài de",j:"自由気ままに",eh:"我想自由自在地旅游。",ep:"Wǒ xiǎng zìyóu zìzài de lǚyóu.",ej:"自由気ままに旅行したいです。"},
+    {h:"旅游",p:"lǚyóu",j:"旅行する、観光する",eh:"暑假我想去旅游。",ep:"Shǔjià wǒ xiǎng qù lǚyóu.",ej:"夏休みに旅行に行きたいです。"}
+  ],
+  3: [
+    {h:"京都",p:"Jīngdū",j:"京都",eh:"京都是日本的古都。",ep:"Jīngdū shì Rìběn de gǔdū.",ej:"京都は日本の古都です。"},
+    {h:"大阪",p:"Dàbǎn",j:"大阪",eh:"大阪的小吃很有名。",ep:"Dàbǎn de xiǎochī hěn yǒumíng.",ej:"大阪のB級グルメは有名です。"},
+    {h:"奈良",p:"Nàiliáng",j:"奈良",eh:"奈良有很多鹿。",ep:"Nàiliáng yǒu hěn duō lù.",ej:"奈良には鹿がたくさんいます。"},
+    {h:"神户",p:"Shénhù",j:"神戸",eh:"神户的牛肉很有名。",ep:"Shénhù de niúròu hěn yǒumíng.",ej:"神戸の牛肉は有名です。"},
+    {h:"城市",p:"chéngshì",j:"都市、都会",eh:"东京是大城市。",ep:"Dōngjīng shì dà chéngshì.",ej:"東京は大都市です。"},
+    {h:"~中",p:"~zhōng",j:"〜の中、〜しているところ",eh:"我在工作中。",ep:"Wǒ zài gōngzuò zhōng.",ej:"私は仕事中です。"},
+    {h:"最",p:"zuì",j:"最も、いちばん",eh:"我最喜欢京都。",ep:"Wǒ zuì xǐhuan Jīngdū.",ej:"京都が一番好きです。"},
+    {h:"感兴趣",p:"gǎn xìngqù",j:"興味がある",eh:"我对中国文化感兴趣。",ep:"Wǒ duì Zhōngguó wénhuà gǎn xìngqù.",ej:"中国文化に興味があります。"},
+    {h:"金阁寺",p:"Jīngésì",j:"金閣寺",eh:"金阁寺非常漂亮。",ep:"Jīngésì fēicháng piàoliang.",ej:"金閣寺はとても綺麗です。"},
+    {h:"二条城",p:"Èrtiáochéng",j:"二条城",eh:"二条城是世界遗产。",ep:"Èrtiáochéng shì shìjiè yíchǎn.",ej:"二条城は世界遺産です。"},
+    {h:"银阁寺",p:"Yíngésì",j:"銀閣寺",eh:"银阁寺也很有名。",ep:"Yíngésì yě hěn yǒumíng.",ej:"銀閣寺も有名です。"},
+    {h:"清水寺",p:"Qīngshuǐsì",j:"清水寺",eh:"清水寺的景色很美。",ep:"Qīngshuǐsì de jǐngsè hěn měi.",ej:"清水寺の景色は美しいです。"},
+    {h:"及",p:"jí",j:"および",eh:"京都及奈良都很有名。",ep:"Jīngdū jí Nàiliáng dōu hěn yǒumíng.",ej:"京都および奈良はどちらも有名です。"},
+    {h:"平安神宫",p:"Píng'ān shéngōng",j:"平安神宮",eh:"平安神宫在京都。",ep:"Píng'ān shéngōng zài Jīngdū.",ej:"平安神宮は京都にあります。"},
+    {h:"虽然~但(是)~",p:"suīrán~dàn(shì)~",j:"〜ではあるが〜",eh:"虽然下雨，但是我还是去了。",ep:"Suīrán xiàyǔ, dànshì wǒ háishi qù le.",ej:"雨でしたが、それでも行きました。"},
+    {h:"非常",p:"fēicháng",j:"非常に、大変",eh:"今天非常热。",ep:"Jīntiān fēicháng rè.",ej:"今日はとても暑いです。"},
+    {h:"值得",p:"zhídé",j:"〜する価値がある",eh:"这个地方值得去。",ep:"Zhège dìfang zhídé qù.",ej:"この場所は行く価値があります。"},
+    {h:"那天",p:"nà tiān",j:"あの日、その日",eh:"那天天气很好。",ep:"Nà tiān tiānqì hěn hǎo.",ej:"その日は天気がよかったです。"},
+    {h:"尽管~但(是)~",p:"jǐnguǎn~dàn(shì)~",j:"〜にもかかわらず〜",eh:"尽管很累，但是很开心。",ep:"Jǐnguǎn hěn lèi, dànshì hěn kāixīn.",ej:"疲れましたが、楽しかったです。"},
+    {h:"游客",p:"yóukè",j:"旅行客、観光客",eh:"京都有很多游客。",ep:"Jīngdū yǒu hěn duō yóukè.",ej:"京都には観光客が多いです。"},
+    {h:"其中",p:"qízhōng",j:"その中、そのうち",eh:"我有三个朋友，其中一个是中国人。",ep:"Wǒ yǒu sān gè péngyou, qízhōng yí gè shì Zhōngguórén.",ej:"友達が3人いて、そのうち1人は中国人です。"},
+    {h:"有的~有的~",p:"yǒude~yǒude~",j:"〜もいれば〜もいる",eh:"有的人喜欢茶，有的人喜欢咖啡。",ep:"Yǒude rén xǐhuan chá, yǒude rén xǐhuan kāfēi.",ej:"お茶が好きな人もいれば、コーヒーが好きな人もいます。"},
+    {h:"照相机",p:"zhàoxiàngjī",j:"カメラ",eh:"我带了照相机。",ep:"Wǒ dài le zhàoxiàngjī.",ej:"カメラを持ってきました。"},
+    {h:"一边~一边~",p:"yìbiān~yìbiān~",j:"〜しながら〜する",eh:"我一边吃饭，一边看电视。",ep:"Wǒ yìbiān chīfàn, yìbiān kàn diànshì.",ej:"ご飯を食べながらテレビを見ます。"},
+    {h:"跟在",p:"gēnzài",j:"〜につき従う",eh:"小狗跟在主人后边。",ep:"Xiǎogǒu gēnzài zhǔrén hòubian.",ej:"子犬は飼い主の後ろについて行きます。"},
+    {h:"导游",p:"dǎoyóu",j:"ガイド",eh:"导游给我们讲解。",ep:"Dǎoyóu gěi wǒmen jiǎngjiě.",ej:"ガイドが私たちに説明してくれます。"},
+    {h:"后边",p:"hòubian",j:"後ろ",eh:"我坐在他后边。",ep:"Wǒ zuò zài tā hòubian.",ej:"私は彼の後ろに座ります。"},
+    {h:"认真地",p:"rènzhēn de",j:"真剣に、まじめに",eh:"他认真地学习汉语。",ep:"Tā rènzhēn de xuéxí Hànyǔ.",ej:"彼は真剣に中国語を勉強しています。"},
+    {h:"讲解",p:"jiǎngjiě",j:"説明する、解説する",eh:"老师给我们讲解语法。",ep:"Lǎoshī gěi wǒmen jiǎngjiě yǔfǎ.",ej:"先生が私たちに文法を解説します。"},
+    {h:"古迹",p:"gǔjì",j:"遺跡、旧跡",eh:"京都有很多古迹。",ep:"Jīngdū yǒu hěn duō gǔjì.",ej:"京都には多くの古跡があります。"}
+  ]
+};
+
+let currentLesson = "1";
+let cards = [];
+let currentIndex = 0;
+let speed = 0.85;
+let correctCount = 0;
+let answeredCount = 0;
+let chineseVoice = null;
+let voicesLoaded = false;
+
+function loadChineseVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  if (voices.length === 0) return false;
+  const preferredOrder = [
+    v => v.lang === "zh-CN",
+    v => v.lang === "zh_CN",
+    v => v.lang.toLowerCase().startsWith("cmn"),
+    v => v.lang.toLowerCase().startsWith("zh-hans"),
+    v => v.lang.toLowerCase().startsWith("zh"),
+  ];
+  for (const matcher of preferredOrder) {
+    const found = voices.find(matcher);
+    if (found) {
+      chineseVoice = found;
+      voicesLoaded = true;
+      return true;
+    }
+  }
+  voicesLoaded = true;
+  return false;
+}
+
+function loadLesson(lesson) {
+  currentLesson = lesson;
+  if (lesson === "all") {
+    cards = [...data[1], ...data[2], ...data[3]];
+  } else {
+    cards = [...data[lesson]];
+  }
+  currentIndex = 0;
+  correctCount = 0;
+  answeredCount = 0;
+  resetCardState();
+  renderCard();
+  updateLessonButtons();
+  updateScore();
+}
+
+function updateLessonButtons() {
+  document.querySelectorAll(".lesson-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.lesson === currentLesson);
+  });
+}
+
+function resetCardState() {
+  document.getElementById("input-hanzi").value = "";
+  document.getElementById("input-pinyin").value = "";
+  document.getElementById("answer-area").classList.remove("shown");
+  document.getElementById("judge-buttons").classList.remove("shown");
+}
+
+function renderCard() {
+  if (cards.length === 0) return;
+  const c = cards[currentIndex];
+  document.getElementById("ans-hanzi").textContent = c.h;
+  document.getElementById("ans-pinyin").textContent = c.p;
+  document.getElementById("ans-meaning").textContent = c.j;
+  document.getElementById("ans-example").textContent = `例: ${c.eh}（${c.ep}）`;
+  document.getElementById("progress").textContent = `${currentIndex + 1} / ${cards.length}`;
+  document.getElementById("prev-btn").disabled = currentIndex === 0;
+  document.getElementById("next-btn").disabled = currentIndex === cards.length - 1;
+}
+
+function updateScore() {
+  document.getElementById("score").textContent = `正解: ${correctCount} / ${answeredCount}`;
+}
+
+function playAudio() {
+  if (!('speechSynthesis' in window)) {
+    alert("お使いのブラウザは音声合成に対応していません。");
+    return;
+  }
+  if (!voicesLoaded) loadChineseVoice();
+  if (!chineseVoice) loadChineseVoice();
+  if (!chineseVoice) {
+    alert("中国語の音声が見つかりません。\n端末の設定から中国語(中文/简体)の音声データをインストールしてください。");
+    return;
+  }
+  const c = cards[currentIndex];
+  let text = c.h.replace(/[~〜～]/g, "");
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = chineseVoice;
+  utterance.lang = chineseVoice.lang;
+  utterance.rate = speed;
+  utterance.pitch = 1.0;
+  window.speechSynthesis.speak(utterance);
+}
+
+document.getElementById("play-btn").addEventListener("click", playAudio);
+
+document.querySelectorAll(".speed-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    speed = parseFloat(btn.dataset.speed);
+    document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
+
+document.getElementById("reveal-btn").addEventListener("click", () => {
+  document.getElementById("answer-area").classList.add("shown");
+  document.getElementById("judge-buttons").classList.add("shown");
+});
+
+document.getElementById("correct-btn").addEventListener("click", () => {
+  correctCount++;
+  answeredCount++;
+  updateScore();
+  goNext();
+});
+
+document.getElementById("wrong-btn").addEventListener("click", () => {
+  answeredCount++;
+  updateScore();
+  goNext();
+});
+
+function goNext() {
+  if (currentIndex < cards.length - 1) {
+    currentIndex++;
+    resetCardState();
+    renderCard();
+    setTimeout(playAudio, 300);
+  } else {
+    alert(`お疲れさまでした！\n\n最終スコア: ${correctCount} / ${answeredCount}\n正答率: ${answeredCount > 0 ? Math.round(correctCount / answeredCount * 100) : 0}%`);
+  }
+}
+
+document.getElementById("prev-btn").addEventListener("click", () => {
+  if (currentIndex > 0) {
+    currentIndex--;
+    resetCardState();
+    renderCard();
+  }
+});
+
+document.getElementById("next-btn").addEventListener("click", () => {
+  if (currentIndex < cards.length - 1) {
+    currentIndex++;
+    resetCardState();
+    renderCard();
+  }
+});
+
+document.getElementById("shuffle-btn").addEventListener("click", () => {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  currentIndex = 0;
+  correctCount = 0;
+  answeredCount = 0;
+  resetCardState();
+  renderCard();
+  updateScore();
+});
+
+document.getElementById("reset-btn").addEventListener("click", () => {
+  correctCount = 0;
+  answeredCount = 0;
+  updateScore();
+});
+
+document.querySelectorAll(".lesson-btn").forEach(btn => {
+  btn.addEventListener("click", () => loadLesson(btn.dataset.lesson));
+});
+
+// 音声リスト読み込み
+if ('speechSynthesis' in window) {
+  loadChineseVoice();
+  window.speechSynthesis.onvoiceschanged = () => loadChineseVoice();
+  window.speechSynthesis.getVoices();
+  setTimeout(loadChineseVoice, 500);
+  setTimeout(loadChineseVoice, 1500);
+}
+
+loadLesson("1");
+</script>
+</body>
+</html>

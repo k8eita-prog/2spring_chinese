@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSK3級 フラッシュカード</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+    background: linear-gradient(135deg, #fef6e4 0%, #f8d7da 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  h1 {
+    color: #c44569;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .subtitle {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  .progress {
+    color: #555;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  .card-container {
+    perspective: 1200px;
+    width: 100%;
+    max-width: 420px;
+    height: 460px;
+    margin-bottom: 20px;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+  }
+  .card-front {
+    font-size: 90px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+  .back-section { margin-bottom: 14px; width: 100%; }
+  .label {
+    font-size: 12px;
+    color: #c44569;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .pinyin {
+    font-size: 22px;
+    color: #2980b9;
+    font-style: italic;
+  }
+  .meaning {
+    font-size: 18px;
+    color: #2c3e50;
+  }
+  .example-cn {
+    font-size: 17px;
+    color: #2c3e50;
+    margin-bottom: 3px;
+  }
+  .example-py {
+    font-size: 14px;
+    color: #2980b9;
+    font-style: italic;
+    margin-bottom: 3px;
+  }
+  .example-jp {
+    font-size: 14px;
+    color: #555;
+  }
+  .hint {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #999;
+  }
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+  button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25px;
+    background: #c44569;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(196,69,105,0.3);
+    transition: transform 0.1s, background 0.2s;
+  }
+  button:hover { background: #a93757; }
+  button:active { transform: scale(0.96); }
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .shuffle-btn { background: #2980b9; box-shadow: 0 4px 10px rgba(41,128,185,0.3); }
+  .shuffle-btn:hover { background: #1f6391; }
+</style>
+</head>
+<body>
+  <h1>🎴 HSK3級 フラッシュカード</h1>
+  <div class="subtitle">カードをクリックして裏返してね！</div>
+  <div class="progress" id="progress">1 / 10</div>
+
+  <div class="card-container">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="card-face card-front" id="front">学习</div>
+      <div class="card-face card-back" id="back"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prevCard()" id="prevBtn">← 前へ</button>
+    <button onclick="nextCard()" id="nextBtn">次へ →</button>
+  </div>
+  <button class="shuffle-btn" onclick="shuffleCards()">🔀 シャッフル</button>
+  <div class="hint">スペースキー：めくる / ← → ：移動</div>
+
+<script>
+const cards = [
+  { hanzi: "学习", pinyin: "xuéxí", meaning: "勉強する、学習する",
+    ex_cn: "我每天学习汉语。", ex_py: "Wǒ měitiān xuéxí Hànyǔ.", ex_jp: "私は毎日中国語を勉強します。" },
+  { hanzi: "朋友", pinyin: "péngyou", meaning: "友達",
+    ex_cn: "他是我的好朋友。", ex_py: "Tā shì wǒ de hǎo péngyou.", ex_jp: "彼は私の親友です。" },
+  { hanzi: "喜欢", pinyin: "xǐhuan", meaning: "好きである、好む",
+    ex_cn: "我喜欢吃水果。", ex_py: "Wǒ xǐhuan chī shuǐguǒ.", ex_jp: "私は果物を食べるのが好きです。" },
+  { hanzi: "时间", pinyin: "shíjiān", meaning: "時間",
+    ex_cn: "今天我没有时间。", ex_py: "Jīntiān wǒ méiyǒu shíjiān.", ex_jp: "今日は時間がありません。" },
+  { hanzi: "工作", pinyin: "gōngzuò", meaning: "仕事、働く",
+    ex_cn: "我爸爸在医院工作。", ex_py: "Wǒ bàba zài yīyuàn gōngzuò.", ex_jp: "父は病院で働いています。" },
+  { hanzi: "知道", pinyin: "zhīdào", meaning: "知っている、わかる",
+    ex_cn: "我不知道他的名字。", ex_py: "Wǒ bù zhīdào tā de míngzi.", ex_jp: "私は彼の名前を知りません。" },
+  { hanzi: "觉得", pinyin: "juéde", meaning: "～と思う、感じる",
+    ex_cn: "我觉得汉语很有意思。", ex_py: "Wǒ juéde Hànyǔ hěn yǒuyìsi.", ex_jp: "私は中国語はとても面白いと思います。" },
+  { hanzi: "帮助", pinyin: "bāngzhù", meaning: "助ける、手伝う",
+    ex_cn: "谢谢你的帮助。", ex_py: "Xièxie nǐ de bāngzhù.", ex_jp: "助けてくれてありがとう。" },
+  { hanzi: "重要", pinyin: "zhòngyào", meaning: "重要である、大切である",
+    ex_cn: "这件事很重要。", ex_py: "Zhè jiàn shì hěn zhòngyào.", ex_jp: "このことはとても重要です。" },
+  { hanzi: "希望", pinyin: "xīwàng", meaning: "希望する、望む",
+    ex_cn: "我希望明天是晴天。", ex_py: "Wǒ xīwàng míngtiān shì qíngtiān.", ex_jp: "明日が晴れだといいなと思います。" }
+];
+
+let currentIndex = 0;
+let order = cards.map((_, i) => i);
+
+function renderCard() {
+  const card = cards[order[currentIndex]];
+  document.getElementById('front').textContent = card.hanzi;
+  document.getElementById('back').innerHTML = `
+    <div class="back-section">
+      <div class="label">ピンイン</div>
+      <div class="pinyin">${card.pinyin}</div>
+    </div>
+    <div class="back-section">
+      <div class="label">日本語訳</div>
+      <div class="meaning">${card.meaning}</div>
+    </div>
+    <div class="back-section">
+      <div class="label">例文</div>
+      <div class="example-cn">${card.ex_cn}</div>
+      <div class="example-py">${card.ex_py}</div>
+      <div class="example-jp">${card.ex_jp}</div>
+    </div>
+  `;
+  document.getElementById('card').classList.remove('flipped');
+  document.getElementById('progress').textContent = `${currentIndex + 1} / ${cards.length}`;
+  document.getElementById('prevBtn').disabled = currentIndex === 0;
+  document.getElementById('nextBtn').disabled = currentIndex === cards.length - 1;
+}
+
+function flipCard() {
+  document.getElementById('card').classList.toggle('flipped');
+}
+
+function nextCard() {
+  if (currentIndex < cards.length - 1) {
+    currentIndex++;
+    renderCard();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard();
+  }
+}
+
+function shuffleCards() {
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+  else if (e.code === 'ArrowRight') nextCard();
+  else if (e.code === 'ArrowLeft') prevCard();
+});
+
+renderCard();
+</script>
+</body>
+</html>
