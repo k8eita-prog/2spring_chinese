@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国語ドリル</title>
+<style>
+  :root{
+    --cream:#fdf8f0;
+    --cream-card:#fffdf9;
+    --ink:#4a4540;
+    --ink-soft:#7a736b;
+    --green:#8fbf9f;
+    --green-deep:#5a9a72;
+    --green-soft:#e6f2ea;
+    --blue:#9cc0d8;
+    --blue-deep:#5f93b8;
+    --blue-soft:#e7f1f7;
+    --pink:#e7b9c4;
+    --pink-soft:#fbeef1;
+    --yellow:#f3d9a4;
+    --yellow-soft:#fdf3df;
+    --shadow:0 4px 18px rgba(120,110,95,.12);
+    --shadow-sm:0 2px 8px rgba(120,110,95,.10);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",-apple-system,"Segoe UI",sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.7;
+    padding:0 0 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    text-align:center;
+    padding:28px 20px 18px;
+  }
+  header h1{
+    font-size:1.7rem;
+    font-weight:700;
+    letter-spacing:.04em;
+    color:var(--ink);
+  }
+  header .sub{
+    color:var(--ink-soft);
+    font-size:.85rem;
+    margin-top:4px;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px;}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
+  .tab{
+    border:none;cursor:pointer;
+    background:var(--cream-card);
+    color:var(--ink-soft);
+    padding:9px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:var(--shadow-sm);
+    transition:.18s;
+  }
+  .tab:hover{transform:translateY(-1px);}
+  .tab.active{background:var(--green);color:#fff;}
+
+  .filters{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:22px;}
+  .chip{
+    border:none;cursor:pointer;
+    background:#fff;
+    color:var(--ink-soft);
+    padding:6px 14px;border-radius:999px;
+    font-size:.82rem;font-weight:600;
+    box-shadow:var(--shadow-sm);
+    transition:.18s;
+  }
+  .chip.active{color:#fff;}
+  .chip[data-f="all"].active{background:var(--ink-soft);}
+  .chip[data-f="sakubun"].active{background:var(--pink);}
+  .chip[data-f="narabe"].active{background:var(--blue-deep);}
+  .chip[data-f="ana"].active{background:var(--green-deep);}
+  .chip[data-f="seicho"].active{background:#d9a85c;}
+
+  /* progress */
+  .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .progress-bar{flex:1;height:8px;background:#efe7d9;border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--green);width:0;transition:.4s;}
+  .progress-txt{font-size:.8rem;color:var(--ink-soft);white-space:nowrap;}
+
+  /* card */
+  .card{
+    background:var(--cream-card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px 24px 22px;
+    margin-bottom:18px;
+  }
+  .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .badge{
+    font-size:.72rem;font-weight:700;
+    padding:4px 11px;border-radius:999px;
+    letter-spacing:.03em;
+  }
+  .badge.sakubun{background:var(--pink-soft);color:#c47d8e;}
+  .badge.narabe{background:var(--blue-soft);color:var(--blue-deep);}
+  .badge.ana{background:var(--green-soft);color:var(--green-deep);}
+  .badge.seicho{background:var(--yellow-soft);color:#c79546;}
+  .lesson-tag{font-size:.72rem;color:var(--ink-soft);}
+
+  .q-jp{font-size:1.15rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .q-hint{font-size:.82rem;color:var(--ink-soft);margin-bottom:14px;}
+  .q-point-tag{
+    display:inline-block;font-size:.72rem;color:var(--green-deep);
+    background:var(--green-soft);padding:2px 9px;border-radius:8px;margin-bottom:14px;
+  }
+
+  /* flashcard answer */
+  .answer-box{
+    background:var(--blue-soft);
+    border-radius:14px;
+    padding:16px 18px;
+    margin-top:6px;
+    animation:fade .3s ease;
+  }
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;}}
+  .han{font-size:1.5rem;font-weight:700;color:var(--ink);letter-spacing:.02em;}
+  .han ruby rt{font-size:.62em;color:var(--blue-deep);font-weight:600;}
+  .pinyin-line{font-size:.95rem;color:var(--blue-deep);margin-top:2px;}
+  .point-note{
+    font-size:.88rem;color:var(--ink-soft);margin-top:12px;
+    padding-top:12px;border-top:1px dashed #d8cdbb;line-height:1.65;
+  }
+  .point-note b{color:var(--green-deep);}
+
+  /* narabe / ana interactive */
+  .tokens{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;}
+  .token{
+    background:#fff;border:2px solid var(--blue-soft);
+    color:var(--ink);padding:8px 14px;border-radius:12px;
+    cursor:pointer;font-size:1.05rem;font-weight:600;
+    box-shadow:var(--shadow-sm);transition:.14s;user-select:none;
+  }
+  .token:hover{border-color:var(--blue);}
+  .token .tp{display:block;font-size:.62rem;color:var(--blue-deep);font-weight:600;margin-top:1px;}
+  .token.used{opacity:.32;pointer-events:none;}
+  .build-area{
+    min-height:54px;background:#fff;border:2px dashed #ddd2c0;
+    border-radius:12px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;
+    align-items:center;margin-bottom:12px;
+  }
+  .build-area:empty::before{content:"ここに語句を並べます";color:#c9bda9;font-size:.85rem;font-weight:500;}
+  .build-area .token{border-color:var(--green-soft);}
+
+  .opt-row{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px;}
+  .opt{
+    background:#fff;border:2px solid var(--green-soft);
+    color:var(--ink);padding:9px 16px;border-radius:12px;
+    cursor:pointer;font-size:1.05rem;font-weight:600;
+    box-shadow:var(--shadow-sm);transition:.14s;
+  }
+  .opt:hover{border-color:var(--green);}
+  .opt .tp{display:block;font-size:.62rem;color:var(--green-deep);font-weight:600;}
+  .opt.correct{background:var(--green-soft);border-color:var(--green-deep);}
+  .opt.wrong{background:var(--pink-soft);border-color:var(--pink);}
+  .ana-sentence{font-size:1.2rem;font-weight:600;margin-bottom:4px;line-height:2;}
+  .ana-sentence .blank{
+    display:inline-block;min-width:48px;border-bottom:2px solid var(--green-deep);
+    text-align:center;color:var(--green-deep);font-weight:700;margin:0 3px;
+  }
+  .ana-pinyin{font-size:.85rem;color:var(--ink-soft);margin-bottom:14px;}
+
+  /* seicho */
+  .seicho-han{font-size:2rem;font-weight:700;text-align:center;margin:8px 0 4px;letter-spacing:.1em;}
+  .seicho-q{text-align:center;color:var(--ink-soft);font-size:.85rem;margin-bottom:14px;}
+  .tone-opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px;}
+  .tone-opt{
+    background:#fff;border:2px solid var(--yellow-soft);
+    padding:10px 18px;border-radius:12px;cursor:pointer;
+    font-size:1.1rem;font-weight:600;box-shadow:var(--shadow-sm);transition:.14s;
+  }
+  .tone-opt:hover{border-color:var(--yellow);}
+  .tone-opt.correct{background:var(--green-soft);border-color:var(--green-deep);}
+  .tone-opt.wrong{background:var(--pink-soft);border-color:var(--pink);}
+
+  /* buttons */
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+  .btn{
+    border:none;cursor:pointer;border-radius:12px;
+    padding:11px 20px;font-size:.92rem;font-weight:700;
+    transition:.16s;box-shadow:var(--shadow-sm);
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-soft{background:#fff;color:var(--ink-soft);}
+  .btn-next{background:var(--blue-deep);color:#fff;}
+  .btn:disabled{opacity:.4;cursor:default;transform:none;}
+
+  .feedback{font-size:1rem;font-weight:700;margin:10px 0 4px;}
+  .feedback.ok{color:var(--green-deep);}
+  .feedback.ng{color:#c47d8e;}
+
+  .empty{text-align:center;color:var(--ink-soft);padding:40px 20px;font-size:.95rem;}
+  footer{text-align:center;color:#c9bda9;font-size:.75rem;margin-top:30px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>中国語ドリル</h1>
+  <div class="sub">第1課〜第3課 ｜ 瞬間作文・並べ替え・穴埋め・声調</div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters"></div>
+  <div class="progress-row">
+    <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-txt" id="ptxt">0 / 0</div>
+  </div>
+  <div id="stage"></div>
+  <footer>解いた語句は教材の文脈に合わせています。声に出して練習しましょう 🍵</footer>
+</div>
+
+<script>
+/* ============================================================
+   問題データ  ── 新しい課はここに push するだけで増やせます
+   type: "sakubun"(瞬間作文) | "narabe"(並べ替え)
+       | "ana"(穴埋め) | "seicho"(声調)
+   ============================================================ */
+const DATA = [
+/* ========================= 第1課 ========================= */
+// --- 瞬間作文 ---
+{lesson:1, type:"sakubun", point:"自己紹介",
+ jp:"自己紹介させてください。私は林彩香と申します。",
+ han:[["我","Wǒ"],["自我介绍","zìwǒ jièshào"],["一下","yíxià"],["。我","。Wǒ"],["姓","xìng"],["林","Lín"],["，叫","，jiào"],["林彩香","Lín Cǎixiāng"],["。",""]],
+ note:"<b>自我介绍一下</b>=「ちょっと自己紹介する」。動詞のあとの「一下」で動作を軽く和らげます。姓だけ言うときは「姓」、フルネームは「叫」。"},
+{lesson:1, type:"sakubun", point:"叫(二重目的語)",
+ jp:"友達はみんな私を彩香と呼びます。",
+ han:[["朋友们","Péngyoumen"],["都","dōu"],["叫","jiào"],["我","wǒ"],["彩香","Cǎixiāng"],["。",""]],
+ note:"<b>叫＋人＋名前</b>で「(人)を〜と呼ぶ」。「叫」は目的語を2つとれる動詞です。"},
+{lesson:1, type:"sakubun", point:"是〜的",
+ jp:"私は1999年に生まれました。",
+ han:[["我","Wǒ"],["是","shì"],["1999年","yī jiǔ jiǔ jiǔ nián"],["出生","chūshēng"],["的","de"],["。",""]],
+ note:"すでに起きた動作の<b>時・場所・手段</b>を強調するときは「是〜的」。ここでは「いつ生まれたか」を強調しています。"},
+{lesson:1, type:"sakubun", point:"给(介詞)",
+ jp:"兄は私にたくさんの中国映画を紹介してくれました。",
+ han:[["他","Tā"],["给","gěi"],["我","wǒ"],["介绍了","jièshàole"],["很多","hěn duō"],["中国电影","Zhōngguó diànyǐng"],["。",""]],
+ note:"介詞<b>给</b>は「〜に」と動作の相手を導きます。「介绍了」の「了」は動作の完了。"},
+{lesson:1, type:"sakubun", point:"跟…用…",
+ jp:"私は中国の友達と中国語でおしゃべりしたいです。",
+ han:[["我","Wǒ"],["想","xiǎng"],["跟","gēn"],["中国朋友","Zhōngguó péngyou"],["用","yòng"],["汉语","Hànyǔ"],["聊天儿","liáotiānr"],["。",""]],
+ note:"<b>跟＋人</b>=「〜と」、<b>用＋手段</b>=「〜で」。語順は「跟(誰と)→用(何で)→動詞」。"},
+// --- 並べ替え ---
+{lesson:1, type:"narabe", point:"叫(二重目的語)",
+ jp:"彼は私をお兄さんと呼びます。",
+ tokens:[["他","Tā"],["叫","jiào"],["我","wǒ"],["大哥","dàgē"]],
+ answer:["他","叫","我","大哥"],
+ note:"<b>叫＋我(人)＋大哥(呼び名)</b>。主語＋叫＋対象＋呼称の順。"},
+{lesson:1, type:"narabe", point:"吧(勧誘)",
+ jp:"私たち一緒に食事に行きましょう。",
+ tokens:[["我们","Wǒmen"],["一起","yìqǐ"],["去","qù"],["吃","chī"],["饭","fàn"],["吧","ba"]],
+ answer:["我们","一起","去","吃","饭","吧"],
+ note:"連動文「去吃饭(食べに行く)」＋文末の<b>吧</b>で「〜しましょう」の勧誘。"},
+{lesson:1, type:"narabe", point:"是〜的(否定)",
+ jp:"これは中国で買ったのではありません。",
+ tokens:[["这","Zhè"],["不","bú"],["是","shì"],["在","zài"],["中国","Zhōngguó"],["买","mǎi"],["的","de"]],
+ answer:["这","不","是","在","中国","买","的"],
+ note:"否定は<b>不是〜的</b>。場所「在中国」を強調しています。"},
+// --- 穴埋め ---
+{lesson:1, type:"ana", point:"是〜的",
+ jp:"私は電車で来たのです。",
+ sentence:["我","___","坐","电车","来","___","。"],
+ pinyin:"Wǒ ___ zuò diànchē lái ___.",
+ blanks:[{ans:"是",opts:[["是","shì"],["在","zài"],["给","gěi"]]},
+         {ans:"的",opts:[["的","de"],["了","le"],["吧","ba"]]}],
+ note:"手段(電車)を強調する<b>是〜的</b>構文。「坐电车」=電車に乗って。"},
+{lesson:1, type:"ana", point:"给(介詞)",
+ jp:"私はあなたに誕生日プレゼントを買ってあげます。",
+ sentence:["我","___","你","买","生日礼物","。"],
+ pinyin:"Wǒ ___ nǐ mǎi shēngrì lǐwù.",
+ blanks:[{ans:"给",opts:[["给","gěi"],["跟","gēn"],["叫","jiào"]]}],
+ note:"<b>给＋人</b>で「〜のために(〜に)」。動作の受け手を導きます。"},
+{lesson:1, type:"ana", point:"吧(提案)",
+ jp:"週末、私の家に遊びに来てください。",
+ sentence:["周末","你","来","我家","玩儿","___","。"],
+ pinyin:"Zhōumò nǐ lái wǒ jiā wánr ___.",
+ blanks:[{ans:"吧",opts:[["吧","ba"],["吗","ma"],["的","de"]]}],
+ note:"文末の<b>吧</b>は柔らかい提案・勧誘。「〜してね」のニュアンス。"},
+// --- 声調 ---
+{lesson:1, type:"seicho", point:"声調",
+ han:"介绍", base:"jieshao", answer:"jièshào",
+ opts:["jièshào","jiěshǎo","jiēshào","jièshāo"],
+ note:"<b>介绍 jièshào</b>=紹介する。どちらも第4声(下げる)。"},
+{lesson:1, type:"seicho", point:"声調",
+ han:"朋友", base:"pengyou", answer:"péngyou",
+ opts:["péngyou","pèngyǒu","pēngyóu","péngyǒu"],
+ note:"<b>朋友 péngyou</b>=友達。「友」は本来3声ですが、ここでは軽声で読みます。"},
+{lesson:1, type:"seicho", point:"声調",
+ han:"出生", base:"chusheng", answer:"chūshēng",
+ opts:["chūshēng","chùshèng","chúshéng","chūshèng"],
+ note:"<b>出生 chūshēng</b>=生まれる。両方とも第1声(高く平ら)。"},
+
+/* ========================= 第2課 ========================= */
+// --- 瞬間作文 ---
+{lesson:2, type:"sakubun", point:"从…到…",
+ jp:"東京から長崎まで飛行機でだいたい2時間かかります。",
+ han:[["从","Cóng"],["东京","Dōngjīng"],["到","dào"],["长崎","Chángqí"],["坐飞机","zuò fēijī"],["大概","dàgài"],["要","yào"],["两个小时","liǎng ge xiǎoshí"],["。",""]],
+ note:"<b>从A到B</b>=「AからBまで」。起点と終点をセットで表します。「要」=(時間が)かかる。"},
+{lesson:2, type:"sakubun", point:"离",
+ jp:"長崎は東京からだいたい1000キロ離れています。",
+ han:[["长崎","Chángqí"],["离","lí"],["东京","Dōngjīng"],["大概","dàgài"],["有","yǒu"],["1000公里","yìqiān gōnglǐ"],["。",""]],
+ note:"<b>离</b>は2点間の「隔たり(距離)」を表します。「A离B＋距離」=「AはBから〜離れている」。"},
+{lesson:2, type:"sakubun", point:"可以(許可)",
+ jp:"夏は海へ泳ぎに行くこともできます。",
+ han:[["夏天","Xiàtiān"],["还","hái"],["可以","kěyǐ"],["去","qù"],["海边","hǎibiān"],["游泳","yóuyǒng"],["。",""]],
+ note:"<b>可以</b>は客観的条件・許可で「〜できる/してよい」。"},
+{lesson:2, type:"sakubun", point:"能(条件)",
+ jp:"天気が良いときは富士山も見えます。",
+ han:[["天气","Tiānqì"],["好","hǎo"],["的时候","de shíhou"],["还","hái"],["能","néng"],["看到","kàndào"],["富士山","Fùshìshān"],["。",""]],
+ note:"<b>能</b>は能力や条件があって「〜できる」。「看到」=見える(到=結果補語)。"},
+{lesson:2, type:"sakubun", point:"以后",
+ jp:"私は高校を卒業したあと、長崎を離れて東京に来ました。",
+ han:[["我","Wǒ"],["高中","gāozhōng"],["毕业","bìyè"],["以后","yǐhòu"],["，离开","，líkāi"],["长崎","Chángqí"],["到","dào"],["东京","Dōngjīng"],["来","lái"],["。",""]],
+ note:"<b>〜以后</b>=「〜したあと」。「离开＋場所」=(場所)を離れる。"},
+// --- 並べ替え ---
+{lesson:2, type:"narabe", point:"离…近",
+ jp:"私の家は駅からとても近いです。",
+ tokens:[["我家","Wǒ jiā"],["离","lí"],["车站","chēzhàn"],["很","hěn"],["近","jìn"]],
+ answer:["我家","离","车站","很","近"],
+ note:"<b>A离B很近</b>=「AはBからとても近い」。距離の遠近は「离」で表します。"},
+{lesson:2, type:"narabe", point:"能(具体的数字)",
+ jp:"私は500メートル泳げます。",
+ tokens:[["我","Wǒ"],["能","néng"],["游","yóu"],["500米","wǔbǎi mǐ"]],
+ answer:["我","能","游","500米"],
+ note:"具体的な数値の達成には<b>能</b>を使います(可以ではなく)。"},
+{lesson:2, type:"narabe", point:"可以(許可)",
+ jp:"学校の寮ではペットを飼ってはいけません。",
+ tokens:[["学校","Xuéxiào"],["宿舍","sùshè"],["不","bù"],["可以","kěyǐ"],["养","yǎng"],["宠物","chǒngwù"]],
+ answer:["学校","宿舍","不","可以","养","宠物"],
+ note:"<b>不可以</b>=「〜してはいけない」(禁止)。「养宠物」=ペットを飼う。"},
+// --- 穴埋め ---
+{lesson:2, type:"ana", point:"从…到…",
+ jp:"東京から北京まで飛行機でだいたい4時間かかります。",
+ sentence:["___","东京","___","北京","坐飞机","大概","要","四个小时","。"],
+ pinyin:"___ Dōngjīng ___ Běijīng zuò fēijī dàgài yào sì ge xiǎoshí.",
+ blanks:[{ans:"从",opts:[["从","cóng"],["离","lí"],["在","zài"]]},
+         {ans:"到",opts:[["到","dào"],["有","yǒu"],["跟","gēn"]]}],
+ note:"起点と終点は<b>从…到…</b>のセットで。"},
+{lesson:2, type:"ana", point:"会(可能性)",
+ jp:"祝日を過ごすときはきっととても賑やかでしょう。",
+ sentence:["过节","的时候","一定","___","很","热闹","吧","。"],
+ pinyin:"Guòjié de shíhou yídìng ___ hěn rènao ba.",
+ blanks:[{ans:"会",opts:[["会","huì"],["能","néng"],["可以","kěyǐ"]]}],
+ note:"<b>会</b>は「〜だろう/のはずだ」という可能性も表します。"},
+{lesson:2, type:"ana", point:"离(時間)",
+ jp:"夏休みまであと3週間あります。",
+ sentence:["___","暑假","还","有","三个","星期","。"],
+ pinyin:"___ shǔjià hái yǒu sān ge xīngqī.",
+ blanks:[{ans:"离",opts:[["离","lí"],["从","cóng"],["到","dào"]]}],
+ note:"<b>离</b>は時間の隔たり(〜まであと)にも使えます。"},
+// --- 声調 ---
+{lesson:2, type:"seicho", point:"声調",
+ han:"环境", base:"huanjing", answer:"huánjìng",
+ opts:["huánjìng","huānjǐng","huànjīng","huánjǐng"],
+ note:"<b>环境 huánjìng</b>=環境。2声→4声。"},
+{lesson:2, type:"seicho", point:"声調",
+ han:"毕业", base:"biye", answer:"bìyè",
+ opts:["bìyè","bǐyě","bíyé","bìyē"],
+ note:"<b>毕业 bìyè</b>=卒業する。両方とも第4声。"},
+{lesson:2, type:"seicho", point:"声調",
+ han:"经常", base:"jingchang", answer:"jīngcháng",
+ opts:["jīngcháng","jǐngchǎng","jìngchàng","jīngchāng"],
+ note:"<b>经常 jīngcháng</b>=いつも。1声→2声。「景常 jǐngchǎng」と混同注意。"},
+
+/* ========================= 第3課 ========================= */
+// --- 瞬間作文 ---
+{lesson:3, type:"sakubun", point:"了(変化)",
+ jp:"最近、太極拳を習いはじめました。",
+ han:[["最近","Zuìjìn"],["开始","kāishǐ"],["学","xué"],["打太极拳","dǎ tàijíquán"],["了","le"],["。",""]],
+ note:"文末の<b>了</b>は新しい状況の「発生・変化」。「習いはじめた」という変化を表します。"},
+{lesson:3, type:"sakubun", point:"除了…以外",
+ jp:"太極拳のほかに、私は毎週ジムにも2回行きます。",
+ han:[["除了","Chúle"],["打太极拳","dǎ tàijíquán"],["以外","yǐwài"],["，我","，wǒ"],["每星期","měi xīngqī"],["还","hái"],["去","qù"],["两次","liǎng cì"],["健身房","jiànshēnfáng"],["。",""]],
+ note:"<b>除了A以外，还B</b>=「Aのほかに、さらにB」。追加を表すときは「还」と呼応。"},
+{lesson:3, type:"sakubun", point:"了〜了(継続)",
+ jp:"この習慣はもう2年続いています。",
+ han:[["这个习惯","Zhège xíguàn"],["已经","yǐjīng"],["保持了","bǎochíle"],["两年","liǎng nián"],["了","le"],["。",""]],
+ note:"<b>動詞＋了…時間量＋了</b>で「〜してもう…になる(今も継続)」。前の了=完了、文末の了=継続。"},
+{lesson:3, type:"sakubun", point:"又〜又…",
+ jp:"私たちがレストランを選ぶ基準は、美味しくて安いことです。",
+ han:[["我们","Wǒmen"],["选","xuǎn"],["餐厅","cāntīng"],["的标准","de biāozhǔn"],["是","shì"],["又","yòu"],["好吃","hǎochī"],["又","yòu"],["便宜","piányi"],["。",""]],
+ note:"<b>又A又B</b>=「AでもありBでもある」。二つの性質を並べます。"},
+{lesson:3, type:"sakubun", point:"可以(機能)",
+ jp:"運動は体を鍛えられるし、同時に自分をリラックスさせることもできます。",
+ han:[["运动","Yùndòng"],["可以","kěyǐ"],["锻炼","duànliàn"],["身体","shēntǐ"],["，同时","，tóngshí"],["也","yě"],["可以","kěyǐ"],["放松","fàngsōng"],["自己","zìjǐ"],["。",""]],
+ note:"<b>可以</b>=「〜できる」。「锻炼身体」=体を鍛える、「放松自己」=自分をリラックスさせる。"},
+// --- 並べ替え ---
+{lesson:3, type:"narabe", point:"又〜又…",
+ jp:"このバッグはきれいで実用的です。",
+ tokens:[["这个","Zhège"],["包","bāo"],["又","yòu"],["漂亮","piàoliang"],["又","yòu"],["实惠","shíhuì"]],
+ answer:["这个","包","又","漂亮","又","实惠"],
+ note:"<b>又漂亮又实惠</b>。「又〜又…」で二つの良さを並列。"},
+{lesson:3, type:"narabe", point:"了(変化)",
+ jp:"もう9時だ。早く家に帰ろうよ。",
+ tokens:[["已经","Yǐjīng"],["九点","jiǔ diǎn"],["了","le"],["快","kuài"],["回家","huí jiā"],["吧","ba"]],
+ answer:["已经","九点","了","快","回家","吧"],
+ note:"<b>已经…了</b>=「もう〜になった」(変化)。「快…吧」=早く〜しよう。"},
+{lesson:3, type:"narabe", point:"了〜了(継続)",
+ jp:"私は2時間ゲームをしています。",
+ tokens:[["我","Wǒ"],["玩儿了","wánrle"],["两个小时","liǎng ge xiǎoshí"],["游戏","yóuxì"],["了","le"]],
+ answer:["我","玩儿了","两个小时","游戏","了"],
+ note:"<b>玩儿了＋時間量＋游戏＋了</b>。「(動詞)了＋時間量＋目的語」の語順。文末の了で「今も継続」。"},
+{lesson:3, type:"narabe", point:"除了…以外",
+ jp:"パソコンのほかに、私はタブレットも持っています。",
+ tokens:[["除了","Chúle"],["电脑","diànnǎo"],["以外","yǐwài"],["我","wǒ"],["还","hái"],["有","yǒu"],["平板电脑","píngbǎn diànnǎo"]],
+ answer:["除了","电脑","以外","我","还","有","平板电脑"],
+ note:"<b>除了A以外，我还有B</b>=「Aのほかに、さらにBも持っている」。"},
+// --- 穴埋め ---
+{lesson:3, type:"ana", point:"了(変化)",
+ jp:"最近、私はこのアプリを使いはじめました。",
+ sentence:["我","最近","开始","用","这个软件","___","。"],
+ pinyin:"Wǒ zuìjìn kāishǐ yòng zhège ruǎnjiàn ___.",
+ blanks:[{ans:"了",opts:[["了","le"],["的","de"],["吧","ba"]]}],
+ note:"文末の<b>了</b>で「使いはじめた」という新しい状況の発生。"},
+{lesson:3, type:"ana", point:"除了…以外",
+ jp:"チョコレートのほかに、私はアイスクリームも好きです。",
+ sentence:["___","巧克力","___","，我","还","喜欢","吃","冰淇淋","。"],
+ pinyin:"___ qiǎokèlì ___, wǒ hái xǐhuan chī bīngqílín.",
+ blanks:[{ans:"除了",opts:[["除了","chúle"],["因为","yīnwèi"],["不过","búguò"]]},
+         {ans:"以外",opts:[["以外","yǐwài"],["以后","yǐhòu"],["以前","yǐqián"]]}],
+ note:"<b>除了…以外，还…</b>のセット。「以外」は省略も可能。"},
+{lesson:3, type:"ana", point:"又〜又…",
+ jp:"この靴は私の一番のお気に入りで、かわいくて履きやすいです。",
+ sentence:["这双鞋子","是我的最爱","，","___","可爱","___","好穿","。"],
+ pinyin:"Zhè shuāng xiézi shì wǒ de zuì'ài, ___ kě'ài ___ hǎochuān.",
+ blanks:[{ans:"又",opts:[["又","yòu"],["也","yě"],["还","hái"]]},
+         {ans:"又",opts:[["又","yòu"],["再","zài"],["就","jiù"]]}],
+ note:"<b>又可爱又好穿</b>。二つの長所を並べる「又〜又…」。"},
+// --- 声調 ---
+{lesson:3, type:"seicho", point:"声調",
+ han:"锻炼", base:"duanlian", answer:"duànliàn",
+ opts:["duànliàn","duǎnliǎn","duānlián","duànlián"],
+ note:"<b>锻炼 duànliàn</b>=鍛える。両方とも第4声。"},
+{lesson:3, type:"seicho", point:"声調",
+ han:"健康", base:"jiankang", answer:"jiànkāng",
+ opts:["jiànkāng","jiǎnkǎng","jiānkáng","jiànkáng"],
+ note:"<b>健康 jiànkāng</b>=健康。4声→1声。"},
+{lesson:3, type:"seicho", point:"声調",
+ han:"便宜", base:"pianyi", answer:"piányi",
+ opts:["piányi","biànyí","piànyì","piányí"],
+ note:"<b>便宜 piányi</b>=安い。「便」は pián と読みます(biàn ではない)。「宜」は軽声。"},
+];
+
+/* ============================================================
+   アプリ・ロジック
+   ============================================================ */
+const LESSONS = [...new Set(DATA.map(d=>d.lesson))].sort((a,b)=>a-b);
+const FILTERS = [
+  {f:"all",label:"すべて"},
+  {f:"sakubun",label:"瞬間作文"},
+  {f:"narabe",label:"並べ替え"},
+  {f:"ana",label:"穴埋め"},
+  {f:"seicho",label:"声調"},
+];
+const TYPE_LABEL = {sakubun:"瞬間作文",narabe:"並べ替え",ana:"穴埋め",seicho:"声調"};
+
+let curLesson = LESSONS[0];
+let curFilter = "all";
+let queue = [];
+let idx = 0;
+let done = new Set();
+
+function buildTabs(){
+  const t = document.getElementById("tabs");
+  t.innerHTML = "";
+  LESSONS.forEach(l=>{
+    const b=document.createElement("button");
+    b.className="tab"+(l===curLesson?" active":"");
+    b.textContent="第"+l+"課";
+    b.onclick=()=>{curLesson=l;refresh();};
+    t.appendChild(b);
+  });
+}
+function buildFilters(){
+  const f=document.getElementById("filters");
+  f.innerHTML="";
+  FILTERS.forEach(o=>{
+    const b=document.createElement("button");
+    b.className="chip"+(o.f===curFilter?" active":"");
+    b.dataset.f=o.f;
+    b.textContent=o.label;
+    b.onclick=()=>{curFilter=o.f;refresh();};
+    f.appendChild(b);
+  });
+}
+function refresh(){
+  buildTabs();buildFilters();
+  queue = DATA.filter(d=>d.lesson===curLesson && (curFilter==="all"||d.type===curFilter));
+  idx=0; done=new Set();
+  render();
+}
+function updateProgress(){
+  const total=queue.length;
+  const fill=document.getElementById("pfill");
+  const txt=document.getElementById("ptxt");
+  fill.style.width = total? (done.size/total*100)+"%":"0%";
+  txt.textContent = done.size+" / "+total;
+}
+
+function render(){
+  const stage=document.getElementById("stage");
+  updateProgress();
+  if(queue.length===0){
+    stage.innerHTML='<div class="empty">この組み合わせの問題はまだありません。<br>別の形式を選んでください。</div>';
+    return;
+  }
+  if(idx>=queue.length){
+    stage.innerHTML='<div class="card"><div class="empty">🎉 この課のこの形式は全部解き終わりました！<br><br>'
+      +'<button class="btn btn-primary" onclick="restart()">もう一度</button></div></div>';
+    return;
+  }
+  const q=queue[idx];
+  if(q.type==="sakubun") renderSakubun(q);
+  else if(q.type==="narabe") renderNarabe(q);
+  else if(q.type==="ana") renderAna(q);
+  else if(q.type==="seicho") renderSeicho(q);
+}
+function restart(){idx=0;done=new Set();render();}
+
+function cardHead(q){
+  return '<div class="card-top"><span class="badge '+q.type+'">'+TYPE_LABEL[q.type]
+    +'</span><span class="lesson-tag">第'+q.lesson+'課 ・ '+(idx+1)+'/'+queue.length+'</span></div>';
+}
+function pointTag(q){return q.point?'<div class="q-point-tag">📌 '+q.point+'</div>':'';}
+
+function rubyHan(arr){
+  // arr: [[漢字,ピンイン],...]  ピンインが空なら句読点扱い
+  return arr.map(([h,p])=> p? '<ruby>'+h+'<rt>'+p+'</rt></ruby>' : h).join('');
+}
+function plainPinyin(arr){
+  return arr.filter(([h,p])=>p).map(([h,p])=>p).join(' ');
+}
+
+/* ---------- 瞬間作文(フラッシュカード) ---------- */
+function renderSakubun(q){
+  const stage=document.getElementById("stage");
+  stage.innerHTML =
+    '<div class="card">'+cardHead(q)+pointTag(q)
+    +'<div class="q-jp">'+q.jp+'</div>'
+    +'<div class="q-hint">頭の中で中国語を作ってから「答えを見る」を押しましょう。</div>'
+    +'<div id="ans"></div>'
+    +'<div class="btn-row">'
+    +'<button class="btn btn-primary" id="reveal">答えを見る</button>'
+    +'</div></div>';
+  document.getElementById("reveal").onclick=()=>{
+    document.getElementById("ans").innerHTML=
+      '<div class="answer-box">'
+      +'<div class="han">'+rubyHan(q.han)+'</div>'
+      +'<div class="pinyin-line">'+plainPinyin(q.han)+'</div>'
+      +'<div class="point-note">'+q.note+'</div></div>';
+    const br=stage.querySelector(".btn-row");
+    br.innerHTML='<button class="btn btn-soft" onclick="markEasy(false)">もう一度</button>'
+      +'<button class="btn btn-next" onclick="markEasy(true)">できた → 次へ</button>';
+  };
+}
+function markEasy(ok){ if(ok) done.add(idx); idx++; render(); }
+
+/* ---------- 並べ替え ---------- */
+let buildState=[];
+function renderNarabe(q){
+  const stage=document.getElementById("stage");
+  buildState=[];
+  const shuffled=[...q.tokens.map((t,i)=>({t,i}))].sort(()=>Math.random()-.5);
+  let toks=shuffled.map(o=>'<span class="token" data-i="'+o.i+'" onclick="pickToken(this)">'
+    +o.t[0]+'<span class="tp">'+o.t[1]+'</span></span>').join('');
+  stage.innerHTML=
+    '<div class="card">'+cardHead(q)+pointTag(q)
+    +'<div class="q-jp">'+q.jp+'</div>'
+    +'<div class="q-hint">語句をタップして正しい順に並べましょう。</div>'
+    +'<div class="build-area" id="build"></div>'
+    +'<div class="tokens" id="pool">'+toks+'</div>'
+    +'<div id="nb-fb"></div>'
+    +'<div class="btn-row">'
+    +'<button class="btn btn-soft" onclick="resetNarabe()">リセット</button>'
+    +'<button class="btn btn-primary" id="nb-check" onclick="checkNarabe()">確認</button>'
+    +'</div></div>';
+  window._q=q;
+}
+function pickToken(el){
+  if(el.classList.contains("used"))return;
+  el.classList.add("used");
+  const i=el.dataset.i;
+  const q=window._q;
+  buildState.push(i);
+  const b=document.getElementById("build");
+  const sp=document.createElement("span");
+  sp.className="token";sp.dataset.i=i;
+  sp.innerHTML=q.tokens[i][0]+'<span class="tp">'+q.tokens[i][1]+'</span>';
+  sp.onclick=()=>{ // タップで戻す
+    sp.remove();
+    document.querySelector('#pool .token[data-i="'+i+'"]').classList.remove("used");
+    buildState=buildState.filter(x=>x!==i);
+  };
+  b.appendChild(sp);
+}
+function resetNarabe(){renderNarabe(window._q);}
+function checkNarabe(){
+  const q=window._q;
+  const built=buildState.map(i=>q.tokens[i][0]);
+  const ok=built.join('')===q.answer.join('');
+  const fb=document.getElementById("nb-fb");
+  if(ok){
+    fb.innerHTML='<div class="feedback ok">○ 正解です！</div>'
+      +'<div class="answer-box"><div class="han">'+q.answer.join('')+'</div>'
+      +'<div class="pinyin-line">'+q.tokens.map(t=>t[1]).filter((_,k)=>true).join(' ')+'</div>'
+      +'<div class="point-note">'+q.note+'</div></div>';
+    document.getElementById("nb-check").disabled=true;
+    done.add(idx);updateProgress();
+    fb.parentElement.querySelector(".btn-row").innerHTML=
+      '<button class="btn btn-next" onclick="idx++;render();">次へ →</button>';
+  }else{
+    fb.innerHTML='<div class="feedback ng">× もう一度試してみましょう</div>';
+  }
+}
+
+/* ---------- 穴埋め ---------- */
+let anaPicks=[];
+function renderAna(q){
+  const stage=document.getElementById("stage");
+  anaPicks=q.blanks.map(()=>null);
+  let html='<div class="card">'+cardHead(q)+pointTag(q)
+    +'<div class="q-jp">'+q.jp+'</div>'
+    +'<div class="ana-sentence" id="ana-sent"></div>'
+    +'<div class="ana-pinyin">'+q.pinyin+'</div>';
+  q.blanks.forEach((bl,bi)=>{
+    html+='<div class="q-hint">空欄'+(bi+1)+':</div><div class="opt-row">'
+      + bl.opts.map(o=>'<span class="opt" onclick="pickAna('+bi+',\''+o[0]+'\',this)">'
+        +o[0]+'<span class="tp">'+o[1]+'</span></span>').join('')
+      +'</div>';
+  });
+  html+='<div id="ana-fb"></div></div>';
+  stage.innerHTML=html;
+  window._q=q;
+  drawAnaSentence();
+}
+function drawAnaSentence(){
+  const q=window._q;
+  let bi=0;
+  const s=q.sentence.map(seg=>{
+    if(seg==="___"){
+      const v=anaPicks[bi]; const cur=bi; bi++;
+      return '<span class="blank">'+(v||'　')+'</span>';
+    }
+    return seg;
+  }).join('');
+  document.getElementById("ana-sent").innerHTML=s;
+}
+function pickAna(bi,val,el){
+  const q=window._q;
+  anaPicks[bi]=val;
+  // 同じ空欄グループの選択状態リセット
+  const row=el.parentElement;
+  row.querySelectorAll(".opt").forEach(o=>o.classList.remove("correct","wrong"));
+  drawAnaSentence();
+  // 全部埋まったら自動判定
+  if(anaPicks.every(p=>p!==null)) checkAna();
+}
+function checkAna(){
+  const q=window._q;
+  const rows=document.querySelectorAll("#stage .opt-row");
+  let allOk=true;
+  q.blanks.forEach((bl,bi)=>{
+    if(anaPicks[bi]!==bl.ans) allOk=false;
+    rows[bi].querySelectorAll(".opt").forEach(o=>{
+      const v=o.firstChild.textContent;
+      if(v===bl.ans) {} // 正解は確定時に
+    });
+  });
+  const fb=document.getElementById("ana-fb");
+  if(allOk){
+    // 正解ハイライト
+    rows.forEach((row,bi)=>{
+      row.querySelectorAll(".opt").forEach(o=>{
+        if(o.firstChild.textContent===q.blanks[bi].ans) o.classList.add("correct");
+        o.style.pointerEvents="none";
+      });
+    });
+    fb.innerHTML='<div class="feedback ok">○ 正解です！</div>'
+      +'<div class="answer-box"><div class="point-note">'+q.note+'</div></div>'
+      +'<div class="btn-row"><button class="btn btn-next" onclick="idx++;render();">次へ →</button></div>';
+    done.add(idx);updateProgress();
+  }else{
+    fb.innerHTML='<div class="feedback ng">× もう一度選んでみましょう</div>';
+  }
+}
+
+/* ---------- 声調 ---------- */
+function renderSeicho(q){
+  const stage=document.getElementById("stage");
+  const shuffled=[...q.opts].sort(()=>Math.random()-.5);
+  stage.innerHTML=
+    '<div class="card">'+cardHead(q)+pointTag(q)
+    +'<div class="seicho-han">'+q.han+'</div>'
+    +'<div class="seicho-q">正しい声調(ピンイン)はどれ？</div>'
+    +'<div class="tone-opts">'
+    + shuffled.map(o=>'<span class="tone-opt" onclick="pickTone(this,\''+o+'\')">'+o+'</span>').join('')
+    +'</div><div id="sc-fb"></div></div>';
+  window._q=q;
+}
+function pickTone(el,val){
+  const q=window._q;
+  const fb=document.getElementById("sc-fb");
+  document.querySelectorAll(".tone-opt").forEach(o=>o.style.pointerEvents="none");
+  if(val===q.answer){
+    el.classList.add("correct");
+    fb.innerHTML='<div class="feedback ok">○ 正解！</div>'
+      +'<div class="answer-box"><div class="pinyin-line" style="font-size:1.1rem;">'+q.han+'　'+q.answer+'</div>'
+      +'<div class="point-note">'+q.note+'</div></div>'
+      +'<div class="btn-row"><button class="btn btn-next" onclick="idx++;render();">次へ →</button></div>';
+    done.add(idx);updateProgress();
+  }else{
+    el.classList.add("wrong");
+    document.querySelectorAll(".tone-opt").forEach(o=>{
+      if(o.textContent===q.answer)o.classList.add("correct");
+    });
+    fb.innerHTML='<div class="feedback ng">× 正解は <b>'+q.answer+'</b></div>'
+      +'<div class="answer-box"><div class="point-note">'+q.note+'</div></div>'
+      +'<div class="btn-row">'
+      +'<button class="btn btn-soft" onclick="renderSeicho(window._q)">もう一度</button>'
+      +'<button class="btn btn-next" onclick="idx++;render();">次へ →</button></div>';
+  }
+}
+
+/* init */
+refresh();
+</script>
+</body>
+</html>
