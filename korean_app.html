@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓国語学習アプリ - TOPIK I 対策</title>
+<style>
+:root{
+  --bg:#FAF7F0; --amber:#F4B400; --blue:#1A73E8; --red:#D93025;
+  --green:#34A853; --charcoal:#1F2937; --light:#fff; --muted:#6B7280;
+  --border:#E5E7EB;
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+body{font-family:'Hiragino Sans','Yu Gothic',Meiryo,'Noto Sans KR',sans-serif;
+  background:var(--bg); color:var(--charcoal); line-height:1.6; padding-bottom:60px;}
+header{background:linear-gradient(135deg,var(--blue),#0F4FAA); color:#fff;
+  padding:14px 16px; box-shadow:0 2px 8px rgba(0,0,0,.1); position:sticky; top:0; z-index:50;}
+header h1{font-size:18px; font-weight:700;}
+header .sub{font-size:11px; opacity:.85; margin-top:2px;}
+.tabs{display:flex; background:#fff; border-bottom:2px solid var(--border);
+  position:sticky; top:54px; z-index:40;}
+.tab{flex:1; padding:12px 4px; text-align:center; cursor:pointer; font-weight:600;
+  font-size:13px; color:var(--muted); border-bottom:3px solid transparent; transition:all .2s;}
+.tab.active{color:var(--blue); border-bottom-color:var(--amber); background:#FFF8E1;}
+.container{padding:12px; max-width:900px; margin:0 auto;}
+.panel{display:none;} .panel.active{display:block;}
+.controls{background:#fff; border-radius:12px; padding:12px; margin-bottom:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px;}
+.row:last-child{margin-bottom:0;}
+.btn{background:var(--blue); color:#fff; border:none; padding:8px 14px; border-radius:8px;
+  cursor:pointer; font-size:13px; font-weight:600; transition:all .15s;}
+.btn:active{transform:scale(.96);}
+.btn.amber{background:var(--amber); color:#1F2937;}
+.btn.red{background:var(--red);}
+.btn.green{background:var(--green);}
+.btn.gray{background:#9CA3AF;}
+.btn.outline{background:#fff; color:var(--blue); border:2px solid var(--blue);}
+.btn.small{padding:5px 10px; font-size:11px;}
+.btn.tiny{padding:3px 8px; font-size:10px; border-radius:6px;}
+input[type=text],input[type=search]{flex:1; min-width:120px; padding:9px 12px;
+  border:2px solid var(--border); border-radius:8px; font-size:14px; outline:none;}
+input:focus{border-color:var(--blue);}
+.lesson-panel{background:#fff; border-radius:12px; padding:12px; margin-bottom:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.lesson-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr));
+  gap:6px; margin:8px 0;}
+.lesson-grid label{display:flex; align-items:center; gap:4px; padding:6px 8px;
+  background:#F3F4F6; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600;}
+.lesson-grid label.on{background:#FFF8E1; color:var(--blue);}
+.lesson-grid input{accent-color:var(--blue);}
+.filter-chips{display:flex; gap:6px; flex-wrap:wrap;}
+.chip{padding:6px 10px; background:#F3F4F6; border-radius:20px; font-size:12px;
+  cursor:pointer; font-weight:600; display:flex; align-items:center; gap:5px;}
+.chip.on{background:var(--amber); color:#1F2937;}
+.chip .badge{background:#fff; color:var(--charcoal); padding:1px 6px; border-radius:10px;
+  font-size:10px;}
+
+/* テーブル */
+table{width:100%; border-collapse:collapse; background:#fff; border-radius:12px;
+  overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.05);}
+th{background:var(--blue); color:#fff; padding:8px 6px; text-align:left; font-size:12px;}
+td{padding:8px 6px; border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.hangul{font-size:17px; font-weight:700; color:var(--charcoal);}
+.pron{color:var(--blue); font-size:14px; font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.jp{color:var(--charcoal); font-size:13px;}
+.lesson-tag{display:inline-block; background:#FFF8E1; color:#B45309; padding:2px 6px;
+  border-radius:4px; font-size:10px; font-weight:700;}
+.action-cell{white-space:nowrap;}
+.icon-btn{background:none; border:none; cursor:pointer; font-size:18px; padding:2px 4px;}
+.status-btn{border:none; padding:3px 6px; border-radius:5px; cursor:pointer;
+  font-size:13px; margin-right:2px; background:#F3F4F6;}
+.status-btn.on-fail{background:var(--red); color:#fff;}
+.status-btn.on-hard{background:var(--amber); color:#1F2937;}
+.status-btn.on-good{background:var(--green); color:#fff;}
+
+/* フラッシュカード */
+.card-area{display:flex; flex-direction:column; align-items:center; padding:12px 0;}
+.card{width:100%; max-width:380px; height:300px; perspective:1000px; cursor:pointer;
+  margin-bottom:14px;}
+.card-inner{position:relative; width:100%; height:100%; transition:transform .6s;
+  transform-style:preserve-3d;}
+.card.flipped .card-inner{transform:rotateY(180deg);}
+.card-face{position:absolute; width:100%; height:100%; backface-visibility:hidden;
+  border-radius:18px; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; padding:18px; text-align:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.card-front{background:linear-gradient(135deg,#fff,#FFF8E1);}
+.card-back{background:linear-gradient(135deg,var(--blue),#0F4FAA); color:#fff;
+  transform:rotateY(180deg);}
+.card-hangul{font-size:48px; font-weight:800; color:var(--charcoal); margin-bottom:8px;
+  font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.card-back .pron-big{font-size:24px; margin-bottom:8px; opacity:.95;
+  font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.card-back .jp-big{font-size:20px; font-weight:700; margin-bottom:12px;}
+.card-back .example{font-size:13px; opacity:.9; line-height:1.5; padding:0 8px;
+  border-top:1px solid rgba(255,255,255,.3); padding-top:8px; margin-top:4px;}
+.card-hint{font-size:11px; color:var(--muted); margin-top:8px;}
+.card-controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  width:100%; max-width:380px;}
+.progress-bar{width:100%; max-width:380px; height:6px; background:#F3F4F6;
+  border-radius:3px; overflow:hidden; margin-bottom:12px;}
+.progress-fill{height:100%; background:linear-gradient(90deg,var(--amber),var(--blue));
+  transition:width .3s;}
+.card-meta{font-size:12px; color:var(--muted); margin-bottom:10px;}
+.card-meta .tag{background:#FFF8E1; color:#B45309; padding:2px 6px; border-radius:4px;
+  margin-right:6px;}
+
+/* リスニング */
+.test-area{background:#fff; border-radius:14px; padding:20px; text-align:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.test-score{display:flex; gap:14px; justify-content:center; margin-bottom:14px;
+  flex-wrap:wrap;}
+.score-item{background:#F3F4F6; padding:8px 14px; border-radius:8px;}
+.score-item .num{font-size:22px; font-weight:800; color:var(--blue);}
+.score-item .lbl{font-size:11px; color:var(--muted);}
+.big-play{width:80px; height:80px; border-radius:50%; background:var(--amber);
+  border:none; font-size:38px; cursor:pointer; margin:14px auto; display:block;
+  box-shadow:0 4px 14px rgba(244,180,0,.4);}
+.test-answer{background:#FFF8E1; padding:14px; border-radius:10px; margin-top:14px;
+  display:none;}
+.test-answer.show{display:block;}
+.test-answer .h{font-size:32px; font-weight:800;}
+.test-answer .p{color:var(--blue); margin:4px 0; font-size:18px;
+  font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.test-answer .j{font-size:16px; font-weight:600;}
+.test-actions{display:flex; gap:10px; justify-content:center; margin-top:14px;
+  flex-wrap:wrap;}
+
+/* ヘルプ */
+.shortcuts-help{position:fixed; bottom:14px; right:14px; background:var(--blue);
+  color:#fff; width:40px; height:40px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,.2);
+  font-size:18px; z-index:30;}
+.shortcuts-modal{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:100;
+  display:none; align-items:center; justify-content:center; padding:20px;}
+.shortcuts-modal.show{display:flex;}
+.modal-box{background:#fff; border-radius:14px; padding:20px; max-width:420px;
+  width:100%; max-height:80vh; overflow-y:auto;}
+.modal-box h3{margin-bottom:12px; color:var(--blue);}
+.modal-box .key{display:inline-block; background:#F3F4F6; padding:2px 8px;
+  border-radius:4px; font-family:monospace; margin-right:8px; font-weight:700;}
+.modal-box li{padding:6px 0; font-size:13px; list-style:none;}
+
+@media(max-width:600px){
+  .card-hangul{font-size:38px;}
+  .card{height:260px;}
+  th,td{font-size:12px; padding:6px 4px;}
+  .hangul{font-size:15px;}
+}
+.empty{text-align:center; padding:40px 20px; color:var(--muted);}
+.fav-on{color:var(--amber);}
+.toast{position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.85); color:#fff; padding:10px 18px; border-radius:8px;
+  font-size:13px; z-index:200; opacity:0; transition:opacity .25s;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇰🇷 韓国語学習アプリ</h1>
+  <div class="sub">TOPIK I 2級対策 / 第3課〜第10課</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="list">📋 一覧</div>
+  <div class="tab" data-tab="flash">🎴 フラッシュ</div>
+  <div class="tab" data-tab="test">👂 リスニング</div>
+</div>
+
+<div class="container">
+  <!-- 共通コントロール -->
+  <div class="controls">
+    <div class="row">
+      <strong style="font-size:13px;">📚 課を選ぶ:</strong>
+      <button class="btn small" onclick="setAllLessons(true)">全課</button>
+      <button class="btn small gray" onclick="setAllLessons(false)">クリア</button>
+    </div>
+    <div class="lesson-grid" id="lesson-grid"></div>
+    <div class="row">
+      <strong style="font-size:13px;">🎯 フィルター:</strong>
+      <div class="filter-chips" id="filter-chips"></div>
+    </div>
+    <div class="row">
+      <label style="font-size:13px; display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="fav-only"> ⭐お気に入りのみ
+      </label>
+      <label style="font-size:13px; display:flex; align-items:center; gap:6px;">
+        🔊速度:
+        <select id="speed-select" style="padding:5px; border-radius:6px; border:1px solid var(--border);">
+          <option value="0.7">遅</option>
+          <option value="1.0" selected>普通</option>
+          <option value="1.3">速</option>
+        </select>
+      </label>
+      <span style="font-size:12px; color:var(--muted);" id="total-count"></span>
+    </div>
+  </div>
+
+  <!-- 一覧モード -->
+  <div class="panel active" id="panel-list">
+    <div class="controls">
+      <div class="row">
+        <input type="search" id="search" placeholder="🔍 ハングル・発音・日本語で検索...">
+      </div>
+    </div>
+    <div id="list-content"></div>
+  </div>
+
+  <!-- フラッシュカードモード -->
+  <div class="panel" id="panel-flash">
+    <div class="card-area">
+      <div class="progress-bar"><div class="progress-fill" id="flash-progress"></div></div>
+      <div class="card-meta" id="flash-meta">-</div>
+      <div class="card" id="flash-card" onclick="flipCard()">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-hangul" id="flash-hangul">-</div>
+            <div class="card-hint">タップで裏返し</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="pron-big" id="flash-pron">-</div>
+            <div class="jp-big" id="flash-jp">-</div>
+            <div class="example" id="flash-example">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-controls">
+        <button class="btn outline small" onclick="flashPrev()">← 前</button>
+        <button class="btn amber small" onclick="speakCurrent('flash')">🔊 発音</button>
+        <button class="btn outline small" onclick="flipCard()">↺ 裏</button>
+        <button class="btn outline small" onclick="flashNext()">次 →</button>
+        <button class="btn small" onclick="shuffleFlash()">🔀 シャッフル</button>
+        <button class="btn gray small" onclick="flashReset()">⏮ 最初</button>
+        <button class="btn small" id="auto-btn" onclick="toggleAuto()">▶ 自動</button>
+      </div>
+      <div class="card-controls" style="margin-top:8px;">
+        <button class="status-btn" data-st="fail" onclick="setFlashStatus('fail')">❌覚えてない</button>
+        <button class="status-btn" data-st="hard" onclick="setFlashStatus('hard')">⚠️怪しい</button>
+        <button class="status-btn" data-st="good" onclick="setFlashStatus('good')">✅完璧</button>
+        <button class="icon-btn" id="flash-fav" onclick="toggleFlashFav()">⭐</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- リスニングテストモード -->
+  <div class="panel" id="panel-test">
+    <div class="test-area">
+      <div class="test-score">
+        <div class="score-item"><div class="num" id="t-correct">0</div><div class="lbl">✓正解</div></div>
+        <div class="score-item"><div class="num" id="t-wrong">0</div><div class="lbl">✗不正解</div></div>
+        <div class="score-item"><div class="num" id="t-rate">-</div><div class="lbl">正答率</div></div>
+        <div class="score-item"><div class="num" id="t-total">0</div><div class="lbl">累計</div></div>
+      </div>
+      <div style="font-size:13px; color:var(--muted);">音声を聞いて、答えを書き取ろう（紙やメモアプリに）</div>
+      <button class="big-play" onclick="speakCurrent('test')">🔊</button>
+      <div style="font-size:12px; color:var(--muted);">Spaceで答えを表示</div>
+      <div class="test-answer" id="test-answer">
+        <div class="h" id="t-hangul">-</div>
+        <div class="p" id="t-pron">-</div>
+        <div class="j" id="t-jp">-</div>
+      </div>
+      <div class="test-actions">
+        <button class="btn amber" onclick="showTestAnswer()">👁 答え (Space)</button>
+        <button class="btn green" onclick="markTest(true)">✓ 正解 (C)</button>
+        <button class="btn red" onclick="markTest(false)">✗ 不正解 (W)</button>
+        <button class="btn outline" onclick="nextTest()">⏭ スキップ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="shortcuts-help" onclick="document.getElementById('shortcuts-modal').classList.add('show')">?</div>
+<div class="shortcuts-modal" id="shortcuts-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal-box">
+    <h3>⌨ キーボードショートカット</h3>
+    <ul>
+      <li><span class="key">1/2/3</span>モード切替</li>
+      <li><span class="key">←/→</span>前後移動</li>
+      <li><span class="key">Space</span>裏返し / 答えを見る</li>
+      <li><span class="key">P</span>発音再生</li>
+      <li><span class="key">S</span>シャッフル</li>
+      <li><span class="key">F</span>お気に入り</li>
+      <li><span class="key">Q/W/E</span>覚えてない/怪しい/完璧</li>
+      <li><span class="key">C/W</span>正解/不正解（テスト）</li>
+    </ul>
+    <button class="btn" onclick="document.getElementById('shortcuts-modal').classList.remove('show')" style="margin-top:12px;">閉じる</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ データ ============
+// 発音欄: 書記と異なる場合は実発音をハングル表記、同じならそのまま
+const VOCAB = [
+// 第3課
+{l:3,h:"일본",p:"일본",j:"日本"},
+{l:3,h:"시간",p:"시간",j:"時間"},
+{l:3,h:"도쿄",p:"도쿄",j:"東京"},
+{l:3,h:"사이좋게",p:"사이조케",j:"仲良く"},
+{l:3,h:"선생님",p:"선생님",j:"先生"},
+{l:3,h:"빛",p:"빋",j:"光"},
+{l:3,h:"밖",p:"박",j:"外"},
+{l:3,h:"옷",p:"옫",j:"服"},
+{l:3,h:"꽃",p:"꼳",j:"花"},
+{l:3,h:"부엌",p:"부억",j:"台所"},
+{l:3,h:"앞",p:"압",j:"前"},
+{l:3,h:"학교",p:"학꾜",j:"学校"},
+{l:3,h:"숟가락",p:"숟까락",j:"スプーン"},
+{l:3,h:"맥주",p:"맥쭈",j:"ビール"},
+{l:3,h:"접시",p:"접씨",j:"皿"},
+{l:3,h:"종이",p:"종이",j:"紙"},
+{l:3,h:"옷이",p:"오시",j:"服が"},
+{l:3,h:"꽃이",p:"꼬치",j:"花が"},
+{l:3,h:"좋아요",p:"조아요",j:"良いです/好きです"},
+{l:3,h:"싫어요",p:"시러요",j:"嫌いです"},
+{l:3,h:"신주쿠",p:"신주쿠",j:"新宿"},
+{l:3,h:"신오쿠보",p:"시노쿠보",j:"新大久保"},
+{l:3,h:"신문",p:"신문",j:"新聞",ex:"신문을 읽어요. (新聞を読みます。/신무늘 일거요)"},
+{l:3,h:"여보세요",p:"여보세요",j:"もしもし"},
+{l:3,h:"미안합니다",p:"미안함니다",j:"すみません"},
+{l:3,h:"괜찮아요",p:"괜차나요",j:"大丈夫です"},
+{l:3,h:"저기요",p:"저기요",j:"すみません(呼びかけ)"},
+{l:3,h:"화장실",p:"화장실",j:"トイレ・化粧室"},
+{l:3,h:"지하철",p:"지하철",j:"地下鉄"},
+{l:3,h:"은행",p:"으냉",j:"銀行"},
+{l:3,h:"주차 금지",p:"주차 금지",j:"駐車禁止"},
+
+// 第4課
+{l:4,h:"안녕하십니까",p:"안녕하심니까",j:"こんにちは(丁寧)"},
+{l:4,h:"저",p:"저",j:"わたし(謙譲)"},
+{l:4,h:"는/은",p:"는/은",j:"〜は(助詞)"},
+{l:4,h:"입니다",p:"임니다",j:"〜です"},
+{l:4,h:"안녕하세요",p:"안녕하세요",j:"こんにちは"},
+{l:4,h:"야마오카 리미",p:"야마오카 리미",j:"山岡リミ"},
+{l:4,h:"어느",p:"어느",j:"どの"},
+{l:4,h:"나라",p:"나라",j:"国"},
+{l:4,h:"사람",p:"사람",j:"人"},
+{l:4,h:"입니까",p:"임니까",j:"〜ですか"},
+{l:4,h:"일본 사람",p:"일본 사람",j:"日本人"},
+{l:4,h:"유학생",p:"유학쌩",j:"留学生"},
+{l:4,h:"아",p:"아",j:"あ"},
+{l:4,h:"그래요",p:"그래요",j:"そうですか"},
+{l:4,h:"만나서 반갑습니다",p:"만나서 반갑씀니다",j:"お会いできてうれしいです"},
+{l:4,h:"네",p:"네",j:"はい"},
+{l:4,h:"학년",p:"항년",j:"学年"},
+{l:4,h:"한국",p:"한국",j:"韓国"},
+{l:4,h:"십만",p:"심만",j:"十万"},
+{l:4,h:"나카타",p:"나카타",j:"中田"},
+{l:4,h:"우체국",p:"우체국",j:"郵便局"},
+{l:4,h:"김유리",p:"김유리",j:"キム・ユリ"},
+{l:4,h:"회사",p:"회사",j:"会社"},
+{l:4,h:"서점",p:"서점",j:"書店"},
+{l:4,h:"사사키",p:"사사키",j:"佐々木"},
+{l:4,h:"대학생",p:"대학쌩",j:"大学生"},
+{l:4,h:"취미",p:"취미",j:"趣味"},
+{l:4,h:"무엇",p:"무얻",j:"何"},
+{l:4,h:"축구",p:"축꾸",j:"サッカー"},
+{l:4,h:"이것",p:"이걷",j:"これ"},
+{l:4,h:"냉면",p:"냉면",j:"冷麺"},
+{l:4,h:"하루키",p:"하루키",j:"ハルキ"},
+{l:4,h:"김민정",p:"김민정",j:"キム・ミンジョン"},
+{l:4,h:"박은우",p:"바근우",j:"パク・ウヌ"},
+{l:4,h:"마나",p:"마나",j:"マナ"},
+{l:4,h:"비빔밥",p:"비빔빱",j:"ビビンバ"},
+{l:4,h:"공무원",p:"공무원",j:"公務員"},
+{l:4,h:"공원",p:"공원",j:"公園"},
+{l:4,h:"극장",p:"극짱",j:"劇場"},
+{l:4,h:"대학",p:"대학",j:"大学"},
+{l:4,h:"백화점",p:"배콰점",j:"百貨店"},
+{l:4,h:"병원",p:"병원",j:"病院"},
+{l:4,h:"슈퍼마켓",p:"슈퍼마켇",j:"スーパー"},
+{l:4,h:"시장",p:"시장",j:"市場"},
+{l:4,h:"식당",p:"식땅",j:"食堂"},
+{l:4,h:"아파트",p:"아파트",j:"マンション"},
+{l:4,h:"약국",p:"약꾹",j:"薬局"},
+{l:4,h:"역",p:"역",j:"駅"},
+{l:4,h:"편의점",p:"펴니점",j:"コンビニ"},
+{l:4,h:"호텔",p:"호텔",j:"ホテル"},
+
+// 第5課
+{l:5,h:"이 사람",p:"이 사람",j:"この人"},
+{l:5,h:"누구",p:"누구",j:"誰"},
+{l:5,h:"남자 친구",p:"남자 친구",j:"彼氏(男友達)"},
+{l:5,h:"아니요",p:"아니요",j:"いいえ"},
+{l:5,h:"오빠",p:"오빠",j:"お兄さん(女性から)"},
+{l:5,h:"가/이",p:"가/이",j:"〜が(助詞)"},
+{l:5,h:"없다",p:"업따",j:"ない・いない"},
+{l:5,h:"있다",p:"읻따",j:"ある・いる"},
+{l:5,h:"미국",p:"미국",j:"アメリカ"},
+{l:5,h:"씨",p:"씨",j:"〜さん"},
+{l:5,h:"형제",p:"형제",j:"兄弟"},
+{l:5,h:"형",p:"형",j:"兄(男性から)"},
+{l:5,h:"그리고",p:"그리고",j:"そして"},
+{l:5,h:"여동생",p:"여동생",j:"妹"},
+{l:5,h:"도",p:"도",j:"〜も"},
+{l:5,h:"백화점",p:"배콰점",j:"デパート"},
+{l:5,h:"생각하다",p:"생가카다",j:"考える"},
+{l:5,h:"복잡하다",p:"복짜파다",j:"複雑だ"},
+{l:5,h:"따뜻하다",p:"따뜨타다",j:"暖かい"},
+{l:5,h:"놓다",p:"노타",j:"置く"},
+{l:5,h:"이",p:"이",j:"この"},
+{l:5,h:"그",p:"그",j:"その"},
+{l:5,h:"저",p:"저",j:"あの"},
+{l:5,h:"이것",p:"이걷",j:"これ"},
+{l:5,h:"그것",p:"그걷",j:"それ"},
+{l:5,h:"저것",p:"저걷",j:"あれ"},
+{l:5,h:"여기",p:"여기",j:"ここ"},
+{l:5,h:"거기",p:"거기",j:"そこ"},
+{l:5,h:"저기",p:"저기",j:"あそこ"},
+{l:5,h:"어느 것",p:"어느 걷",j:"どれ"},
+{l:5,h:"어디",p:"어디",j:"どこ"},
+{l:5,h:"요리",p:"요리",j:"料理"},
+{l:5,h:"음식",p:"음식",j:"食べ物"},
+{l:5,h:"불고기",p:"불고기",j:"プルゴギ"},
+{l:5,h:"강아지",p:"강아지",j:"子犬"},
+{l:5,h:"카페",p:"카페",j:"カフェ"},
+{l:5,h:"다나카",p:"다나카",j:"田中"},
+{l:5,h:"옆",p:"엽",j:"隣"},
+{l:5,h:"안",p:"안",j:"中"},
+{l:5,h:"지하",p:"지하",j:"地下"},
+{l:5,h:"교회",p:"교회",j:"教会"},
+{l:5,h:"책",p:"책",j:"本"},
+{l:5,h:"주스",p:"주스",j:"ジュース"},
+{l:5,h:"에",p:"에",j:"〜に(場所)"},
+{l:5,h:"집",p:"집",j:"家"},
+{l:5,h:"고양이",p:"고양이",j:"猫"},
+{l:5,h:"책상",p:"책쌍",j:"机"},
+{l:5,h:"위",p:"위",j:"上"},
+{l:5,h:"아래",p:"아래",j:"下"},
+{l:5,h:"의자",p:"의자",j:"椅子"},
+{l:5,h:"텔레비전",p:"텔레비전",j:"テレビ"},
+{l:5,h:"소파",p:"소파",j:"ソファ"},
+{l:5,h:"가방",p:"가방",j:"カバン"},
+{l:5,h:"컴퓨터",p:"컴퓨터",j:"パソコン"},
+{l:5,h:"경찰서",p:"경찰써",j:"警察署"},
+{l:5,h:"도서관",p:"도서관",j:"図書館"},
+{l:5,h:"휴지통",p:"휴지통",j:"ゴミ箱"},
+{l:5,h:"야채",p:"야채",j:"野菜"},
+{l:5,h:"과일",p:"과일",j:"果物"},
+{l:5,h:"앞",p:"압",j:"前"},
+{l:5,h:"뒤",p:"뒤",j:"後ろ"},
+{l:5,h:"속",p:"속",j:"中"},
+{l:5,h:"겉",p:"걷",j:"表"},
+{l:5,h:"표면",p:"표면",j:"表面"},
+{l:5,h:"밑",p:"믿",j:"下"},
+{l:5,h:"근처",p:"근처",j:"近所"},
+{l:5,h:"가까이",p:"가까이",j:"近く"},
+{l:5,h:"건너편",p:"건너편",j:"向かい側"},
+{l:5,h:"맞은편",p:"마즌편",j:"向い側"},
+{l:5,h:"사이",p:"사이",j:"間"},
+{l:5,h:"가운데",p:"가운데",j:"真ん中"},
+{l:5,h:"오른쪽",p:"오른쪽",j:"右"},
+{l:5,h:"왼쪽",p:"왼쪽",j:"左"},
+{l:5,h:"동쪽",p:"동쪽",j:"東"},
+{l:5,h:"서쪽",p:"서쪽",j:"西"},
+{l:5,h:"남쪽",p:"남쪽",j:"南"},
+{l:5,h:"북쪽",p:"북쪽",j:"北"},
+
+// 第6課
+{l:6,h:"에서",p:"에서",j:"〜で(場所)"},
+{l:6,h:"무엇을",p:"무어슬",j:"何を"},
+{l:6,h:"하다",p:"하다",j:"する"},
+{l:6,h:"사다",p:"사다",j:"買う"},
+{l:6,h:"생일",p:"생일",j:"誕生日"},
+{l:6,h:"선물",p:"선물",j:"プレゼント"},
+{l:6,h:"찾다",p:"찯따",j:"探す"},
+{l:6,h:"언제",p:"언제",j:"いつ"},
+{l:6,h:"다음 주",p:"다음 쭈",j:"来週"},
+{l:6,h:"월",p:"월",j:"月"},
+{l:6,h:"일",p:"일",j:"日"},
+{l:6,h:"그렇다",p:"그러타",j:"そうだ"},
+{l:6,h:"어떻다",p:"어떠타",j:"どうだ"},
+{l:6,h:"핸드폰",p:"핸드폰",j:"携帯電話"},
+{l:6,h:"케이스",p:"케이스",j:"ケース"},
+{l:6,h:"얼마",p:"얼마",j:"いくら"},
+{l:6,h:"천",p:"천",j:"千"},
+{l:6,h:"원",p:"원",j:"ウォン"},
+{l:6,h:"가다",p:"가다",j:"行く"},
+{l:6,h:"입다",p:"입따",j:"着る"},
+{l:6,h:"바쁘다",p:"바쁘다",j:"忙しい"},
+{l:6,h:"덥다",p:"덥따",j:"暑い"},
+{l:6,h:"커피",p:"커피",j:"コーヒー"},
+{l:6,h:"마시다",p:"마시다",j:"飲む"},
+{l:6,h:"음악",p:"으막",j:"音楽"},
+{l:6,h:"듣다",p:"듣따",j:"聞く"},
+{l:6,h:"그림",p:"그림",j:"絵"},
+{l:6,h:"그리다",p:"그리다",j:"描く"},
+{l:6,h:"버스",p:"버스",j:"バス"},
+{l:6,h:"타다",p:"타다",j:"乗る"},
+{l:6,h:"공부하다",p:"공부하다",j:"勉強する"},
+{l:6,h:"서울",p:"서울",j:"ソウル"},
+{l:6,h:"오다",p:"오다",j:"来る"},
+{l:6,h:"김치",p:"김치",j:"キムチ"},
+{l:6,h:"먹다",p:"먹따",j:"食べる"},
+{l:6,h:"일요일",p:"이료일",j:"日曜日"},
+{l:6,h:"노래방",p:"노래방",j:"カラオケ"},
+{l:6,h:"노래",p:"노래",j:"歌"},
+{l:6,h:"부르다",p:"부르다",j:"歌う"},
+{l:6,h:"사진",p:"사진",j:"写真"},
+{l:6,h:"찍다",p:"찍따",j:"撮る"},
+{l:6,h:"보다",p:"보다",j:"見る"},
+{l:6,h:"일",p:"일",j:"一"},
+{l:6,h:"이",p:"이",j:"二"},
+{l:6,h:"삼",p:"삼",j:"三"},
+{l:6,h:"사",p:"사",j:"四"},
+{l:6,h:"오",p:"오",j:"五"},
+{l:6,h:"육",p:"육",j:"六"},
+{l:6,h:"칠",p:"칠",j:"七"},
+{l:6,h:"팔",p:"팔",j:"八"},
+{l:6,h:"구",p:"구",j:"九"},
+{l:6,h:"십",p:"십",j:"十"},
+{l:6,h:"백",p:"백",j:"百"},
+{l:6,h:"만",p:"만",j:"万"},
+{l:6,h:"억",p:"억",j:"億"},
+{l:6,h:"영",p:"영",j:"ゼロ"},
+{l:6,h:"공",p:"공",j:"ゼロ"},
+{l:6,h:"년",p:"년",j:"〜年"},
+{l:6,h:"분",p:"분",j:"〜分"},
+{l:6,h:"층",p:"층",j:"〜階"},
+{l:6,h:"학년",p:"항년",j:"〜年生"},
+{l:6,h:"몇",p:"멷",j:"いくつ"},
+{l:6,h:"며칠",p:"며칠",j:"何日"},
+{l:6,h:"미터",p:"미터",j:"メートル"},
+{l:6,h:"키",p:"키",j:"身長"},
+{l:6,h:"센티",p:"센티",j:"センチ"},
+{l:6,h:"자주",p:"자주",j:"よく(頻繁に)"},
+{l:6,h:"점심",p:"점심",j:"昼ご飯"},
+{l:6,h:"도시락",p:"도시락",j:"弁当"},
+{l:6,h:"오늘",p:"오늘",j:"今日"},
+{l:6,h:"내일",p:"내일",j:"明日"},
+{l:6,h:"모레",p:"모레",j:"明後日"},
+{l:6,h:"어제",p:"어제",j:"昨日"},
+{l:6,h:"그저께",p:"그저께",j:"一昨日"},
+{l:6,h:"휴일",p:"휴일",j:"休日"},
+{l:6,h:"매일",p:"매일",j:"毎日"},
+{l:6,h:"아침",p:"아침",j:"朝"},
+{l:6,h:"낮",p:"낟",j:"昼"},
+{l:6,h:"저녁",p:"저녁",j:"夕方"},
+{l:6,h:"밤",p:"밤",j:"夜"},
+{l:6,h:"오전",p:"오전",j:"午前"},
+{l:6,h:"오후",p:"오후",j:"午後"},
+{l:6,h:"월요일",p:"워료일",j:"月曜日"},
+{l:6,h:"화요일",p:"화요일",j:"火曜日"},
+{l:6,h:"수요일",p:"수요일",j:"水曜日"},
+{l:6,h:"목요일",p:"모교일",j:"木曜日"},
+{l:6,h:"금요일",p:"그묘일",j:"金曜日"},
+{l:6,h:"토요일",p:"토요일",j:"土曜日"},
+{l:6,h:"무슨 요일",p:"무슨뇨일",j:"何曜日"},
+
+// 第7課
+{l:7,h:"시",p:"시",j:"〜時"},
+{l:7,h:"파티",p:"파티",j:"パーティー"},
+{l:7,h:"시작하다",p:"시자카다",j:"始める"},
+{l:7,h:"일곱",p:"일곱",j:"七つ"},
+{l:7,h:"어디서",p:"어디서",j:"どこで"},
+{l:7,h:"집",p:"집",j:"家"},
+{l:7,h:"아니에요",p:"아니에요",j:"〜ではないです"},
+{l:7,h:"식당",p:"식땅",j:"食堂"},
+{l:7,h:"회비",p:"회비",j:"会費"},
+{l:7,h:"비싸다",p:"비싸다",j:"(値段が)高い"},
+{l:7,h:"지 않다",p:"지 안타",j:"〜ない"},
+{l:7,h:"별로",p:"별로",j:"別に・それほど"},
+{l:7,h:"천천히",p:"천천히",j:"ゆっくり"},
+{l:7,h:"말하다",p:"마라다",j:"言う・話す"},
+{l:7,h:"넣다",p:"너타",j:"入れる"},
+{l:7,h:"말씀하시다",p:"말씀하시다",j:"おっしゃる"},
+{l:7,h:"영화",p:"영화",j:"映画"},
+{l:7,h:"결혼",p:"겨론",j:"結婚"},
+{l:7,h:"올해",p:"오래",j:"今年"},
+{l:7,h:"남학생",p:"나막쌩",j:"男子学生"},
+{l:7,h:"안녕히",p:"안녕히",j:"安らかに"},
+{l:7,h:"부산",p:"부산",j:"釜山"},
+{l:7,h:"춥다",p:"춥따",j:"寒い"},
+{l:7,h:"학생",p:"학쌩",j:"学生"},
+{l:7,h:"처음",p:"처음",j:"初めて"},
+{l:7,h:"친구",p:"친구",j:"友達"},
+{l:7,h:"하나",p:"하나",j:"一つ"},
+{l:7,h:"둘",p:"둘",j:"二つ"},
+{l:7,h:"셋",p:"섿",j:"三つ"},
+{l:7,h:"넷",p:"넫",j:"四つ"},
+{l:7,h:"다섯",p:"다섣",j:"五つ"},
+{l:7,h:"여섯",p:"여섣",j:"六つ"},
+{l:7,h:"여덟",p:"여덜",j:"八つ"},
+{l:7,h:"아홉",p:"아홉",j:"九つ"},
+{l:7,h:"열",p:"열",j:"十"},
+{l:7,h:"스물",p:"스물",j:"二十"},
+{l:7,h:"서른",p:"서른",j:"三十"},
+{l:7,h:"마흔",p:"마흔",j:"四十"},
+{l:7,h:"쉰",p:"쉰",j:"五十"},
+{l:7,h:"예순",p:"예순",j:"六十"},
+{l:7,h:"일흔",p:"일흔",j:"七十"},
+{l:7,h:"여든",p:"여든",j:"八十"},
+{l:7,h:"아흔",p:"아흔",j:"九十"},
+{l:7,h:"개",p:"개",j:"〜個"},
+{l:7,h:"살",p:"살",j:"〜歳"},
+{l:7,h:"번",p:"번",j:"〜回"},
+{l:7,h:"명",p:"명",j:"〜名"},
+{l:7,h:"만나다",p:"만나다",j:"会う"},
+{l:7,h:"빵",p:"빵",j:"パン"},
+{l:7,h:"설탕",p:"설탕",j:"砂糖"},
+{l:7,h:"표 사는 곳",p:"표 사는 곧",j:"切符売り場"},
+{l:7,h:"자다",p:"자다",j:"寝る"},
+{l:7,h:"일어나다",p:"이러나다",j:"起きる"},
+{l:7,h:"어렵다",p:"어렵따",j:"難しい"},
+{l:7,h:"술",p:"술",j:"お酒"},
+{l:7,h:"담배",p:"담배",j:"タバコ"},
+{l:7,h:"피우다",p:"피우다",j:"吸う"},
+{l:7,h:"수업",p:"수업",j:"授業"},
+
+// 第8課
+{l:8,h:"축하하다",p:"추카하다",j:"祝う"},
+{l:8,h:"고맙다",p:"고맙따",j:"ありがたい"},
+{l:8,h:"그런데",p:"그런데",j:"ところで"},
+{l:8,h:"뭐",p:"뭐",j:"何"},
+{l:8,h:"부모님",p:"부모님",j:"ご両親"},
+{l:8,h:"그래서",p:"그래서",j:"それで"},
+{l:8,h:"공항",p:"공항",j:"空港"},
+{l:8,h:"까지",p:"까지",j:"〜まで"},
+{l:8,h:"반",p:"반",j:"半"},
+{l:8,h:"쯤",p:"쯤",j:"〜くらい"},
+{l:8,h:"그렇군요",p:"그러쿤뇨",j:"そうなんですね"},
+{l:8,h:"계시다",p:"계시다",j:"いらっしゃる"},
+{l:8,h:"이번 주",p:"이번 쭈",j:"今週"},
+{l:8,h:"주말",p:"주말",j:"週末"},
+{l:8,h:"끊다",p:"끈타",j:"切る"},
+{l:8,h:"울다",p:"울다",j:"泣く"},
+{l:8,h:"옳다",p:"올타",j:"正しい"},
+{l:8,h:"많다",p:"만타",j:"多い"},
+{l:8,h:"화장품",p:"화장품",j:"化粧品"},
+{l:8,h:"한복",p:"한복",j:"韓服"},
+{l:8,h:"매일",p:"매일",j:"毎日"},
+{l:8,h:"부터",p:"부터",j:"〜から"},
+{l:8,h:"수원",p:"수원",j:"水原"},
+{l:8,h:"와/과",p:"와/과",j:"〜と"},
+{l:8,h:"하고",p:"하고",j:"〜と"},
+{l:8,h:"해",p:"해",j:"太陽"},
+{l:8,h:"달",p:"달",j:"月"},
+{l:8,h:"갈비",p:"갈비",j:"カルビ"},
+{l:8,h:"교과서",p:"교과서",j:"教科書"},
+{l:8,h:"필통",p:"필통",j:"筆箱"},
+{l:8,h:"젓가락",p:"젇까락",j:"箸"},
+{l:8,h:"댁",p:"댁",j:"お宅"},
+{l:8,h:"성함",p:"성함",j:"お名前"},
+{l:8,h:"분",p:"분",j:"方(人)"},
+{l:8,h:"아버지",p:"아버지",j:"お父さん"},
+{l:8,h:"아버님",p:"아버님",j:"お父様"},
+{l:8,h:"어머니",p:"어머니",j:"お母さん"},
+{l:8,h:"어머님",p:"어머님",j:"お母様"},
+{l:8,h:"아들",p:"아들",j:"息子"},
+{l:8,h:"아드님",p:"아드님",j:"ご子息"},
+{l:8,h:"딸",p:"딸",j:"娘"},
+{l:8,h:"따님",p:"따님",j:"お嬢様"},
+{l:8,h:"사모님",p:"사모님",j:"奥様"},
+{l:8,h:"나이",p:"나이",j:"歳"},
+{l:8,h:"연세",p:"연세",j:"お歳"},
+{l:8,h:"약속",p:"약쏙",j:"約束"},
+{l:8,h:"형님",p:"형님",j:"お兄様"},
+{l:8,h:"누나",p:"누나",j:"お姉さん(男性から)"},
+{l:8,h:"언니",p:"언니",j:"お姉さん(女性から)"},
+{l:8,h:"누님",p:"누님",j:"お姉様"},
+{l:8,h:"동생",p:"동생",j:"弟・妹"},
+{l:8,h:"남동생",p:"남동생",j:"弟"},
+{l:8,h:"역사",p:"역싸",j:"歴史"},
+
+// 第9課
+{l:9,h:"오늘",p:"오늘",j:"今日"},
+{l:9,h:"뭐 하다",p:"뭐 하다",j:"何する"},
+{l:9,h:"해요",p:"해요",j:"します"},
+{l:9,h:"없어요",p:"업써요",j:"ありません"},
+{l:9,h:"그냥",p:"그냥",j:"ただ"},
+{l:9,h:"기숙사",p:"기숙싸",j:"寄宿舎・寮"},
+{l:9,h:"있어요",p:"이써요",j:"あります"},
+{l:9,h:"그러면",p:"그러면",j:"それでは"},
+{l:9,h:"같이",p:"가치",j:"一緒に"},
+{l:9,h:"영화관",p:"영화관",j:"映画館"},
+{l:9,h:"가요",p:"가요",j:"行きます"},
+{l:9,h:"어떤",p:"어떤",j:"どんな"},
+{l:9,h:"봐요",p:"봐요",j:"見ます"},
+{l:9,h:"공포 영화",p:"공포 영화",j:"ホラー映画"},
+{l:9,h:"어때요",p:"어때요",j:"どうですか"},
+{l:9,h:"좋아하다",p:"조아하다",j:"好きだ"},
+{l:9,h:"잘됐다",p:"잘됃따",j:"よかった"},
+{l:9,h:"이따가",p:"이따가",j:"後で"},
+{l:9,h:"우유",p:"우유",j:"牛乳"},
+{l:9,h:"명동",p:"명동",j:"明洞"},
+{l:9,h:"서다",p:"서다",j:"止まる"},
+{l:9,h:"1학년",p:"일항년",j:"1年生"},
+{l:9,h:"2학년",p:"이항년",j:"2年生"},
+{l:9,h:"이쪽",p:"이쪽",j:"こちら"},
+{l:9,h:"그쪽",p:"그쪽",j:"そちら"},
+{l:9,h:"그날",p:"그날",j:"その日"},
+{l:9,h:"게임",p:"게임",j:"ゲーム"},
+{l:9,h:"공원",p:"공원",j:"公園"},
+{l:9,h:"놀다",p:"놀다",j:"遊ぶ"},
+{l:9,h:"여름 방학",p:"여름 방학",j:"夏休み"},
+{l:9,h:"오키나와",p:"오키나와",j:"沖縄"},
+{l:9,h:"주말",p:"주말",j:"週末"},
+{l:9,h:"쇼핑",p:"쇼핑",j:"ショッピング"},
+{l:9,h:"아르바이트",p:"아르바이트",j:"アルバイト"},
+{l:9,h:"한국 드라마",p:"한국 드라마",j:"韓国ドラマ"},
+{l:9,h:"공연",p:"공연",j:"公演"},
+{l:9,h:"시작하다",p:"시자카다",j:"始まる"},
+{l:9,h:"열다",p:"열다",j:"開ける"},
+{l:9,h:"비행기",p:"비행기",j:"飛行機"},
+{l:9,h:"점심",p:"점심",j:"昼ご飯"},
+{l:9,h:"짧다",p:"짤따",j:"短い"},
+{l:9,h:"만화",p:"만화",j:"漫画"},
+{l:9,h:"정말",p:"정말",j:"本当に"},
+{l:9,h:"재미있다",p:"재미읻따",j:"面白い"},
+{l:9,h:"정류장",p:"정뉴장",j:"バス停"},
+{l:9,h:"고속버스",p:"고속뻐스",j:"高速バス"},
+{l:9,h:"택시",p:"택씨",j:"タクシー"},
+{l:9,h:"전철",p:"전철",j:"電車"},
+{l:9,h:"기차",p:"기차",j:"列車"},
+{l:9,h:"배",p:"배",j:"船"},
+{l:9,h:"차",p:"차",j:"車"},
+{l:9,h:"자동차",p:"자동차",j:"自動車"},
+{l:9,h:"자전거",p:"자전거",j:"自転車"},
+
+// 第10課
+{l:10,h:"이번 주말",p:"이번 주말",j:"今度の週末"},
+{l:10,h:"괜찮다",p:"괜찬타",j:"大丈夫だ"},
+{l:10,h:"으세요",p:"으세요",j:"〜なさいます"},
+{l:10,h:"무슨 일",p:"무슨 닐",j:"どんなこと"},
+{l:10,h:"토요일",p:"토요일",j:"土曜日"},
+{l:10,h:"일본 요리",p:"일본 뇨리",j:"日本料理"},
+{l:10,h:"우리",p:"우리",j:"私たち"},
+{l:10,h:"식사하다",p:"식싸하다",j:"食事する"},
+{l:10,h:"진짜",p:"진짜",j:"本当"},
+{l:10,h:"스키야키",p:"스키야키",j:"すき焼き"},
+{l:10,h:"아주",p:"아주",j:"とても"},
+{l:10,h:"다행",p:"다행",j:"幸い・よかった"},
+{l:10,h:"꼭",p:"꼭",j:"必ず"},
+{l:10,h:"오세요",p:"오세요",j:"来てください"},
+{l:10,h:"선생님",p:"선생님",j:"先生"},
+{l:10,h:"한국 분",p:"한국 뿐",j:"韓国の方"},
+{l:10,h:"닫다",p:"닫따",j:"閉める"},
+{l:10,h:"사 주다",p:"사 주다",j:"買ってあげる"},
+{l:10,h:"만들다",p:"만들다",j:"作る"},
+{l:10,h:"한 번",p:"한 번",j:"一度"},
+{l:10,h:"더",p:"더",j:"もっと"},
+{l:10,h:"깎다",p:"깍따",j:"削る・値切る"},
+{l:10,h:"들다",p:"들다",j:"持つ"},
+{l:10,h:"일찍",p:"일찍",j:"早く"},
+{l:10,h:"기다리다",p:"기다리다",j:"待つ"},
+{l:10,h:"에어컨",p:"에어컨",j:"エアコン"},
+{l:10,h:"켜다",p:"켜다",j:"つける"},
+{l:10,h:"로/으로",p:"로/으로",j:"〜で(手段)・〜へ(方向)"},
+{l:10,h:"비누",p:"비누",j:"石鹸"},
+{l:10,h:"손",p:"손",j:"手"},
+{l:10,h:"씻다",p:"씯따",j:"洗う"},
+{l:10,h:"외국",p:"외국",j:"外国"},
+{l:10,h:"유학",p:"유학",j:"留学"},
+{l:10,h:"칠판",p:"칠판",j:"黒板"},
+{l:10,h:"지우다",p:"지우다",j:"消す"},
+{l:10,h:"보이다",p:"보이다",j:"見せる"},
+{l:10,h:"머리",p:"머리",j:"頭"},
+{l:10,h:"아프다",p:"아프다",j:"痛い"},
+{l:10,h:"운동",p:"운동",j:"運動"},
+{l:10,h:"홍차",p:"홍차",j:"紅茶"},
+{l:10,h:"드시다",p:"드시다",j:"召し上がる"},
+{l:10,h:"신발 가게",p:"신발 가게",j:"靴屋"},
+{l:10,h:"옷 가게",p:"옫 까게",j:"服屋"},
+{l:10,h:"방",p:"방",j:"部屋"},
+{l:10,h:"사무실",p:"사무실",j:"事務室"},
+{l:10,h:"끝나다",p:"끈나다",j:"終わる"},
+{l:10,h:"소개하다",p:"소개하다",j:"紹介する"},
+{l:10,h:"과자",p:"과자",j:"お菓子"},
+{l:10,h:"메뉴",p:"메뉴",j:"メニュー"},
+{l:10,h:"생선",p:"생선",j:"魚"},
+{l:10,h:"소고기",p:"소고기",j:"牛肉"},
+{l:10,h:"돼지고기",p:"돼지고기",j:"豚肉"},
+{l:10,h:"닭고기",p:"닥꼬기",j:"鶏肉"},
+{l:10,h:"떡",p:"떡",j:"餅"},
+{l:10,h:"계란",p:"계란",j:"卵"},
+{l:10,h:"반찬",p:"반찬",j:"おかず"},
+{l:10,h:"물",p:"물",j:"水"},
+{l:10,h:"술",p:"술",j:"お酒"},
+{l:10,h:"젓가락",p:"젇까락",j:"箸"},
+];
+
+// IDを付与
+VOCAB.forEach((v,i)=>v.id=i);
+
+// 例文補完(教科書になければTOPIK初級レベルで補う)
+const EXAMPLES = {
+  // 主要な単語に簡単な例文を付与
+};
+function getExample(v){
+  if(v.ex) return v.ex;
+  // 自動生成: 簡単なTOPIK初級例文
+  const j = v.j;
+  const h = v.h;
+  // 助詞や数字などはスキップ
+  if(/^[〜～].|助詞|ゼロ|百|千|万|億|^[一二三四五六七八九十]$/.test(j)||/^\d/.test(j))
+    return `${h} — 基本語彙です。`;
+  return `이것은 ${h}입니다. (これは${j}です。)`;
+}
+
+// ============ 状態 ============
+const LS_KEY = 'kr_app_state_v1';
+const state = loadState();
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    return {
+      selectedLessons: s.selectedLessons || [3,4,5,6,7,8,9,10],
+      filter: s.filter || 'all',
+      favOnly: !!s.favOnly,
+      favorites: new Set(s.favorites||[]),
+      statuses: s.statuses || {},  // id -> 'fail'|'hard'|'good'
+      speed: s.speed || 1.0,
+      score: s.score || {correct:0, wrong:0},
+      flashIdx: s.flashIdx || 0,
+    };
+  }catch(e){return {selectedLessons:[3,4,5,6,7,8,9,10],filter:'all',favOnly:false,favorites:new Set(),statuses:{},speed:1.0,score:{correct:0,wrong:0},flashIdx:0};}
+}
+function saveState(){
+  localStorage.setItem(LS_KEY, JSON.stringify({
+    ...state,
+    favorites: [...state.favorites],
+  }));
+}
+
+// ============ UI構築 ============
+const LESSONS = [3,4,5,6,7,8,9,10];
+
+function buildLessonGrid(){
+  const g = document.getElementById('lesson-grid');
+  g.innerHTML = LESSONS.map(l=>`
+    <label class="${state.selectedLessons.includes(l)?'on':''}" data-l="${l}">
+      <input type="checkbox" ${state.selectedLessons.includes(l)?'checked':''} onchange="toggleLesson(${l})">
+      第${l}課
+    </label>
+  `).join('');
+}
+function toggleLesson(l){
+  const i = state.selectedLessons.indexOf(l);
+  if(i>=0) state.selectedLessons.splice(i,1);
+  else state.selectedLessons.push(l);
+  saveState(); buildLessonGrid(); refresh();
+}
+function setAllLessons(on){
+  state.selectedLessons = on ? [...LESSONS] : [];
+  saveState(); buildLessonGrid(); refresh();
+}
+
+function buildFilterChips(){
+  const filters = [
+    {k:'all', l:'📋一覧'},
+    {k:'new', l:'🆕未学習'},
+    {k:'fail', l:'❌覚えてない'},
+    {k:'hard', l:'⚠️怪しい'},
+    {k:'good', l:'✅完璧'},
+  ];
+  const c = document.getElementById('filter-chips');
+  c.innerHTML = filters.map(f=>{
+    const n = countByFilter(f.k);
+    return `<span class="chip ${state.filter===f.k?'on':''}" onclick="setFilter('${f.k}')">${f.l}<span class="badge">${n}</span></span>`;
+  }).join('');
+}
+function countByFilter(k){
+  return getAllInLessons().filter(v=>matchFilter(v,k)).length;
+}
+function matchFilter(v,k){
+  const s = state.statuses[v.id];
+  if(k==='all') return true;
+  if(k==='new') return !s;
+  return s === k;
+}
+function setFilter(k){state.filter=k; saveState(); refresh();}
+
+function getAllInLessons(){
+  return VOCAB.filter(v=>state.selectedLessons.includes(v.l));
+}
+function getFiltered(){
+  let arr = getAllInLessons();
+  if(state.filter!=='all') arr = arr.filter(v=>matchFilter(v,state.filter));
+  if(state.favOnly) arr = arr.filter(v=>state.favorites.has(v.id));
+  const q = (document.getElementById('search')?.value||'').trim().toLowerCase();
+  if(q) arr = arr.filter(v=>v.h.includes(q)||v.p.includes(q)||v.j.toLowerCase().includes(q));
+  return arr;
+}
+
+// ============ 一覧モード ============
+function renderList(){
+  const arr = getFiltered();
+  const c = document.getElementById('list-content');
+  if(arr.length===0){c.innerHTML='<div class="empty">該当する単語がありません</div>';return;}
+  c.innerHTML = `<table>
+    <thead><tr>
+      <th style="width:32px;">課</th>
+      <th>ハングル</th>
+      <th>発音</th>
+      <th>日本語</th>
+      <th style="width:120px;">操作</th>
+    </tr></thead>
+    <tbody>${arr.map(v=>`
+      <tr>
+        <td><span class="lesson-tag">${v.l}</span></td>
+        <td class="hangul">${v.h}</td>
+        <td class="pron">[${v.p}]</td>
+        <td class="jp">${v.j}</td>
+        <td class="action-cell">
+          <button class="icon-btn" onclick="speak('${v.h.replace(/'/g,"\\'")}')">🔊</button>
+          <button class="icon-btn ${state.favorites.has(v.id)?'fav-on':''}" onclick="toggleFav(${v.id})">${state.favorites.has(v.id)?'⭐':'☆'}</button>
+          <button class="status-btn ${state.statuses[v.id]==='fail'?'on-fail':''}" onclick="setStatus(${v.id},'fail')">❌</button>
+          <button class="status-btn ${state.statuses[v.id]==='hard'?'on-hard':''}" onclick="setStatus(${v.id},'hard')">⚠️</button>
+          <button class="status-btn ${state.statuses[v.id]==='good'?'on-good':''}" onclick="setStatus(${v.id},'good')">✅</button>
+        </td>
+      </tr>
+    `).join('')}</tbody>
+  </table>`;
+}
+
+function setStatus(id, st){
+  if(state.statuses[id]===st) delete state.statuses[id];
+  else state.statuses[id]=st;
+  saveState(); refresh();
+}
+function toggleFav(id){
+  if(state.favorites.has(id)) state.favorites.delete(id);
+  else state.favorites.add(id);
+  saveState(); refresh();
+}
+
+// ============ Web Speech API ============
+let voicesLoaded = false;
+let koVoice = null;
+function loadVoices(){
+  const voices = window.speechSynthesis.getVoices();
+  koVoice = voices.find(v=>v.lang==='ko-KR' || v.lang.startsWith('ko'));
+  voicesLoaded = true;
+  if(!koVoice && voices.length>0){
+    // 警告（一度だけ）
+    if(!sessionStorage.getItem('ko_warned')){
+      sessionStorage.setItem('ko_warned','1');
+      setTimeout(()=>{
+        alert('⚠️ 韓国語の音声が見つかりません。\n\n対処方法:\n【Windows】設定→時刻と言語→言語→韓国語を追加→言語パック+音声をDL\n【Mac】システム設定→アクセシビリティ→音声→韓国語の音声を追加\n【iOS/Android】設定→音声→韓国語を追加\n\nそれまでは英語/日本語音声で代用再生します。');
+      }, 1000);
+    }
+  }
+}
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  loadVoices();
+}
+function speak(text){
+  if(!('speechSynthesis' in window)){toast('このブラウザは音声非対応');return;}
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='ko-KR';
+  if(koVoice) u.voice = koVoice;
+  u.rate = state.speed;
+  window.speechSynthesis.speak(u);
+}
+function speakCurrent(mode){
+  if(mode==='flash'){
+    const v = flashCurrent(); if(v) speak(v.h);
+  }else if(mode==='test'){
+    if(testCurrent) speak(testCurrent.h);
+  }
+}
+
+// ============ フラッシュカード ============
+let flashList = [];
+let autoTimer = null;
+let autoState = 0; // 0:front, 1:flipped
+
+function rebuildFlash(){
+  flashList = getFiltered();
+  if(state.flashIdx>=flashList.length) state.flashIdx=0;
+  renderFlash();
+}
+function flashCurrent(){return flashList[state.flashIdx];}
+function renderFlash(){
+  const v = flashCurrent();
+  if(!v){
+    document.getElementById('flash-hangul').textContent = '該当なし';
+    document.getElementById('flash-pron').textContent='-';
+    document.getElementById('flash-jp').textContent='-';
+    document.getElementById('flash-example').textContent='-';
+    document.getElementById('flash-meta').textContent='-';
+    document.getElementById('flash-progress').style.width='0%';
+    return;
+  }
+  document.getElementById('flash-card').classList.remove('flipped');
+  document.getElementById('flash-hangul').textContent = v.h;
+  document.getElementById('flash-pron').textContent = '['+v.p+']';
+  document.getElementById('flash-jp').textContent = v.j;
+  document.getElementById('flash-example').textContent = getExample(v);
+  const st = state.statuses[v.id];
+  const stTxt = st==='fail'?'❌覚えてない':st==='hard'?'⚠️怪しい':st==='good'?'✅完璧':'🆕未学習';
+  document.getElementById('flash-meta').innerHTML = `<span class="tag">第${v.l}課</span> ${state.flashIdx+1}/${flashList.length} | ${stTxt}`;
+  document.getElementById('flash-progress').style.width = ((state.flashIdx+1)/flashList.length*100)+'%';
+  document.getElementById('flash-fav').textContent = state.favorites.has(v.id)?'⭐':'☆';
+  document.querySelectorAll('[data-st]').forEach(b=>{
+    b.classList.toggle('on-fail', b.dataset.st==='fail' && st==='fail');
+    b.classList.toggle('on-hard', b.dataset.st==='hard' && st==='hard');
+    b.classList.toggle('on-good', b.dataset.st==='good' && st==='good');
+  });
+}
+function flipCard(){document.getElementById('flash-card').classList.toggle('flipped');}
+function flashNext(){if(state.flashIdx<flashList.length-1){state.flashIdx++; saveState(); renderFlash();}}
+function flashPrev(){if(state.flashIdx>0){state.flashIdx--; saveState(); renderFlash();}}
+function shuffleFlash(){
+  for(let i=flashList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [flashList[i],flashList[j]]=[flashList[j],flashList[i]];}
+  state.flashIdx=0; saveState(); renderFlash(); toast('🔀 シャッフルしました');
+}
+function flashReset(){state.flashIdx=0; saveState(); renderFlash();}
+function setFlashStatus(st){
+  const v = flashCurrent(); if(!v) return;
+  if(state.statuses[v.id]===st) delete state.statuses[v.id];
+  else state.statuses[v.id]=st;
+  saveState(); renderFlash(); buildFilterChips();
+}
+function toggleFlashFav(){
+  const v = flashCurrent(); if(!v) return;
+  toggleFav(v.id);
+  document.getElementById('flash-fav').textContent = state.favorites.has(v.id)?'⭐':'☆';
+}
+function toggleAuto(){
+  const btn = document.getElementById('auto-btn');
+  if(autoTimer){clearInterval(autoTimer); autoTimer=null; btn.textContent='▶ 自動'; btn.classList.remove('amber'); return;}
+  btn.textContent='⏸ 停止'; btn.classList.add('amber'); autoState=0;
+  autoTimer = setInterval(()=>{
+    if(autoState===0){flipCard(); autoState=1;}
+    else{flashNext(); autoState=0;}
+  },4000);
+}
+
+// スワイプ
+let touchStartX = 0;
+document.getElementById('flash-card').addEventListener('touchstart', e=>{touchStartX = e.changedTouches[0].clientX;});
+document.getElementById('flash-card').addEventListener('touchend', e=>{
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx)>60){if(dx<0) flashNext(); else flashPrev();}
+});
+
+// ============ リスニングテスト ============
+let testList = [];
+let testCurrent = null;
+let answerShown = false;
+
+function rebuildTest(){
+  testList = getFiltered().slice();
+  // シャッフル
+  for(let i=testList.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[testList[i],testList[j]]=[testList[j],testList[i]];}
+  nextTest();
+}
+function nextTest(){
+  if(testList.length===0){testCurrent=null; renderTest(); return;}
+  testCurrent = testList.shift();
+  answerShown=false;
+  renderTest();
+}
+function renderTest(){
+  document.getElementById('test-answer').classList.toggle('show', answerShown);
+  if(testCurrent){
+    document.getElementById('t-hangul').textContent = testCurrent.h;
+    document.getElementById('t-pron').textContent = '['+testCurrent.p+']';
+    document.getElementById('t-jp').textContent = testCurrent.j;
+  }
+  const s = state.score;
+  document.getElementById('t-correct').textContent = s.correct;
+  document.getElementById('t-wrong').textContent = s.wrong;
+  document.getElementById('t-total').textContent = s.correct+s.wrong;
+  const t = s.correct+s.wrong;
+  document.getElementById('t-rate').textContent = t>0?Math.round(s.correct/t*100)+'%':'-';
+}
+function showTestAnswer(){answerShown=true; renderTest();}
+function markTest(correct){
+  if(!testCurrent) return;
+  if(correct){
+    state.score.correct++;
+    // ステータス昇格
+    const cur = state.statuses[testCurrent.id];
+    if(cur==='fail') state.statuses[testCurrent.id]='hard';
+    else state.statuses[testCurrent.id]='good';
+    toast('✓ 正解！');
+  }else{
+    state.score.wrong++;
+    state.statuses[testCurrent.id]='fail';
+    state.favorites.add(testCurrent.id);
+    toast('✗ お気に入りに追加');
+  }
+  saveState();
+  buildFilterChips();
+  nextTest();
+}
+
+// ============ タブ切替 ============
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+tab));
+  if(tab==='flash') rebuildFlash();
+  if(tab==='test') rebuildTest();
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+
+// ============ 検索 ============
+document.getElementById('search').addEventListener('input', renderList);
+
+// ============ お気に入り・速度 ============
+document.getElementById('fav-only').addEventListener('change', e=>{
+  state.favOnly = e.target.checked; saveState(); refresh();
+});
+document.getElementById('speed-select').addEventListener('change', e=>{
+  state.speed = parseFloat(e.target.value); saveState();
+});
+
+// ============ トースト ============
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(()=>t.classList.remove('show'), 1500);
+}
+
+// ============ キーボード ============
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  const activeTab = document.querySelector('.tab.active').dataset.tab;
+  if(e.key==='1') switchTab('list');
+  else if(e.key==='2') switchTab('flash');
+  else if(e.key==='3') switchTab('test');
+  else if(e.key==='ArrowLeft' && activeTab==='flash') flashPrev();
+  else if(e.key==='ArrowRight' && activeTab==='flash') flashNext();
+  else if(e.key===' '){
+    e.preventDefault();
+    if(activeTab==='flash') flipCard();
+    else if(activeTab==='test') showTestAnswer();
+  }
+  else if(e.key==='p'||e.key==='P'){
+    if(activeTab==='flash') speakCurrent('flash');
+    else if(activeTab==='test') speakCurrent('test');
+  }
+  else if(e.key==='s'||e.key==='S'){if(activeTab==='flash') shuffleFlash();}
+  else if(e.key==='f'||e.key==='F'){if(activeTab==='flash') toggleFlashFav();}
+  else if(e.key==='q'||e.key==='Q'){if(activeTab==='flash') setFlashStatus('fail');}
+  else if(e.key==='w'||e.key==='W'){
+    if(activeTab==='flash') setFlashStatus('hard');
+    else if(activeTab==='test') markTest(false);
+  }
+  else if(e.key==='e'||e.key==='E'){if(activeTab==='flash') setFlashStatus('good');}
+  else if(e.key==='c'||e.key==='C'){if(activeTab==='test') markTest(true);}
+});
+
+// ============ 初期化 ============
+function refresh(){
+  document.getElementById('total-count').textContent = `${getFiltered().length} / ${getAllInLessons().length}語`;
+  buildFilterChips();
+  renderList();
+  if(document.querySelector('.tab.active').dataset.tab==='flash') rebuildFlash();
+}
+document.getElementById('fav-only').checked = state.favOnly;
+document.getElementById('speed-select').value = state.speed;
+buildLessonGrid();
+refresh();
+</script>
+</body>
+</html>
