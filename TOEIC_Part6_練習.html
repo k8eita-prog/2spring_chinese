@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TOEIC Part 6 練習</title>
+<style>
+  :root{
+    --navy:#1a237e;
+    --navy-dark:#0d1442;
+    --gold:#ffc107;
+    --gold-dark:#c79100;
+    --bg:#f4f6fb;
+    --panel:#ffffff;
+    --text:#1f2330;
+    --muted:#5b6478;
+    --green:#2e7d32;
+    --green-bg:#e8f5e9;
+    --red:#c62828;
+    --red-bg:#ffebee;
+    --border:#dde2ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+  }
+  header{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-dark) 100%);
+    color:#fff;
+    padding:14px 20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+    position:sticky;top:0;z-index:50;
+  }
+  .header-row{
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:8px;
+  }
+  .title{
+    font-weight:700;font-size:1.1rem;letter-spacing:.02em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .title-badge{
+    background:var(--gold);color:var(--navy-dark);
+    padding:2px 8px;border-radius:6px;font-size:.78rem;font-weight:700;
+  }
+  .score-box{
+    display:flex;gap:10px;align-items:center;
+    font-size:.85rem;
+  }
+  .score-pill{
+    background:rgba(255,255,255,.12);
+    padding:4px 10px;border-radius:20px;
+    border:1px solid rgba(255,255,255,.2);
+  }
+  .icon-btn{
+    background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);
+    border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.9rem;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,.1);}
+  .progress-wrap{
+    margin-top:10px;background:rgba(255,255,255,.15);height:6px;border-radius:4px;overflow:hidden;
+  }
+  .progress-bar{
+    height:100%;background:var(--gold);width:0%;transition:width .3s;
+  }
+  .tabs{
+    display:flex;gap:4px;background:var(--panel);
+    border-bottom:1px solid var(--border);padding:8px 16px 0;
+    position:sticky;top:75px;z-index:40;flex-wrap:wrap;
+  }
+  .tab{
+    border:none;background:transparent;cursor:pointer;
+    padding:10px 18px;border-radius:8px 8px 0 0;
+    font-weight:600;color:var(--muted);font-size:.95rem;
+  }
+  .tab.active{
+    background:var(--navy);color:#fff;
+  }
+  main{
+    max-width:780px;margin:20px auto;padding:0 16px 80px;
+  }
+  .passage-card{
+    background:var(--panel);border-radius:14px;padding:20px 22px;
+    box-shadow:0 4px 14px rgba(20,30,80,.08);
+    margin-bottom:18px;border-top:4px solid var(--gold);
+  }
+  .passage-meta{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;
+    font-size:.8rem;color:var(--muted);
+  }
+  .level-badge{
+    padding:2px 8px;border-radius:6px;font-weight:700;font-size:.72rem;
+  }
+  .lv-beginner{background:#e3f2fd;color:#1565c0;}
+  .lv-intermediate{background:#fff3e0;color:#e65100;}
+  .lv-advanced{background:#fce4ec;color:#ad1457;}
+  .passage-title{
+    font-weight:700;font-size:1rem;color:var(--navy);margin-bottom:10px;
+  }
+  .passage-body{
+    background:#fafbff;border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px;
+    white-space:pre-wrap;font-size:.96rem;
+    font-family:Georgia,"Times New Roman",serif;
+    line-height:1.85;
+  }
+  .blank{
+    display:inline-block;min-width:60px;border-bottom:2px solid var(--navy);
+    text-align:center;color:var(--navy);font-weight:700;
+    padding:0 8px;margin:0 2px;
+  }
+  .blank.filled{color:var(--green);border-color:var(--green);}
+  .question-card{
+    background:var(--panel);border-radius:12px;padding:16px 18px;
+    box-shadow:0 2px 8px rgba(20,30,80,.06);margin-bottom:12px;
+  }
+  .q-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .q-num{
+    font-weight:700;color:var(--navy);font-size:.95rem;
+  }
+  .bookmark-btn{
+    background:transparent;border:none;font-size:1.1rem;cursor:pointer;
+    color:#bbb;
+  }
+  .bookmark-btn.active{color:var(--gold);}
+  .options{
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .option{
+    background:#fff;border:1.5px solid var(--border);
+    padding:11px 14px;border-radius:8px;cursor:pointer;
+    text-align:left;font-size:.95rem;
+    transition:all .15s;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .option:hover:not(:disabled){border-color:var(--navy);background:#f0f4ff;}
+  .option:disabled{cursor:default;}
+  .opt-label{
+    font-weight:700;color:var(--navy);min-width:18px;
+  }
+  .option.correct{
+    background:var(--green-bg);border-color:var(--green);
+  }
+  .option.correct .opt-label{color:var(--green);}
+  .option.incorrect{
+    background:var(--red-bg);border-color:var(--red);
+  }
+  .option.incorrect .opt-label{color:var(--red);}
+  .feedback-panel{
+    margin-top:12px;background:#fffbe6;border-left:4px solid var(--gold);
+    padding:12px 14px;border-radius:6px;font-size:.92rem;
+    animation:slideIn .3s ease;
+    display:none;
+  }
+  .feedback-panel.show{display:block;}
+  @keyframes slideIn{
+    from{opacity:0;transform:translateY(-6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .feedback-result{
+    font-weight:700;margin-bottom:6px;
+  }
+  .feedback-result.ok{color:var(--green);}
+  .feedback-result.ng{color:var(--red);}
+  .next-row{
+    display:flex;justify-content:flex-end;gap:8px;margin-top:14px;
+  }
+  .primary-btn{
+    background:var(--gold);color:var(--navy-dark);
+    border:none;border-radius:8px;padding:10px 22px;
+    font-weight:700;cursor:pointer;font-size:.95rem;
+    box-shadow:0 2px 6px rgba(255,193,7,.4);
+  }
+  .primary-btn:hover{background:var(--gold-dark);color:#fff;}
+  .secondary-btn{
+    background:var(--navy);color:#fff;border:none;border-radius:8px;
+    padding:10px 22px;font-weight:600;cursor:pointer;font-size:.95rem;
+  }
+  .summary{
+    background:var(--panel);border-radius:14px;padding:30px;
+    text-align:center;box-shadow:0 4px 14px rgba(20,30,80,.1);
+  }
+  .summary h2{color:var(--navy);margin-top:0;}
+  .summary-score{
+    font-size:3rem;font-weight:800;color:var(--gold);margin:10px 0;
+  }
+  .summary-rate{font-size:1.1rem;color:var(--muted);}
+  .summary-actions{
+    display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap;
+  }
+  /* Modal */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(10,20,50,.6);
+    display:none;align-items:center;justify-content:center;z-index:200;
+    padding:16px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:#fff;border-radius:12px;padding:24px;max-width:480px;width:100%;
+    box-shadow:0 8px 30px rgba(0,0,0,.3);
+  }
+  .modal h3{margin-top:0;color:var(--navy);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{
+    display:block;font-size:.85rem;font-weight:600;
+    margin-bottom:4px;color:var(--muted);
+  }
+  .form-group input{
+    width:100%;padding:8px 10px;border:1.5px solid var(--border);
+    border-radius:6px;font-size:.9rem;font-family:monospace;
+  }
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+  /* Toast */
+  .toast-wrap{
+    position:fixed;right:16px;bottom:16px;z-index:300;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .toast{
+    background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);font-size:.88rem;
+    animation:toastIn .25s ease;max-width:320px;
+  }
+  .toast.err{background:var(--red);}
+  .toast.ok{background:var(--green);}
+  @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .empty-msg{
+    background:#fff;border-radius:10px;padding:30px;text-align:center;
+    color:var(--muted);
+  }
+  @media (max-width:600px){
+    .tabs{top:90px;}
+    .passage-card{padding:14px;}
+    .passage-body{font-size:.9rem;padding:12px;}
+    .option{font-size:.9rem;padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="title">
+      <span>📘 TOEIC Part 6 練習</span>
+      <span class="title-badge" id="levelLabel">初級</span>
+    </div>
+    <div class="score-box">
+      <span class="score-pill" id="scoreLabel">スコア: 0/0 (0%)</span>
+      <button class="icon-btn" id="settingsBtn" title="Notion設定">⚙️</button>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progBar"></div></div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-level="beginner">初級</button>
+  <button class="tab" data-level="intermediate">中級</button>
+  <button class="tab" data-level="advanced">上級</button>
+</div>
+
+<main id="app"></main>
+
+<!-- Settings Modal -->
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <h3>⚙️ Notion 連携設定</h3>
+    <div class="form-group">
+      <label>Notion Integration Token</label>
+      <input id="tokenInput" placeholder="secret_..." />
+    </div>
+    <div class="form-group">
+      <label>セッションスコア用 DB ID</label>
+      <input id="scoreDbInput" placeholder="xxxxxxxxxxxxxxxx" />
+    </div>
+    <div class="form-group">
+      <label>苦手問題用 DB ID</label>
+      <input id="mistakeDbInput" placeholder="xxxxxxxxxxxxxxxx" />
+    </div>
+    <div class="modal-actions">
+      <button class="icon-btn" style="color:var(--navy);border-color:var(--navy);" id="cancelSettings">キャンセル</button>
+      <button class="primary-btn" id="saveSettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   Part 6 長文穴埋め 問題データ
+   構成: 初級13本(52問) / 中級13本(52問) / 上級12本(48問)
+   合計: 38本 / 152問
+   各長文は4つの空所(blanks)を持ち、各空所に4択問題が紐づく
+============================================================ */
+
+const passages = [
+/* ==================== 初級 (Beginner) 13本 ==================== */
+{
+  id:"b1", level:"beginner",
+  title:"Office Cleaning Notice",
+  body:`To: All Staff
+From: Office Manager
+Subject: New Cleaning Schedule
+
+Starting next Monday, our office will (1)___ a new cleaning company. The cleaners will come every weekday evening at 7 p.m. (2)___, please make sure your desk is tidy before you leave.
+
+If you have any items you want (3)___, please put them in a drawer. The cleaners will not touch personal belongings. We hope this change will help us keep the office (4)___ and comfortable for everyone.`,
+  questions:[
+    {blank:1, options:["use","used","using","to using"], answer:0,
+     explanation:"助動詞 will の後には動詞の原形が来るので 'use' が正解。'used' は過去形、'using' は ing 形、'to using' は形として不適切。"},
+    {blank:2, options:["However","Therefore","Although","Because"], answer:1,
+     explanation:"前文「掃除員が来る」→後文「机を整理しておくように」という因果関係。だから 'Therefore（したがって）' が適切。'However' は逆接、'Although'/'Because' は接続詞で文頭副詞句として使えない。"},
+    {blank:3, options:["protect","protected","protecting","protection"], answer:2,
+     explanation:"want + 目的語 + to V または want + V-ing の形を取れるが、ここは 'items you want protecting'（守りたい物）の意味で動名詞が自然。受動的意味で動名詞を使う英国寄りの用法だが、TOEICでもこの形は出題される。"},
+    {blank:4, options:["clean","cleanly","cleaner","cleaning"], answer:0,
+     explanation:"keep + O + 形容詞（O を〜の状態に保つ）の構文。'clean'（清潔な）が適切。'cleanly' は副詞、'cleaner' は比較級で意味が合わず、'cleaning' は ing 形。"}
+  ]
+},
+{
+  id:"b2", level:"beginner",
+  title:"Company Picnic Invitation",
+  body:`Dear Employees,
+
+We are happy to (1)___ you to our annual company picnic. The event will be held on Saturday, July 12, at Greenwood Park. Lunch and drinks will (2)___ provided for all attendees.
+
+Please bring your family members. There will be games for children (3)___ live music for adults. If you plan to come, kindly reply to this email (4)___ Friday.
+
+We look forward to seeing you there!`,
+  questions:[
+    {blank:1, options:["invite","invites","inviting","invited"], answer:0,
+     explanation:"be happy to + 動詞の原形（〜できて嬉しい）の構文。'invite' が正解。"},
+    {blank:2, options:["be","being","been","is"], answer:0,
+     explanation:"will の後は原形 + 受動態 'be + 過去分詞' の形。'will be provided' で「提供される予定」。"},
+    {blank:3, options:["or","but","and","so"], answer:2,
+     explanation:"「子供向けのゲームと大人向けの音楽」と並列している。等位接続詞 'and' が適切。"},
+    {blank:4, options:["until","by","since","for"], answer:1,
+     explanation:"「金曜までに返信を」という期限を示す前置詞は 'by'。'until' は継続「〜までずっと」、'since' は起点、'for' は期間を表す。"}
+  ]
+},
+{
+  id:"b3", level:"beginner",
+  title:"New Coffee Machine",
+  body:`A new coffee machine has been (1)___ in the break room. It is available for all employees to use during work hours.
+
+The machine offers several drinks (2)___ coffee, tea, and hot chocolate. Please read the instructions before using it for the first time. If you encounter any problems, (3)___ contact the maintenance team.
+
+We kindly ask everyone to clean up after using the machine. (4)___ keeping the break room tidy helps everyone enjoy their break.`,
+  questions:[
+    {blank:1, options:["install","installs","installed","installing"], answer:2,
+     explanation:"has been + 過去分詞（現在完了の受動態）。'installed' が正解。「設置された」。"},
+    {blank:2, options:["include","includes","including","included"], answer:2,
+     explanation:"「コーヒー、紅茶、ココアを含むいくつかの飲み物」。前置詞的に使われる現在分詞 'including（〜を含めて）' が正解。"},
+    {blank:3, options:["please","pleased","pleasing","pleasure"], answer:0,
+     explanation:"命令文を丁寧にする 'please' が正解。'please contact 〜（〜に連絡してください）'。"},
+    {blank:4, options:["Your help in","Your helping","You help with","Help you with"], answer:0,
+     explanation:"主語として「あなたの〜における協力」を表す名詞句 'Your help in keeping 〜' が自然。動名詞句が直後に続く形。"}
+  ]
+},
+{
+  id:"b4", level:"beginner",
+  title:"Library Reopening",
+  body:`The Westfield Public Library will (1)___ on Monday, March 3, after a two-month renovation. The new library features more reading rooms, computer stations, and a children's area.
+
+(2)___ the reopening week, all visitors will receive a free bookmark. There will also be reading events for children every afternoon.
+
+Library hours are from 9 a.m. (3)___ 8 p.m. on weekdays. On weekends, the library closes at 5 p.m. We hope to see many (4)___ visitors enjoying the new space.`,
+  questions:[
+    {blank:1, options:["reopen","reopens","reopened","reopening"], answer:0,
+     explanation:"助動詞 will の後は動詞の原形。'reopen' が正解。"},
+    {blank:2, options:["While","During","When","Since"], answer:1,
+     explanation:"後に名詞句 'the reopening week' が続くので、前置詞 'During（〜の間）' が正解。'While'/'When' は接続詞、'Since' は意味が合わない。"},
+    {blank:3, options:["to","at","in","by"], answer:0,
+     explanation:"'from A to B（AからBまで）' のセット表現。"},
+    {blank:4, options:["happy","happily","happiness","happier"], answer:0,
+     explanation:"名詞 'visitors' を修飾する形容詞が必要。'happy visitors（喜ぶ訪問者）' が正解。"}
+  ]
+},
+{
+  id:"b5", level:"beginner",
+  title:"Order Confirmation",
+  body:`Thank you for your order with BluePine Online Store. Your order number is #45219 and (1)___ been confirmed.
+
+Your items will be shipped within two business days. You will receive a tracking number by email (2)___ the package leaves our warehouse.
+
+If you need to change the delivery address, please contact us (3)___ 24 hours. After that, changes may not be possible.
+
+We appreciate your (4)___ and hope you enjoy your new items!`,
+  questions:[
+    {blank:1, options:["have","has","is","was"], answer:1,
+     explanation:"主語は 'Your order'（単数）なので 'has been confirmed'（現在完了受動態）。"},
+    {blank:2, options:["once","while","during","until"], answer:0,
+     explanation:"「荷物が倉庫を出た時点で」という意味。接続詞 'once（〜したらすぐに）' が適切。"},
+    {blank:3, options:["within","between","among","along"], answer:0,
+     explanation:"「24時間以内に」。期間内を示す 'within' が正解。"},
+    {blank:4, options:["business","busy","busily","businesses"], answer:0,
+     explanation:"'your business' で「お取引・ご利用」を意味する定番表現。"}
+  ]
+},
+{
+  id:"b6", level:"beginner",
+  title:"Job Posting",
+  body:`Sunrise Café is (1)___ for friendly and hardworking staff. We have openings for part-time servers and one full-time kitchen assistant.
+
+(2)___ experience is preferred, we are willing to train the right candidates. Applicants must be available on weekends.
+
+If you are interested, please send your résumé (3)___ sunrisecafe.hr@example.com. We will contact selected applicants for an interview (4)___ one week.`,
+  questions:[
+    {blank:1, options:["looking","looked","looks","look"], answer:0,
+     explanation:"be looking for 〜（〜を探している）の進行形。"},
+    {blank:2, options:["Because","Although","Since","Unless"], answer:1,
+     explanation:"「経験があれば望ましいが、訓練する用意がある」という逆接。'Although（〜だけれども）' が正解。"},
+    {blank:3, options:["at","on","to","with"], answer:2,
+     explanation:"send A to B（AをBに送る）。'to' が正解。"},
+    {blank:4, options:["within","by","until","during"], answer:0,
+     explanation:"「1週間以内に」を表す 'within'。'by' は「までに」だが期間表現は 'within'。"}
+  ]
+},
+{
+  id:"b7", level:"beginner",
+  title:"Hotel Welcome Letter",
+  body:`Dear Guest,
+
+Welcome to the Lakeview Hotel. We are (1)___ to have you stay with us. Our staff is available 24 hours a day to help with any (2)___ you may have.
+
+Breakfast is served in the main dining room from 7 a.m. to 10 a.m. The fitness center and pool are open (3)___ 6 a.m. to 10 p.m.
+
+If you need extra towels or pillows, please call the front desk. We hope you (4)___ your stay.`,
+  questions:[
+    {blank:1, options:["delight","delights","delighted","delightful"], answer:2,
+     explanation:"be delighted to V（〜できて嬉しい）。過去分詞由来の形容詞 'delighted'。"},
+    {blank:2, options:["requests","request","requested","requesting"], answer:0,
+     explanation:"'any' の後は通常複数形または不可算名詞。'any requests'（どんな要望でも）が正解。"},
+    {blank:3, options:["from","at","on","in"], answer:0,
+     explanation:"from A to B（A時からB時まで）。"},
+    {blank:4, options:["enjoy","enjoying","enjoyed","to enjoy"], answer:0,
+     explanation:"hope (that) S + V の節。動詞の原形 'enjoy' が正解。'We hope you enjoy your stay.' で定型表現。"}
+  ]
+},
+{
+  id:"b8", level:"beginner",
+  title:"Gym Membership Renewal",
+  body:`Dear Mr. Brown,
+
+Your gym membership at FitLife will (1)___ on April 30. To continue using our facilities without interruption, please renew your membership before that date.
+
+We are offering a special (2)___ for early renewals. If you renew by April 15, you will receive a 10% discount on the yearly fee.
+
+You can renew online or (3)___ visiting the front desk. Our staff will be happy to (4)___ you.
+
+Thank you for choosing FitLife.`,
+  questions:[
+    {blank:1, options:["expire","expires","expired","expiring"], answer:0,
+     explanation:"will の後は動詞の原形。'expire（期限切れになる）'。"},
+    {blank:2, options:["offer","offers","offering","offered"], answer:0,
+     explanation:"'a special offer'（特別オファー）。冠詞 a の後の名詞単数形。"},
+    {blank:3, options:["by","with","at","on"], answer:0,
+     explanation:"by + 動名詞（〜することによって）。'by visiting'。"},
+    {blank:4, options:["assist","assistance","assisting","assistant"], answer:0,
+     explanation:"will be happy to V の不定詞。動詞原形 'assist（手伝う）' が正解。"}
+  ]
+},
+{
+  id:"b9", level:"beginner",
+  title:"School Festival Announcement",
+  body:`Greenview High School will hold its annual school festival on Saturday, October 18. The festival is open to (1)___, including students, parents, and members of the community.
+
+There will be food stands, music performances, and art exhibitions. Tickets are not (2)___; the festival is free of charge.
+
+Parking is limited, so we encourage visitors to use public transportation. Buses run every 15 minutes (3)___ the nearby train station.
+
+We hope (4)___ will join us and enjoy this special day.`,
+  questions:[
+    {blank:1, options:["everyone","anyone","someone","no one"], answer:0,
+     explanation:"「皆さんに開かれている」という意味。'everyone' が自然。"},
+    {blank:2, options:["require","required","requirement","requires"], answer:1,
+     explanation:"be 動詞 + 過去分詞（受動態）。'Tickets are not required（チケットは不要）'。"},
+    {blank:3, options:["from","at","with","on"], answer:0,
+     explanation:"「最寄り駅から」。起点を示す 'from'。"},
+    {blank:4, options:["many people","much people","more peoples","each people"], answer:0,
+     explanation:"'people' は通常複数扱い。数えられるので 'many people' が正解。'much' は不可算名詞用。"}
+  ]
+},
+{
+  id:"b10", level:"beginner",
+  title:"Internet Service Notice",
+  body:`Dear Customer,
+
+We will perform (1)___ maintenance on our network on Sunday, May 5, from 2 a.m. to 5 a.m. During this time, internet service may be temporarily (2)___.
+
+This maintenance is necessary (3)___ improve service quality and provide faster speeds. We apologize for any inconvenience.
+
+If you have any questions, please call our customer support team at 0120-123-456. (4)___ for your understanding.`,
+  questions:[
+    {blank:1, options:["schedule","schedules","scheduling","scheduled"], answer:3,
+     explanation:"名詞 'maintenance' を修飾する過去分詞 'scheduled（予定された）'。'scheduled maintenance' は定型語。"},
+    {blank:2, options:["unavailable","available","availably","availability"], answer:0,
+     explanation:"「利用できない可能性がある」。形容詞 'unavailable'。"},
+    {blank:3, options:["for","to","of","with"], answer:1,
+     explanation:"目的を表す to 不定詞。'to improve（改善するために）'。"},
+    {blank:4, options:["Thanks","Thank","Thanking","To thank"], answer:0,
+     explanation:"'Thanks for + 名詞' で「〜をありがとう」。手紙の結びの定型。"}
+  ]
+},
+{
+  id:"b11", level:"beginner",
+  title:"Product Recall Notice",
+  body:`SafeKitchen Co. is voluntarily recalling its Model A100 electric kettle (1)___ to a possible safety issue. Some units may overheat during use.
+
+If you own this product, please stop using it (2)___. You can return the kettle to the store where you purchased it for a full refund.
+
+(3)___ proof of purchase is required, but we recommend bringing your receipt. We are sorry for the inconvenience and thank you for your (4)___.`,
+  questions:[
+    {blank:1, options:["due","because","since","owing"], answer:0,
+     explanation:"'due to + 名詞（〜が原因で）' の前置詞句。'because' は接続詞、'since' は意味が広い、'owing' 単体では不可。"},
+    {blank:2, options:["immediately","immediate","immediacy","more immediate"], answer:0,
+     explanation:"動詞 'stop using' を修飾する副詞 'immediately（直ちに）'。"},
+    {blank:3, options:["No","Not","None","Never"], answer:0,
+     explanation:"名詞 'proof' を修飾して「いかなる証明も不要」とする 'No proof is required'。"},
+    {blank:4, options:["cooperate","cooperation","cooperative","cooperated"], answer:1,
+     explanation:"前置詞 'for' の後は名詞。'cooperation（協力）' が正解。"}
+  ]
+},
+{
+  id:"b12", level:"beginner",
+  title:"Restaurant Opening",
+  body:`Bella's Italian Kitchen is (1)___ pleased to announce the opening of our second location in downtown Riverside.
+
+The new restaurant will open its doors on June 1. We will offer the same delicious menu (2)___ a few new pasta dishes.
+
+To celebrate our opening, all customers (3)___ a free dessert during the first week. No reservation is needed; just walk in and enjoy.
+
+We can't wait to (4)___ you at our new place!`,
+  questions:[
+    {blank:1, options:["proud","proudly","pride","prouder"], answer:1,
+     explanation:"形容詞 'pleased' を修飾する副詞 'proudly（誇らしげに）'。"},
+    {blank:2, options:["plus","added","with","by"], answer:2,
+     explanation:"「同じメニュー＋新しいパスタ料理」。付加を示す 'with（〜とともに）'。"},
+    {blank:3, options:["receive","will receive","received","receiving"], answer:1,
+     explanation:"未来の出来事「最初の1週間中に受け取る」。'will receive' が正解。"},
+    {blank:4, options:["serve","serves","served","serving"], answer:0,
+     explanation:"can't wait to + 動詞の原形（〜するのが待ち遠しい）。'serve（給仕する）'。"}
+  ]
+},
+{
+  id:"b13", level:"beginner",
+  title:"Survey Request Email",
+  body:`Dear Valued Customer,
+
+Thank you for your recent purchase. We would (1)___ to hear your feedback.
+
+Please take a few minutes to complete a short online survey. Your (2)___ will help us improve our products and services.
+
+The survey contains 10 questions and (3)___ less than 5 minutes to complete. As a thank-you, we will send you a coupon for 15% off your next order.
+
+Click the link below to start. (4)___ in advance for your participation.`,
+  questions:[
+    {blank:1, options:["like","liked","liking","likely"], answer:0,
+     explanation:"would like to V（〜したいと思う）の定型表現。"},
+    {blank:2, options:["opinion","opinions","opinionated","opining"], answer:1,
+     explanation:"「あなた方のご意見（複数）」。複数の顧客への呼びかけだが、ここは 'Your opinions' で複数形が自然。単数 opinion も文法的に可能だが、TOEIC では一般論として複数形を取ることが多い。"},
+    {blank:3, options:["take","takes","took","taken"], answer:1,
+     explanation:"主語は 'The survey'（単数）。三人称単数の現在形 'takes'。"},
+    {blank:4, options:["Thank","Thanks","Thanked","Thanking"], answer:1,
+     explanation:"'Thanks in advance（前もってお礼を）' の決まり文句。手紙やメールの結びでよく使われる。"}
+  ]
+},
+
+/* ==================== 中級 (Intermediate) 13本 ==================== */
+{
+  id:"i1", level:"intermediate",
+  title:"Quarterly Sales Report",
+  body:`To: Department Heads
+From: Sandra Chen, Finance
+Subject: Q2 Sales Performance
+
+I am pleased to share that our second quarter sales have (1)___ expectations by 12%. This impressive growth is largely (2)___ to the success of our new product line launched in April.
+
+(3)___, customer satisfaction scores have reached an all-time high. The marketing team's targeted campaigns clearly resonated with our key demographics.
+
+Looking ahead, we plan to expand into two new regional markets in Q3. A detailed strategy document will be (4)___ next week.`,
+  questions:[
+    {blank:1, options:["exceeded","extended","expanded","extracted"], answer:0,
+     explanation:"「期待を上回る」は 'exceed expectations' という定型。'extended（延長した）'、'expanded（拡大した）'、'extracted（抽出した）' は文脈不適。"},
+    {blank:2, options:["attribute","attributed","attributing","attribution"], answer:1,
+     explanation:"be attributed to 〜（〜のおかげである）。受動態の過去分詞。"},
+    {blank:3, options:["However","Additionally","Otherwise","Nevertheless"], answer:1,
+     explanation:"前文の好業績にさらに別の好材料を加える。'Additionally（加えて）' が適切。'However'/'Nevertheless' は逆接。"},
+    {blank:4, options:["circulated","circular","circulating","circulation"], answer:0,
+     explanation:"「来週配布される」。受動態 will be + 過去分詞。'circulated（回覧された）'。"}
+  ]
+},
+{
+  id:"i2", level:"intermediate",
+  title:"Office Relocation",
+  body:`As many of you are aware, our company headquarters will be (1)___ to the new Riverside Tower beginning August 1.
+
+The new office offers significantly more space, modern meeting rooms, and an on-site cafeteria. We believe this move will enhance both productivity and (2)___ collaboration.
+
+Please pack your personal belongings (3)___ Friday, July 25. The moving company will handle all office equipment and furniture.
+
+Detailed information about the new building, (4)___ parking and public transit options, is attached to this email.`,
+  questions:[
+    {blank:1, options:["relocate","relocated","relocating","relocation"], answer:1,
+     explanation:"will be + 過去分詞（受動態の未来）。'relocated（移転される）'。"},
+    {blank:2, options:["team","teaming","teamed","teams"], answer:0,
+     explanation:"名詞修飾の複合名詞 'team collaboration（チーム協働）'。"},
+    {blank:3, options:["by","until","at","since"], answer:0,
+     explanation:"「7月25日金曜までに荷造りを完了させる」期限。'by' が正解。'until' は継続。"},
+    {blank:4, options:["include","including","included","includes"], answer:1,
+     explanation:"「駐車場や公共交通機関の情報を含めた建物の詳細情報」。前置詞的に使う 'including（〜を含めて）'。"}
+  ]
+},
+{
+  id:"i3", level:"intermediate",
+  title:"Conference Registration",
+  body:`Thank you for registering for the International Marketing Conference. Your participation is greatly (1)___.
+
+Enclosed you will find your name badge and the conference program. Please wear your badge at all times during the event, (2)___ it grants you access to the sessions and meals.
+
+If you have not yet booked accommodation, we recommend the Plaza Hotel, (3)___ offers a special discount for conference attendees.
+
+Should you have any questions, please do not (4)___ to contact our event team.`,
+  questions:[
+    {blank:1, options:["appreciate","appreciated","appreciation","appreciative"], answer:1,
+     explanation:"be 動詞 + 過去分詞（受動態）。'is greatly appreciated（大変感謝しています）'。"},
+    {blank:2, options:["as","so","because of","due to"], answer:0,
+     explanation:"後ろが S+V の節なので接続詞が必要。'as（〜なので）' が適切。'because of'/'due to' は前置詞句。"},
+    {blank:3, options:["that","which","who","whose"], answer:1,
+     explanation:"非制限用法（コンマ付き）の関係代名詞。先行詞は物（Plaza Hotel）なので 'which'。'that' は非制限用法では使えない。"},
+    {blank:4, options:["hesitate","wait","stop","forget"], answer:0,
+     explanation:"'please do not hesitate to contact us（遠慮なくご連絡を）' は定型表現。"}
+  ]
+},
+{
+  id:"i4", level:"intermediate",
+  title:"Performance Review",
+  body:`Annual performance reviews will (1)___ throughout the month of November. Each employee will meet with their direct supervisor for a one-hour discussion.
+
+(2)___ preparing for your review, please complete the self-assessment form and submit it at least three days in advance. This will help ensure a productive conversation.
+
+The review will cover your accomplishments, areas for (3)___, and goals for the coming year. Please be ready to discuss both successes and challenges (4)___.`,
+  questions:[
+    {blank:1, options:["conduct","be conducted","be conducting","be conduct"], answer:1,
+     explanation:"will の後は原形＋受動態 'be + 過去分詞'。'will be conducted（実施される）'。"},
+    {blank:2, options:["While","When","During","On"], answer:1,
+     explanation:"when + 動名詞句（〜する際に）。'When preparing' が自然。'During' は名詞句のみを取る。"},
+    {blank:3, options:["improvement","improve","improves","improved"], answer:0,
+     explanation:"前置詞 for の後は名詞。'areas for improvement（改善すべき分野）' は定型句。"},
+    {blank:4, options:["open","openly","opening","openness"], answer:1,
+     explanation:"動詞 'discuss' を修飾する副詞 'openly（率直に）'。"}
+  ]
+},
+{
+  id:"i5", level:"intermediate",
+  title:"Software Update Notice",
+  body:`Dear Users,
+
+We are writing to inform you that an important software update will be (1)___ this weekend. The update will improve security and add several new features that many of you have (2)___.
+
+To minimize disruption, the update will run automatically during off-peak hours. (3)___, you may experience a brief service interruption of approximately 30 minutes.
+
+After the update, please log in again to verify your account settings. If you notice anything unusual, contact our support team (4)___.`,
+  questions:[
+    {blank:1, options:["release","releases","released","releasing"], answer:2,
+     explanation:"will be + 過去分詞（受動態）。'will be released（リリースされる）'。"},
+    {blank:2, options:["requested","requesting","requests","request"], answer:0,
+     explanation:"現在完了 'have + 過去分詞'。'have requested（要望してきた）'。"},
+    {blank:3, options:["However","Therefore","Furthermore","Moreover"], answer:0,
+     explanation:"前文「中断を最小化」と後文「30分の中断あり」は対立的内容。'However（しかしながら）' が適切。"},
+    {blank:4, options:["promptly","prompt","prompted","prompting"], answer:0,
+     explanation:"動詞を修飾する副詞 'promptly（速やかに）'。"}
+  ]
+},
+{
+  id:"i6", level:"intermediate",
+  title:"New Hire Orientation",
+  body:`Welcome to Horizon Consulting! We are thrilled to have you (1)___ our team.
+
+Your orientation will take place on Monday from 9 a.m. to 4 p.m. in the main conference room. Please arrive by 8:45 a.m. (2)___ you can sign in and pick up your welcome packet.
+
+The day will include presentations about company policies, a tour of the building, and a lunch (3)___ your new colleagues. You will also meet with HR to complete the remaining paperwork.
+
+We look forward (4)___ you on Monday.`,
+  questions:[
+    {blank:1, options:["join","joined","joining","to join"], answer:3,
+     explanation:"have + 目的語 + 不定詞（〜してもらう）の構文。'have you join'/'have you joining' どちらも可能だが、形式的な歓迎表現では 'to join' が自然。"},
+    {blank:2, options:["so that","since","unless","whereas"], answer:0,
+     explanation:"「サインインできるように」の目的を表す 'so that S can V'。"},
+    {blank:3, options:["with","at","by","for"], answer:0,
+     explanation:"「新しい同僚との昼食」。同伴を表す 'with'。"},
+    {blank:4, options:["to seeing","to see","seeing","to seen"], answer:0,
+     explanation:"look forward to + 動名詞（〜を楽しみにする）。to は前置詞なので動名詞 'seeing'。"}
+  ]
+},
+{
+  id:"i7", level:"intermediate",
+  title:"Customer Complaint Response",
+  body:`Dear Ms. Patel,
+
+Thank you for bringing this matter to our (1)___. We sincerely apologize for the inconvenience you experienced with your recent delivery.
+
+After reviewing your case, we have confirmed that the wrong item was shipped (2)___ a packaging error at our warehouse. We have taken steps to prevent similar mistakes in the future.
+
+As a gesture of goodwill, we are offering you a full refund (3)___ a 20% discount on your next purchase. The correct item will arrive at your address within three business days.
+
+Once again, please accept our (4)___ apologies.`,
+  questions:[
+    {blank:1, options:["attention","attend","attentive","attentively"], answer:0,
+     explanation:"'bring 〜 to one's attention（〜を注意に向けさせる、知らせる）' は定型表現。"},
+    {blank:2, options:["due to","because","since","although"], answer:0,
+     explanation:"後ろが名詞句 'a packaging error'。前置詞句 'due to' が必要。"},
+    {blank:3, options:["plus","added","both","with"], answer:0,
+     explanation:"「全額返金＋20%割引」。付加を表す口語的な 'plus（さらに）' が自然。"},
+    {blank:4, options:["sincere","sincerely","sincerity","sincerest"], answer:3,
+     explanation:"「最も心からの謝罪」。最上級 'sincerest apologies' が定型句。"}
+  ]
+},
+{
+  id:"i8", level:"intermediate",
+  title:"Vendor Selection",
+  body:`We have been (1)___ evaluating proposals from three vendors for the office supplies contract. After careful review, we have selected Pacific Office Supply as our new vendor.
+
+Pacific offered the most (2)___ pricing while also demonstrating strong customer service. (3)___ their proposal included same-day delivery for urgent orders, which the other vendors did not provide.
+
+The new contract will take effect on October 1. Please direct all future supply orders (4)___ Pacific's online portal starting on that date.`,
+  questions:[
+    {blank:1, options:["careful","carefully","caring","care"], answer:1,
+     explanation:"進行形の動詞 'evaluating' を修飾する副詞 'carefully（慎重に）'。"},
+    {blank:2, options:["compete","competitive","competition","competitor"], answer:1,
+     explanation:"名詞 'pricing' を修飾する形容詞 'competitive（競争力のある）'。"},
+    {blank:3, options:["Furthermore","However","Otherwise","Instead"], answer:0,
+     explanation:"前文の理由に加えて別の理由を述べる。'Furthermore（さらに）' が適切。"},
+    {blank:4, options:["through","across","into","onto"], answer:0,
+     explanation:"'through their portal（ポータル経由で）'。手段を表す 'through'。"}
+  ]
+},
+{
+  id:"i9", level:"intermediate",
+  title:"Training Session Announcement",
+  body:`Mandatory cybersecurity training will be held on Thursday, September 11, from 2 p.m. to 4 p.m. All employees are (1)___ to attend.
+
+The session will cover (2)___ topics, including password best practices, phishing awareness, and safe handling of sensitive data.
+
+(3)___ been a significant increase in cyber threats targeting businesses this year, this training is more important than ever.
+
+Please confirm your attendance by replying to this email. Employees who cannot attend in person may join (4)___ video conference.`,
+  questions:[
+    {blank:1, options:["expect","expected","expecting","expectation"], answer:1,
+     explanation:"be 動詞 + 過去分詞（受動態）。'are expected to attend（出席することが期待される）'。"},
+    {blank:2, options:["several","much","each","every"], answer:0,
+     explanation:"複数名詞 'topics' を修飾する 'several（いくつかの）'。'much' は不可算、'each'/'every' は単数名詞用。"},
+    {blank:3, options:["There having","Having","There has","With there"], answer:1,
+     explanation:"分詞構文。'Having been a significant increase 〜（〜の大幅な増加があったので）' で理由を示す。"},
+    {blank:4, options:["via","through","by","on"], answer:0,
+     explanation:"'via video conference（ビデオ会議経由で）'。手段を表す 'via' が自然。'by' も可能だがTOEICでは 'via' が頻出。"}
+  ]
+},
+{
+  id:"i10", level:"intermediate",
+  title:"Product Launch Press Release",
+  body:`Tomorrow, TechWave Inc. will officially (1)___ its newest smartphone, the Aurora X. The device features an industry-leading camera system and the fastest processor in its class.
+
+(2)___ many months of development, the Aurora X represents a major step forward for the company. CEO Linda Park stated that the phone (3)___ to redefine the premium smartphone market.
+
+Pre-orders begin immediately on TechWave's website, and the phone will be available in stores (4)___ October 20.`,
+  questions:[
+    {blank:1, options:["unveil","unveiled","unveiling","unveils"], answer:0,
+     explanation:"助動詞 will の後は原形。'unveil（発表する）'。"},
+    {blank:2, options:["Despite","Following","Although","Whereas"], answer:1,
+     explanation:"後ろが名詞句 'many months of development'。前置詞 'Following（〜に続いて）' が適切。'Despite' も前置詞だが意味不適。"},
+    {blank:3, options:["aims","aiming","aimed","is aiming"], answer:0,
+     explanation:"発言内容 that 節の動詞。主語は 'the phone'（単数）。三人称単数現在形 'aims to redefine'。"},
+    {blank:4, options:["starting","start","started","starts"], answer:0,
+     explanation:"「10月20日から」を表す分詞構文。'starting + 日付' で「〜から」を意味する慣用的用法。"}
+  ]
+},
+{
+  id:"i11", level:"intermediate",
+  title:"Renovation Notice",
+  body:`Dear Tenants,
+
+We are writing to inform you that the lobby of your apartment building will undergo renovation (1)___ the next three weeks.
+
+Work will be conducted on weekdays from 9 a.m. to 5 p.m. While we will do everything possible to minimize disruption, residents should expect (2)___ noise during these hours.
+
+Please use the side entrance on Maple Street while the main entrance is closed. We will post (3)___ signs throughout the building.
+
+We appreciate your patience as we work to make our building (4)___ even more attractive.`,
+  questions:[
+    {blank:1, options:["over","upon","by","throughout"], answer:0,
+     explanation:"「これからの3週間にわたって」。'over the next three weeks' は定型表現。"},
+    {blank:2, options:["occasion","occasional","occasionally","occasions"], answer:1,
+     explanation:"名詞 'noise' を修飾する形容詞 'occasional（時折の）'。"},
+    {blank:3, options:["direct","directing","directional","direction"], answer:2,
+     explanation:"名詞 'signs' を修飾する形容詞 'directional（方向を示す）'。'directional signs' で「案内表示」。"},
+    {blank:4, options:["look","looking","looks","to look"], answer:0,
+     explanation:"make + O + 原形（Oに〜させる）。'make our building look 〜（建物を〜に見せる）'。"}
+  ]
+},
+{
+  id:"i12", level:"intermediate",
+  title:"Job Offer Letter",
+  body:`Dear Mr. Tanaka,
+
+We are delighted to (1)___ you a position as Senior Project Manager at Brightline Logistics. After reviewing your impressive background, we are confident that you will be an excellent addition to our team.
+
+Your starting salary will be $85,000 per year, (2)___ a comprehensive benefits package. Your first day will be Monday, July 7.
+
+Please review the attached offer letter carefully. If everything (3)___ acceptable, kindly sign and return it by June 23.
+
+We look forward to (4)___ you on board.`,
+  questions:[
+    {blank:1, options:["offer","offered","offering","offers"], answer:0,
+     explanation:"be delighted to + 動詞の原形。'offer（提供する）'。"},
+    {blank:2, options:["plus","added","with","both"], answer:0,
+     explanation:"「給与に加えて福利厚生」。付加を表す 'plus'。"},
+    {blank:3, options:["is","are","be","being"], answer:0,
+     explanation:"主語は 'everything'（単数扱い）。三人称単数 'is acceptable'。"},
+    {blank:4, options:["welcome","welcoming","welcomed","welcomes"], answer:1,
+     explanation:"look forward to + 動名詞。'welcoming you on board（迎え入れる）'。"}
+  ]
+},
+{
+  id:"i13", level:"intermediate",
+  title:"Community Event Volunteer",
+  body:`The Greenfield Community Center is seeking volunteers for its annual Spring Festival on April 19. Volunteers will help with setup, food service, and (1)___ activities for children.
+
+Each volunteer will receive a free T-shirt, lunch, and a certificate of (2)___. This is a wonderful opportunity to give back to the community and meet new people.
+
+(3)___ interested individuals should sign up by April 5. Spaces are limited and will be filled on a first-come, first-served basis.
+
+For more information, please contact our volunteer coordinator (4)___ the contact details below.`,
+  questions:[
+    {blank:1, options:["organize","organizing","organized","organization"], answer:1,
+     explanation:"並列構造 'setup, food service, and organizing activities'。動名詞 'organizing'。"},
+    {blank:2, options:["appreciate","appreciative","appreciation","appreciates"], answer:2,
+     explanation:"'a certificate of appreciation（感謝状）' は定型句。前置詞 of の後は名詞。"},
+    {blank:3, options:["All","Every","Each","None"], answer:0,
+     explanation:"複数名詞 'individuals' を修飾。'All interested individuals（興味のあるすべての方）'。"},
+    {blank:4, options:["using","use","used","to using"], answer:0,
+     explanation:"分詞構文 'using the contact details（〜を使って）'。"}
+  ]
+},
+
+/* ==================== 上級 (Advanced) 12本 ==================== */
+{
+  id:"a1", level:"advanced",
+  title:"Strategic Partnership Announcement",
+  body:`Meridian Pharmaceuticals and BioGen Research have entered into a strategic partnership (1)___ accelerating the development of next-generation cancer therapies. The collaboration combines Meridian's manufacturing expertise with BioGen's cutting-edge research capabilities.
+
+Under the terms of the agreement, BioGen will receive an upfront payment of $50 million, with additional milestone payments (2)___ predetermined research benchmarks. The two companies will share intellectual property rights for any treatments developed jointly.
+
+Industry analysts have responded (3)___ to the news, citing the complementary strengths of both organizations. (4)___.
+
+The partnership is expected to yield its first clinical candidate within 18 months.`,
+  questions:[
+    {blank:1, options:["aimed at","aiming for","aim to","to aim"], answer:0,
+     explanation:"'aimed at + 動名詞（〜を目的とした）' で名詞を後置修飾。partnership を説明している。"},
+    {blank:2, options:["contingent","contingency","contingently","contingent on"], answer:3,
+     explanation:"'contingent on 〜（〜次第で）' で「研究の節目達成次第支払われる」。前置詞句として後置修飾。"},
+    {blank:3, options:["favorably","favorable","favor","favoring"], answer:0,
+     explanation:"動詞 'responded' を修飾する副詞 'favorably（好意的に）'。"},
+    {blank:4, options:["The deal has already sent both companies' stock prices higher in early trading.","Both companies were founded in the same year.","Pharmaceutical regulations vary widely across countries.","Cancer treatment is a competitive field with many players."], answer:0,
+     explanation:"前文「アナリストの好反応」を受けて具体的な市場反応を示す文が論理的につながる。他の選択肢は文脈と関連性が薄い。"}
+  ]
+},
+{
+  id:"a2", level:"advanced",
+  title:"Internal Audit Findings",
+  body:`The internal audit conducted last quarter has (1)___ several areas in which our financial reporting processes could be strengthened. While no irregularities were detected, the audit team identified opportunities to enhance efficiency and accuracy.
+
+Among the recommendations, the most (2)___ is the implementation of automated reconciliation software. This would significantly reduce the manual workload currently borne by the accounting staff and lessen the likelihood of human error.
+
+(3)___ adopting all of the recommendations, we will need to allocate additional budget for software licensing and staff training. A detailed implementation plan will be presented at next month's board meeting.
+
+(4)___, departmental managers are asked to review the attached summary and submit any feedback by the end of the week.`,
+  questions:[
+    {blank:1, options:["identified","resolved","ignored","postponed"], answer:0,
+     explanation:"監査が「いくつかの分野を特定した」。'identified（特定した）' が文脈に合う。"},
+    {blank:2, options:["significant","significantly","signify","significance"], answer:0,
+     explanation:"'the most + 形容詞' の最上級。形容詞 'significant（重要な）'。"},
+    {blank:3, options:["Prior to","Despite","In addition to","Regardless of"], answer:0,
+     explanation:"「すべての勧告を採用する前に予算配分が必要」。'Prior to + 動名詞（〜する前に）'。"},
+    {blank:4, options:["In the meantime","On the contrary","As a result","Even so"], answer:0,
+     explanation:"「とりあえずの間に、部門長は概要を確認してほしい」。'In the meantime（その間に、当面）' が適切。"}
+  ]
+},
+{
+  id:"a3", level:"advanced",
+  title:"Sustainability Initiative",
+  body:`As part of our corporate sustainability commitment, Hartwell Industries is launching an ambitious initiative to reduce our carbon footprint by 40% (1)___ 2030. This target significantly (2)___ industry standards and reflects our leadership in environmental responsibility.
+
+The initiative encompasses several key areas: transitioning to renewable energy sources at all manufacturing facilities, redesigning packaging to minimize waste, and partnering with suppliers (3)___ adhere to strict environmental criteria.
+
+We recognize that achieving these goals will require sustained effort and investment. (4)___, we believe the long-term benefits—both to our planet and to our business—justify the commitment.`,
+  questions:[
+    {blank:1, options:["by","until","since","within"], answer:0,
+     explanation:"「2030年までに」期限。'by'。'until' は継続的状態を示す。"},
+    {blank:2, options:["exceeds","excess","excessive","exceeding"], answer:0,
+     explanation:"主語は 'This target'（単数）。三人称単数現在形 'exceeds（〜を上回る）'。"},
+    {blank:3, options:["that","who","whose","what"], answer:0,
+     explanation:"先行詞は 'suppliers'（物・組織として扱う）。制限用法の関係代名詞 'that'。"},
+    {blank:4, options:["Nevertheless","Furthermore","Additionally","Otherwise"], answer:0,
+     explanation:"前文「努力と投資が必要」と後文「長期的利益は価値ある」の逆接。'Nevertheless（それでもなお）'。"}
+  ]
+},
+{
+  id:"a4", level:"advanced",
+  title:"Executive Departure",
+  body:`After 22 distinguished years with Carrington Holdings, Chief Operating Officer Michael Reeves has announced his (1)___ from the company, effective September 30. Mr. Reeves played a (2)___ role in transforming Carrington from a regional player into a global enterprise.
+
+(3)___. Among his many achievements, he is particularly remembered for spearheading the international expansion strategy that doubled the company's revenue between 2018 and 2024.
+
+The Board of Directors has begun the search for a successor and expects to announce the appointment within the next 90 days. In the (4)___, Senior Vice President Anna Foster will assume the COO's responsibilities on an interim basis.`,
+  questions:[
+    {blank:1, options:["retirement","retire","retired","retiring"], answer:0,
+     explanation:"所有格 'his' の後は名詞。'his retirement（彼の退職）'。"},
+    {blank:2, options:["pivot","pivotal","pivoting","pivots"], answer:1,
+     explanation:"名詞 'role' を修飾する形容詞 'pivotal（極めて重要な）'。'pivotal role' は定型。"},
+    {blank:3, options:["Mr. Reeves joined the company in 2003 as a regional manager.","Carrington plans to relocate its headquarters next year.","The company faced significant challenges during the pandemic.","Foster has no prior experience in the industry."], answer:0,
+     explanation:"前後の文脈で Reeves の経歴を語っているため、入社経緯を補足する文が自然。他は文脈と無関係または矛盾。"},
+    {blank:4, options:["meantime","while","duration","period"], answer:0,
+     explanation:"'in the meantime（その間に）' は定型句。"}
+  ]
+},
+{
+  id:"a5", level:"advanced",
+  title:"Real Estate Market Report",
+  body:`The commercial real estate market in the metropolitan area showed signs of (1)___ in the third quarter, with office vacancy rates declining for the first time in two years. This shift suggests that businesses are beginning to recommit to physical workspace, although hybrid work arrangements (2)___ widespread.
+
+Demand has been particularly strong in the technology and life sciences sectors, both of (3)___ require specialized facilities that cannot be easily replicated in remote settings. (4)___.
+
+Investors should approach this market with cautious optimism. While the fundamentals are improving, headwinds such as elevated interest rates and economic uncertainty continue to weigh on sentiment.`,
+  questions:[
+    {blank:1, options:["recover","recovery","recovered","recovering"], answer:1,
+     explanation:"前置詞 of の後は名詞。'signs of recovery（回復の兆し）'。"},
+    {blank:2, options:["remain","remains","remaining","remained"], answer:0,
+     explanation:"主語は 'arrangements'（複数）。'remain widespread（依然として広く行われている）'。"},
+    {blank:3, options:["which","that","whom","what"], answer:0,
+     explanation:"非制限用法（コンマ付き）の関係代名詞。先行詞は前述の二つのセクター。'both of which' で「その両方が」。"},
+    {blank:4, options:["Suburban locations have also seen renewed leasing activity, driven by companies seeking lower-cost alternatives.","Residential rents have remained stable throughout the year.","Historical buildings often require extensive renovation.","Many workers prefer to commute by public transportation."], answer:0,
+     explanation:"前文の市場活況の補足説明として、郊外でもリース活動が活発化している点が論理的につながる。他は本文の主題（商業不動産市場）と関連が薄い。"}
+  ]
+},
+{
+  id:"a6", level:"advanced",
+  title:"Regulatory Compliance Update",
+  body:`The Department of Commerce has issued revised guidelines (1)___ data privacy that will take effect on January 1. All companies that handle consumer information will need to update their internal procedures (2)___.
+
+The new guidelines impose stricter requirements regarding consent, data retention, and breach notification. Penalties for non-compliance have been substantially (3)___, with fines now ranging up to $5 million per violation.
+
+(4)___, we strongly recommend that department heads schedule a meeting with our legal counsel before the end of November. Failure to comply could expose the company to significant financial and reputational risk.`,
+  questions:[
+    {blank:1, options:["regarding","regard","regards","regarded"], answer:0,
+     explanation:"前置詞 'regarding（〜に関する）' が 'guidelines' を後置修飾。"},
+    {blank:2, options:["accordingly","according","accord","accords"], answer:0,
+     explanation:"「それに応じて」を表す副詞 'accordingly'。"},
+    {blank:3, options:["increase","increased","increasing","increases"], answer:1,
+     explanation:"have been + 過去分詞（現在完了の受動態）。'have been substantially increased（大幅に増額された）'。"},
+    {blank:4, options:["Given the seriousness of these changes","Despite the seriousness of these changes","Regardless of these changes","Until these changes occur"], answer:0,
+     explanation:"「変更の深刻さを考慮すれば」と理由を示す。'Given 〜（〜を考えると）' が文脈に合う。"}
+  ]
+},
+{
+  id:"a7", level:"advanced",
+  title:"Research Grant Approval",
+  body:`We are pleased to announce that the National Science Foundation has approved our research proposal, allocating $2.3 million over a three-year period. The grant will fund our investigation (1)___ novel materials for energy storage applications.
+
+Dr. Elena Vasquez, who will serve as Principal Investigator, expressed her gratitude (2)___ the foundation's support. "This grant enables us to pursue research directions that would otherwise be (3)___," she noted.
+
+(4)___. Postdoctoral positions will be advertised next month, and qualified candidates are encouraged to apply.`,
+  questions:[
+    {blank:1, options:["into","onto","through","within"], answer:0,
+     explanation:"'investigation into 〜（〜の調査・研究）' は定型。"},
+    {blank:2, options:["for","to","with","by"], answer:0,
+     explanation:"'gratitude for 〜（〜への感謝）'。'gratitude to 人' は人に対する感謝。"},
+    {blank:3, options:["financially","financial","financed","finance"], answer:0,
+     explanation:"動詞句 'would be' を修飾する副詞 'financially unfeasible'。ここは 'financially' が前置で「金銭的に〜である」を示すために必要。実際は be 動詞 + 副詞 + 形容詞 の形（financially unfeasible）が省略されている。"},
+    {blank:4, options:["The funding will also support the hiring of three postdoctoral researchers.","Energy storage is a controversial topic among scientists.","The foundation rejected many other proposals this year.","Dr. Vasquez previously worked at a different university."], answer:0,
+     explanation:"後文で「ポスドク募集」に言及しているため、その導入となる文が必要。'The funding will also support hiring 〜' が論理的に接続する。"}
+  ]
+},
+{
+  id:"a8", level:"advanced",
+  title:"Merger Announcement",
+  body:`Today, Vertex Industries and Apex Manufacturing jointly announced their intention to merge, (1)___ a combined entity valued at approximately $12 billion. The merger, subject to regulatory approval, is expected to close in the second quarter of next year.
+
+The combined company will operate under the name VertexApex Holdings and will be (2)___ in Chicago. Mark Donovan, currently CEO of Vertex, will serve as the new entity's chief executive, while Apex CEO Sarah Lin will assume the role of Chairman.
+
+The merger is anticipated to generate annual cost savings of $300 million within three years, (3)___ largely from consolidating duplicate operations and leveraging shared technology platforms. (4)___, the combined company will benefit from expanded geographic reach and a more diversified product portfolio.`,
+  questions:[
+    {blank:1, options:["create","created","creating","to create"], answer:2,
+     explanation:"分詞構文 'creating a combined entity（〜という統合体を生み出す）'。"},
+    {blank:2, options:["headquartered","headquarters","heads","heading"], answer:0,
+     explanation:"be 動詞 + 過去分詞（受動態）。'be headquartered in 〜（〜に本社を置く）' は定型。"},
+    {blank:3, options:["derive","deriving","derived","derives"], answer:1,
+     explanation:"分詞構文 'deriving largely from 〜（主に〜から生じる）'。"},
+    {blank:4, options:["Additionally","However","Otherwise","Conversely"], answer:0,
+     explanation:"前文「コスト削減」に加えて「地理的範囲拡大とポートフォリオ多様化」を追加。'Additionally（さらに）'。"}
+  ]
+},
+{
+  id:"a9", level:"advanced",
+  title:"CEO Annual Letter",
+  body:`To Our Shareholders,
+
+The past year has been one of remarkable achievement and (1)___ challenges for our company. Despite a difficult macroeconomic environment, we delivered record revenue and made substantial progress on our long-term strategic priorities.
+
+Our success would not have been possible (2)___ the dedication of our employees, the loyalty of our customers, and the support of our shareholders. To each of you, I extend my sincere thanks.
+
+(3)___. We remain firmly committed to disciplined capital allocation, sustainable growth, and operational excellence.
+
+Looking ahead, I am more confident than ever in our ability to (4)___ value over the long term.`,
+  questions:[
+    {blank:1, options:["significant","significantly","signify","signifies"], answer:0,
+     explanation:"名詞 'challenges' を修飾する形容詞 'significant（重要な、相当な）'。"},
+    {blank:2, options:["without","despite","beyond","through"], answer:0,
+     explanation:"「〜なしでは可能ではなかった」。'without' が文脈に合う。"},
+    {blank:3, options:["As we enter the new fiscal year, our strategic focus remains unchanged.","The market is expected to decline next year.","Most of our competitors have struggled this year.","Our shareholders have demanded changes in leadership."], answer:0,
+     explanation:"後文で「長期戦略への取り組み」を語っているため、新年度の戦略不変を述べる文が論理的につながる。"},
+    {blank:4, options:["create","creating","creation","created"], answer:0,
+     explanation:"to + 動詞の原形（不定詞）。'to create value（価値を創造する）'。"}
+  ]
+},
+{
+  id:"a10", level:"advanced",
+  title:"Supply Chain Restructuring",
+  body:`In response to ongoing global supply chain disruptions, Pinnacle Logistics is implementing a comprehensive restructuring of its sourcing and distribution operations. The initiative aims to enhance resilience while maintaining cost (1)___.
+
+Key components of the restructuring include diversifying our supplier base across multiple geographic regions, establishing strategic inventory buffers for critical components, and (2)___ advanced analytics to anticipate potential disruptions.
+
+(3)___ a recent industry survey, companies that proactively address supply chain vulnerabilities outperform their peers by an average of 15% in operating margin. We believe our restructuring positions us to capture similar benefits.
+
+(4)___, the transition will require careful coordination with existing partners and may temporarily affect lead times. We are committed to keeping all stakeholders informed throughout this process.`,
+  questions:[
+    {blank:1, options:["effective","effectively","effectiveness","effects"], answer:2,
+     explanation:"複合名詞 'cost effectiveness（費用対効果）'。"},
+    {blank:2, options:["deploy","deployed","deploying","deploys"], answer:2,
+     explanation:"並列構造 'diversifying 〜, establishing 〜, and deploying 〜'。動名詞で統一。"},
+    {blank:3, options:["According to","Despite","In spite of","Owing to"], answer:0,
+     explanation:"「調査によると」。情報源を示す 'According to'。"},
+    {blank:4, options:["That said","Otherwise","Hence","Thereby"], answer:0,
+     explanation:"前文の楽観的内容を受けて但し書きを述べる。'That said（とはいえ）' が適切。"}
+  ]
+},
+{
+  id:"a11", level:"advanced",
+  title:"Quarterly Earnings Call Preview",
+  body:`Northcoast Energy will release its third-quarter earnings on Tuesday, November 4, followed by a conference call at 10:00 a.m. Eastern Time. Investors and analysts (1)___ to dial in or join via webcast.
+
+Management is expected to address several topics of investor interest, including the impact of recent regulatory changes, progress on the Riverside expansion project, and updated guidance (2)___ full-year financial performance.
+
+(3)___ the volatile commodity prices that characterized the quarter, analysts will be paying close attention to how the company has managed margin pressures. The consensus estimate calls for earnings per share of $1.42, (4)___ from $1.28 in the same quarter last year.`,
+  questions:[
+    {blank:1, options:["invite","invited","are invited","inviting"], answer:2,
+     explanation:"be + 過去分詞（受動態）。'are invited to dial in（電話参加を招待されている）'。"},
+    {blank:2, options:["on","into","through","at"], answer:0,
+     explanation:"'guidance on 〜（〜に関するガイダンス）' は定型。"},
+    {blank:3, options:["Given","Despite","Although","Whereas"], answer:0,
+     explanation:"後ろが名詞句 'the volatile commodity prices'。前置詞 'Given（〜を考えると）'。'Despite' は逆接で文脈不適。"},
+    {blank:4, options:["up","upper","upward","upwards"], answer:0,
+     explanation:"「前年同期比で上昇」。'up from 〜' で「〜から上昇」を表す慣用句。"}
+  ]
+},
+{
+  id:"a12", level:"advanced",
+  title:"Industry Conference Keynote",
+  body:`We are honored to announce that Dr. Robert Kingsley, renowned economist and bestselling author, will deliver the keynote address at this year's Global Finance Summit. His address, (1)___ "Navigating Uncertainty in a Multipolar World," promises to offer valuable insights for our attendees.
+
+Dr. Kingsley brings (2)___ four decades of experience advising governments, central banks, and multinational corporations. His perspectives on monetary policy and geopolitical risk have shaped (3)___ for an entire generation of policymakers.
+
+(4)___. Early registration is recommended, as past summits have sold out quickly.
+
+We look forward to welcoming you to what promises to be an unforgettable event.`,
+  questions:[
+    {blank:1, options:["title","titled","titling","titles"], answer:1,
+     explanation:"分詞による後置修飾。'titled 〜（〜と題された）'。過去分詞で受動的意味。"},
+    {blank:2, options:["nearly","near","nearby","nearness"], answer:0,
+     explanation:"数値を修飾する副詞 'nearly（ほぼ）'。'nearly four decades'。"},
+    {blank:3, options:["thinking","think","thinker","thought"], answer:0,
+     explanation:"動名詞 'thinking（考え方）' が目的語。'shaped thinking（思考を形作った）'。"},
+    {blank:4, options:["Attendees will have the opportunity to participate in a Q&A session following the keynote.","Dr. Kingsley has never spoken at a finance conference before.","The summit will be held entirely online this year.","Registration fees have been reduced for first-time attendees."], answer:0,
+     explanation:"後文で「早期登録推奨」と続くため、参加メリットを示す文が論理的につながる。"}
+  ]
+}
+];
+
+/* ============================================================
+   問題のフラット化（passage → 個別質問）
+============================================================ */
+function flattenQuestions(level){
+  const list = [];
+  passages.filter(p => p.level === level).forEach(p => {
+    p.questions.forEach((q, idx) => {
+      list.push({
+        passageId: p.id,
+        passageTitle: p.title,
+        passageBody: p.body,
+        level: p.level,
+        blank: q.blank,
+        options: q.options,
+        answer: q.answer,
+        explanation: q.explanation,
+        questionIndex: idx,
+        totalInPassage: p.questions.length
+      });
+    });
+  });
+  return list;
+}
+
+/* ============================================================
+   ユーティリティ
+============================================================ */
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* シャッフルは passage 単位で行う（passage 内の問題順は維持） */
+function shufflePassages(level){
+  const ps = passages.filter(p => p.level === level);
+  const shuffled = shuffleArray(ps);
+  const flat = [];
+  shuffled.forEach(p => {
+    p.questions.forEach((q, idx) => {
+      flat.push({
+        passageId: p.id,
+        passageTitle: p.title,
+        passageBody: p.body,
+        level: p.level,
+        blank: q.blank,
+        options: q.options,
+        answer: q.answer,
+        explanation: q.explanation,
+        questionIndex: idx,
+        totalInPassage: p.questions.length,
+        passageRef: p
+      });
+    });
+  });
+  return flat;
+}
+
+/* ============================================================
+   State
+============================================================ */
+const state = {
+  level: "beginner",
+  questions: [],
+  current: 0,
+  correct: 0,
+  answered: 0,
+  finished: false,
+  bookmarks: new Set(),
+  // 現在 passage 内の答え状況
+  currentPassageAnswers: {} // {passageId: [selectedIndex, ...]}
+};
+
+const NOTION_KEYS = {
+  token: "toeic_p6_notion_token",
+  scoreDb: "toeic_p6_notion_score_db",
+  mistakeDb: "toeic_p6_notion_mistake_db"
+};
+
+/* ============================================================
+   レベル切替・初期化
+============================================================ */
+function startLevel(level){
+  state.level = level;
+  state.questions = shufflePassages(level);
+  state.current = 0;
+  state.correct = 0;
+  state.answered = 0;
+  state.finished = false;
+  state.currentPassageAnswers = {};
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.level === level);
+  });
+  document.getElementById("levelLabel").textContent =
+    level === "beginner" ? "初級" : level === "intermediate" ? "中級" : "上級";
+  render();
+}
+
+/* ============================================================
+   描画
+============================================================ */
+function render(){
+  const app = document.getElementById("app");
+  if(state.finished){
+    renderSummary();
+    return;
+  }
+  if(state.questions.length === 0){
+    app.innerHTML = `<div class="empty-msg">問題が見つかりません。</div>`;
+    return;
+  }
+
+  const q = state.questions[state.current];
+  const passage = q.passageRef;
+  const passageAns = state.currentPassageAnswers[q.passageId] || {};
+
+  // 長文の表示（空所には選択済みなら選択肢を入れる）
+  const renderedBody = passage.body.replace(/\((\d+)\)___/g, (_, num) => {
+    const n = parseInt(num, 10);
+    if(passageAns[n] !== undefined){
+      const filled = passage.questions.find(qq => qq.blank === n);
+      const txt = filled.options[passageAns[n]];
+      return `<span class="blank filled">(${num}) ${escapeHTML(txt)}</span>`;
+    }
+    if(n === q.blank){
+      return `<span class="blank">(${num}) ___</span>`;
+    }
+    return `<span class="blank">(${num}) ___</span>`;
+  });
+
+  const levelClass = "lv-" + q.level;
+  const levelText = q.level === "beginner" ? "初級" : q.level === "intermediate" ? "中級" : "上級";
+
+  app.innerHTML = `
+    <div class="passage-card">
+      <div class="passage-meta">
+        <span class="level-badge ${levelClass}">${levelText}</span>
+        <span>パッセージ: ${escapeHTML(q.passageTitle)}</span>
+        <span>· 第 ${q.questionIndex + 1} / ${q.totalInPassage} 問</span>
+      </div>
+      <div class="passage-title">${escapeHTML(q.passageTitle)}</div>
+      <div class="passage-body">${renderedBody}</div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-header">
+        <div class="q-num">問 ${state.current + 1} / ${state.questions.length}　（空所 ${q.blank}）</div>
+        <button class="bookmark-btn ${state.bookmarks.has(makeQKey(q)) ? "active" : ""}" id="bookmarkBtn" title="苦手登録">★</button>
+      </div>
+      <div class="options" id="optionsBox">
+        ${q.options.map((opt, i) => `
+          <button class="option" data-index="${i}">
+            <span class="opt-label">(${String.fromCharCode(65+i)})</span>
+            <span>${escapeHTML(opt)}</span>
+          </button>
+        `).join("")}
+      </div>
+      <div class="feedback-panel" id="feedback"></div>
+      <div class="next-row" id="nextRow" style="display:none;">
+        <button class="primary-btn" id="nextBtn">次の問題 →</button>
+      </div>
+    </div>
+  `;
+
+  // イベント登録
+  document.querySelectorAll("#optionsBox .option").forEach(btn => {
+    btn.addEventListener("click", () => selectOption(parseInt(btn.dataset.index, 10)));
+  });
+  document.getElementById("bookmarkBtn").addEventListener("click", () => {
+    toggleBookmark(q);
+    render();
+  });
+
+  updateHeader();
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function makeQKey(q){
+  return q.passageId + "-" + q.blank;
+}
+
+function toggleBookmark(q){
+  const k = makeQKey(q);
+  if(state.bookmarks.has(k)) state.bookmarks.delete(k);
+  else state.bookmarks.add(k);
+}
+
+function updateHeader(){
+  const total = state.questions.length;
+  const rate = state.answered === 0 ? 0 : Math.round((state.correct / state.answered) * 100);
+  document.getElementById("scoreLabel").textContent =
+    `スコア: ${state.correct}/${state.answered} (${rate}%)`;
+  document.getElementById("progBar").style.width =
+    ((state.current) / total * 100) + "%";
+}
+
+/* ============================================================
+   回答
+============================================================ */
+function selectOption(idx){
+  const q = state.questions[state.current];
+  const opts = document.querySelectorAll("#optionsBox .option");
+  opts.forEach(o => o.disabled = true);
+
+  const correct = (idx === q.answer);
+  state.answered++;
+  if(correct) state.correct++;
+
+  // 表示
+  opts.forEach((o, i) => {
+    if(i === q.answer) o.classList.add("correct");
+    else if(i === idx) o.classList.add("incorrect");
+  });
+
+  // 解説パネル
+  const fb = document.getElementById("feedback");
+  fb.classList.add("show");
+  fb.innerHTML = `
+    <div class="feedback-result ${correct ? "ok" : "ng"}">
+      ${correct ? "✅ 正解！" : "❌ 不正解"}
+    </div>
+    <div><strong>正解：</strong>(${String.fromCharCode(65+q.answer)}) ${escapeHTML(q.options[q.answer])}</div>
+    <div style="margin-top:6px;"><strong>解説：</strong>${escapeHTML(q.explanation)}</div>
+  `;
+
+  document.getElementById("nextRow").style.display = "flex";
+  document.getElementById("nextBtn").addEventListener("click", goNext);
+
+  // 長文に選択結果を反映
+  if(!state.currentPassageAnswers[q.passageId]) state.currentPassageAnswers[q.passageId] = {};
+  state.currentPassageAnswers[q.passageId][q.blank] = idx;
+
+  updateHeader();
+
+  // Notion 送信（不正解時）
+  if(!correct){
+    sendMistakeToNotion(q, idx);
+  }
+}
+
+function goNext(){
+  state.current++;
+  // 次の passage に移ったら currentPassageAnswers をリセットしない
+  // （表示の連続性を保つため）
+  if(state.current >= state.questions.length){
+    state.finished = true;
+    sendScoreToNotion();
+  }
+  render();
+}
+
+/* ============================================================
+   サマリ
+============================================================ */
+function renderSummary(){
+  const app = document.getElementById("app");
+  const total = state.questions.length;
+  const rate = total === 0 ? 0 : Math.round((state.correct / total) * 100);
+  const levelText = state.level === "beginner" ? "初級" : state.level === "intermediate" ? "中級" : "上級";
+
+  app.innerHTML = `
+    <div class="summary">
+      <h2>🎉 ${levelText} 完了！</h2>
+      <div class="summary-score">${state.correct} / ${total}</div>
+      <div class="summary-rate">正答率 ${rate}%</div>
+      <div class="summary-actions">
+        <button class="primary-btn" id="retryBtn">もう一度</button>
+        <button class="secondary-btn" id="otherLevelBtn">別レベルへ</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("retryBtn").addEventListener("click", () => startLevel(state.level));
+  document.getElementById("otherLevelBtn").addEventListener("click", () => {
+    document.querySelector(".tabs").scrollIntoView({behavior:"smooth"});
+  });
+  document.getElementById("progBar").style.width = "100%";
+}
+
+/* ============================================================
+   Notion 連携
+============================================================ */
+function getNotionConfig(){
+  return {
+    token: localStorage.getItem(NOTION_KEYS.token) || "",
+    scoreDb: localStorage.getItem(NOTION_KEYS.scoreDb) || "",
+    mistakeDb: localStorage.getItem(NOTION_KEYS.mistakeDb) || ""
+  };
+}
+
+function saveNotionConfig(){
+  localStorage.setItem(NOTION_KEYS.token, document.getElementById("tokenInput").value.trim());
+  localStorage.setItem(NOTION_KEYS.scoreDb, document.getElementById("scoreDbInput").value.trim());
+  localStorage.setItem(NOTION_KEYS.mistakeDb, document.getElementById("mistakeDbInput").value.trim());
+  closeSettings();
+  toast("✅ Notion設定を保存しました", "ok");
+}
+
+function openSettings(){
+  const c = getNotionConfig();
+  document.getElementById("tokenInput").value = c.token;
+  document.getElementById("scoreDbInput").value = c.scoreDb;
+  document.getElementById("mistakeDbInput").value = c.mistakeDb;
+  document.getElementById("settingsModal").classList.add("show");
+}
+function closeSettings(){
+  document.getElementById("settingsModal").classList.remove("show");
+}
+
+async function notionCreatePage(databaseId, properties){
+  const c = getNotionConfig();
+  if(!c.token || !databaseId) return null;
+  try{
+    const res = await fetch("https://api.notion.com/v1/pages", {
+      method:"POST",
+      headers:{
+        "Authorization": "Bearer " + c.token,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        parent: { database_id: databaseId },
+        properties: properties
+      })
+    });
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error(res.status + " " + t.slice(0,120));
+    }
+    return await res.json();
+  }catch(e){
+    toast("Notion送信失敗：" + e.message, "err");
+    return null;
+  }
+}
+
+async function sendMistakeToNotion(q, selectedIdx){
+  const c = getNotionConfig();
+  if(!c.token || !c.mistakeDb) return;
+  const levelText = q.level === "beginner" ? "初級" : q.level === "intermediate" ? "中級" : "上級";
+  // 問題全文：passage の空所を強調表示
+  const fullText = q.passageBody.replace(`(${q.blank})___`, `【★(${q.blank})___】`);
+  const titleText = (q.passageTitle + " - 空所" + q.blank).slice(0, 30);
+
+  const props = {
+    "タイトル": { title: [{ text: { content: titleText } }] },
+    "Part": { select: { name: "Part 6" } },
+    "レベル": { select: { name: levelText } },
+    "問題全文": { rich_text: [{ text: { content: fullText.slice(0, 1900) } }] },
+    "自分の解答": { rich_text: [{ text: { content: q.options[selectedIdx] } }] },
+    "正解": { rich_text: [{ text: { content: q.options[q.answer] } }] },
+    "解説": { rich_text: [{ text: { content: q.explanation.slice(0, 1900) } }] },
+    "間違えた日": { date: { start: new Date().toISOString() } }
+  };
+  const result = await notionCreatePage(c.mistakeDb, props);
+  if(result) toast("✅ 苦手問題をNotionに記録", "ok");
+}
+
+async function sendScoreToNotion(){
+  const c = getNotionConfig();
+  if(!c.token || !c.scoreDb) return;
+  const levelText = state.level === "beginner" ? "初級" : state.level === "intermediate" ? "中級" : "上級";
+  const total = state.questions.length;
+  const rate = total === 0 ? 0 : Math.round((state.correct / total) * 100);
+  const today = new Date().toISOString().slice(0, 10);
+  const props = {
+    "タイトル": { title: [{ text: { content: `Part 6 ${levelText} ${today}` } }] },
+    "Part": { select: { name: "Part 6" } },
+    "レベル": { select: { name: levelText } },
+    "正答数": { number: state.correct },
+    "出題数": { number: total },
+    "正答率": { number: rate },
+    "学習日": { date: { start: new Date().toISOString() } }
+  };
+  const result = await notionCreatePage(c.scoreDb, props);
+  if(result) toast("✅ セッションスコアをNotionに記録", "ok");
+}
+
+/* ============================================================
+   Toast
+============================================================ */
+function toast(msg, type){
+  const wrap = document.getElementById("toastWrap");
+  const t = document.createElement("div");
+  t.className = "toast " + (type || "");
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => {
+    t.style.transition = "opacity .3s";
+    t.style.opacity = "0";
+    setTimeout(() => t.remove(), 300);
+  }, 2200);
+}
+
+/* ============================================================
+   イベント・起動
+============================================================ */
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => startLevel(t.dataset.level));
+});
+document.getElementById("settingsBtn").addEventListener("click", openSettings);
+document.getElementById("saveSettings").addEventListener("click", saveNotionConfig);
+document.getElementById("cancelSettings").addEventListener("click", closeSettings);
+document.getElementById("settingsModal").addEventListener("click", (e) => {
+  if(e.target.id === "settingsModal") closeSettings();
+});
+
+// 初回起動：Notion未設定なら案内（ただし強制ではない）
+window.addEventListener("DOMContentLoaded", () => {
+  startLevel("beginner");
+  const c = getNotionConfig();
+  if(!c.token){
+    setTimeout(() => toast("⚙️ 右上の設定からNotion連携を有効にできます", ""), 500);
+  }
+});
+</script>
+</body>
+</html>
