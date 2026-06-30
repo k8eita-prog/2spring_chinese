@@ -1,0 +1,2668 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC Part 5 練習</title>
+<style>
+  :root {
+    --navy: #1a237e;
+    --navy-dark: #0d1654;
+    --navy-light: #283593;
+    --gold: #ffc107;
+    --gold-dark: #ffa000;
+    --bg: #f5f6fa;
+    --white: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6c757d;
+    --green: #2e7d32;
+    --green-bg: #c8e6c9;
+    --red: #c62828;
+    --red-bg: #ffcdd2;
+    --border: #e0e0e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  /* ===== Header ===== */
+  header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    color: var(--white);
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .app-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .app-title .accent { color: var(--gold); }
+  .header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .score-display {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .score-display .gold { color: var(--gold); }
+  .settings-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+  }
+  .settings-btn:hover {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  /* ===== Tabs ===== */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    border: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .tab:hover { background: rgba(255,255,255,0.2); }
+  .tab.active {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  /* ===== Progress ===== */
+  .progress-wrap {
+    margin-top: 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .progress-text {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    opacity: 0.9;
+  }
+  /* ===== Main ===== */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  .level-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .level-beginner { background: #e3f2fd; color: #1565c0; }
+  .level-intermediate { background: #fff3e0; color: #ef6c00; }
+  .level-advanced { background: #fce4ec; color: #c2185b; }
+
+  .question-text {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin: 14px 0 22px;
+    color: var(--text);
+  }
+  .question-text .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--navy);
+    padding: 0 6px;
+    text-align: center;
+    color: var(--gold-dark);
+    font-weight: 700;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    text-align: left;
+    padding: 14px 18px;
+    border: 2px solid var(--border);
+    background: var(--white);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option:hover:not(:disabled) {
+    border-color: var(--navy);
+    background: #f0f2ff;
+  }
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .option.correct {
+    background: var(--green-bg);
+    border-color: var(--green);
+    color: var(--green);
+    font-weight: 600;
+  }
+  .option.correct .letter { background: var(--green); }
+  .option.incorrect {
+    background: var(--red-bg);
+    border-color: var(--red);
+    color: var(--red);
+    font-weight: 600;
+  }
+  .option.incorrect .letter { background: var(--red); }
+  .option:disabled { cursor: not-allowed; }
+  .option .icon {
+    margin-left: auto;
+    font-size: 1.2rem;
+  }
+
+  /* ===== Explanation ===== */
+  .explanation {
+    margin-top: 22px;
+    padding: 18px;
+    background: #fffbf0;
+    border-left: 4px solid var(--gold);
+    border-radius: 8px;
+    animation: slideIn 0.4s ease;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation h3 {
+    margin: 0 0 8px;
+    color: var(--navy);
+    font-size: 1rem;
+  }
+  .explanation p {
+    margin: 0;
+    line-height: 1.75;
+    color: #333;
+    white-space: pre-wrap;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Buttons ===== */
+  .next-btn {
+    display: none;
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .next-btn:hover { background: var(--navy-dark); }
+  .next-btn.show { display: block; }
+
+  /* ===== Summary ===== */
+  .summary {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .summary h2 {
+    color: var(--navy);
+    margin: 0 0 16px;
+  }
+  .score-big {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--gold-dark);
+    margin: 20px 0;
+  }
+  .summary-stats {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .summary-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .btn-primary, .btn-secondary {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--navy);
+    border: 2px solid var(--navy);
+  }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    color: var(--navy);
+    margin: 0 0 16px;
+  }
+  .modal label {
+    display: block;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .modal input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: monospace;
+  }
+  .modal-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .modal-note {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--navy);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 2000;
+    animation: toastIn 0.3s ease;
+    max-width: 320px;
+  }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .app-title { font-size: 1.1rem; }
+    .card { padding: 20px; }
+    .question-text { font-size: 1rem; }
+    .option { padding: 12px 14px; font-size: 0.95rem; }
+    .score-big { font-size: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header>
+  <div class="header-top">
+    <h1 class="app-title">TOEIC <span class="accent">Part 5</span> 練習</h1>
+    <div class="header-right">
+      <div class="score-display">スコア <span class="gold" id="scoreDisplay">0/0</span></div>
+      <button class="settings-btn" id="settingsBtn" title="Notion設定">⚙️</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-level="beginner">初級</button>
+    <button class="tab" data-level="intermediate">中級</button>
+    <button class="tab" data-level="advanced">上級</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="progress-text" id="progressText">問題 0/0</div>
+</header>
+
+<!-- ===== Main ===== -->
+<main id="mainArea">
+  <!-- 問題カードがJSで挿入される -->
+</main>
+
+<!-- ===== Settings Modal ===== -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ Notion設定</h2>
+    <label>Notion Integration Token</label>
+    <input type="text" id="inputToken" placeholder="secret_...">
+    <div class="modal-note">https://www.notion.so/my-integrations で取得</div>
+
+    <label>セッションスコアDB ID</label>
+    <input type="text" id="inputScoreDb" placeholder="32文字のDB ID">
+
+    <label>苦手問題DB ID</label>
+    <input type="text" id="inputWeakDb" placeholder="32文字のDB ID">
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelSettings">キャンセル</button>
+      <button class="btn-primary" id="saveSettings">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 問題データ ===== */
+const QUESTIONS = [
+  {
+    "id": 1,
+    "level": "beginner",
+    "sentence": "The new manager is very _____ to his team members.",
+    "options": [
+      "kind",
+      "kindly",
+      "kindness",
+      "kinder"
+    ],
+    "answer": 0,
+    "explanation": "be動詞 (is) + 副詞 (very) の後ろなので、補語となる形容詞が入ります。「kind（親切な）」が正解。kindlyは副詞、kindnessは名詞、kinderは比較級で文脈に合いません。"
+  },
+  {
+    "id": 2,
+    "level": "beginner",
+    "sentence": "Please submit your report by Friday _____.",
+    "options": [
+      "afternoon",
+      "afternoons",
+      "afternoonly",
+      "afternooning"
+    ],
+    "answer": 0,
+    "explanation": "Friday afternoon（金曜日の午後）という時の表現です。曜日 + 時間帯の単数形が一般的。afternoonsは複数形で習慣的表現になり、afternoonly/afternooningは存在しない語です。"
+  },
+  {
+    "id": 3,
+    "level": "beginner",
+    "sentence": "The meeting room is on the _____ floor.",
+    "options": [
+      "three",
+      "third",
+      "threely",
+      "threes"
+    ],
+    "answer": 1,
+    "explanation": "「3階」を表すには序数のthird（第3の）が必要です。threeは基数、threelyは存在せず、threesは複数形で「3つ組」の意味になります。"
+  },
+  {
+    "id": 4,
+    "level": "beginner",
+    "sentence": "Mr. Smith works _____ at his desk every day.",
+    "options": [
+      "quiet",
+      "quietly",
+      "quietness",
+      "quieter"
+    ],
+    "answer": 1,
+    "explanation": "動詞works（働く）を修飾するため副詞quietly（静かに）が正解。quietは形容詞、quietnessは名詞、quieterは比較級。"
+  },
+  {
+    "id": 5,
+    "level": "beginner",
+    "sentence": "Our company has many _____ branches around the world.",
+    "options": [
+      "office",
+      "offices",
+      "official",
+      "officially"
+    ],
+    "answer": 1,
+    "explanation": "manyの後ろは可算名詞の複数形なのでoffices（事務所、ここでは形容詞的に「事務所の」）。実際にはbranchesを修飾するため複合語的にoffice branchesともなりますが、選択肢中manyに続けて自然なのは複数形offices。officialは『公式の』で意味が変わります。文脈上「世界中に多くの事務所支店」を表すにはofficesが最適。"
+  },
+  {
+    "id": 6,
+    "level": "beginner",
+    "sentence": "The customer was very _____ with our service.",
+    "options": [
+      "satisfy",
+      "satisfied",
+      "satisfaction",
+      "satisfying"
+    ],
+    "answer": 1,
+    "explanation": "be動詞 + 過去分詞で受け身・状態を表します。「人が満足している」はsatisfied。satisfyingは「(物が)人を満足させる」で主語が物のときに使います。"
+  },
+  {
+    "id": 7,
+    "level": "beginner",
+    "sentence": "Please make a _____ decision about the project.",
+    "options": [
+      "quick",
+      "quickly",
+      "quickness",
+      "quicker"
+    ],
+    "answer": 0,
+    "explanation": "名詞decisionを修飾するので形容詞quick（迅速な）。quicklyは副詞、quicknessは名詞、quickerは比較級です。"
+  },
+  {
+    "id": 8,
+    "level": "beginner",
+    "sentence": "The training session was very _____.",
+    "options": [
+      "help",
+      "helpful",
+      "helpfully",
+      "helping"
+    ],
+    "answer": 1,
+    "explanation": "be動詞の補語として形容詞が必要です。helpful（役に立つ）が正解。helpは動詞・名詞、helpfullyは副詞、helpingは動名詞/分詞。"
+  },
+  {
+    "id": 9,
+    "level": "beginner",
+    "sentence": "She gave a _____ presentation at the conference.",
+    "options": [
+      "wonder",
+      "wonderful",
+      "wonderfully",
+      "wondering"
+    ],
+    "answer": 1,
+    "explanation": "名詞presentationを修飾するので形容詞wonderful（素晴らしい）。wonderは名詞/動詞、wonderfullyは副詞、wonderingは分詞。"
+  },
+  {
+    "id": 10,
+    "level": "beginner",
+    "sentence": "The price of the product has increased _____.",
+    "options": [
+      "recent",
+      "recently",
+      "recentness",
+      "recents"
+    ],
+    "answer": 1,
+    "explanation": "動詞has increasedを修飾する副詞recently（最近）が必要。recentは形容詞。"
+  },
+  {
+    "id": 11,
+    "level": "beginner",
+    "sentence": "I _____ to the office by bus every morning.",
+    "options": [
+      "go",
+      "going",
+      "goes",
+      "went"
+    ],
+    "answer": 0,
+    "explanation": "主語Iと習慣を表すevery morningから現在形goが正解。三人称単数ではないのでgoesは不可。"
+  },
+  {
+    "id": 12,
+    "level": "beginner",
+    "sentence": "She _____ a new project last week.",
+    "options": [
+      "start",
+      "starts",
+      "started",
+      "starting"
+    ],
+    "answer": 2,
+    "explanation": "last week（先週）があるので過去形started。startは原形、startsは三単現、startingは現在分詞。"
+  },
+  {
+    "id": 13,
+    "level": "beginner",
+    "sentence": "The report _____ by Mr. Tanaka yesterday.",
+    "options": [
+      "wrote",
+      "writes",
+      "was written",
+      "writing"
+    ],
+    "answer": 2,
+    "explanation": "「報告書が書かれた」という受動態が必要です。yesterdayがあるので過去形のwas written。能動態のwrote/writesは「報告書が書いた」になり不自然。"
+  },
+  {
+    "id": 14,
+    "level": "beginner",
+    "sentence": "They are _____ a new software now.",
+    "options": [
+      "develop",
+      "develops",
+      "developing",
+      "developed"
+    ],
+    "answer": 2,
+    "explanation": "are + 動詞ingで現在進行形「今〜している」を作ります。developingが正解。"
+  },
+  {
+    "id": 15,
+    "level": "beginner",
+    "sentence": "The package will _____ tomorrow.",
+    "options": [
+      "arrive",
+      "arrives",
+      "arrived",
+      "arriving"
+    ],
+    "answer": 0,
+    "explanation": "助動詞willの後は動詞の原形。arriveが正解。"
+  },
+  {
+    "id": 16,
+    "level": "beginner",
+    "sentence": "I have _____ in this company for five years.",
+    "options": [
+      "work",
+      "worked",
+      "working",
+      "works"
+    ],
+    "answer": 1,
+    "explanation": "have + 過去分詞で現在完了。継続「5年間ずっと働いている」を表します。workedが正解。"
+  },
+  {
+    "id": 17,
+    "level": "beginner",
+    "sentence": "The store _____ at 9 a.m. every day.",
+    "options": [
+      "open",
+      "opens",
+      "opened",
+      "opening"
+    ],
+    "answer": 1,
+    "explanation": "every dayの習慣で現在形。主語The storeは三人称単数なのでopensが正解。"
+  },
+  {
+    "id": 18,
+    "level": "beginner",
+    "sentence": "These documents must _____ to the manager.",
+    "options": [
+      "send",
+      "sent",
+      "be sent",
+      "sending"
+    ],
+    "answer": 2,
+    "explanation": "助動詞must + 受動態be + 過去分詞。「これらの書類は送られなければならない」のでbe sentが正解。"
+  },
+  {
+    "id": 19,
+    "level": "beginner",
+    "sentence": "Yesterday, I _____ a meeting with the client.",
+    "options": [
+      "have",
+      "had",
+      "has",
+      "having"
+    ],
+    "answer": 1,
+    "explanation": "yesterdayがあるので過去形had。"
+  },
+  {
+    "id": 20,
+    "level": "beginner",
+    "sentence": "The flight _____ delayed because of the weather.",
+    "options": [
+      "is",
+      "are",
+      "be",
+      "being"
+    ],
+    "answer": 0,
+    "explanation": "主語The flightは三人称単数で現在の状態を表すのでis。受動態is delayed。"
+  },
+  {
+    "id": 21,
+    "level": "beginner",
+    "sentence": "I will call you _____ I arrive at the airport.",
+    "options": [
+      "when",
+      "during",
+      "for",
+      "of"
+    ],
+    "answer": 0,
+    "explanation": "「空港に到着した時に電話します」の意。時を表す接続詞whenが正解。duringは前置詞、forとofも前置詞で節を導けません。"
+  },
+  {
+    "id": 22,
+    "level": "beginner",
+    "sentence": "Take an umbrella _____ it is raining.",
+    "options": [
+      "but",
+      "or",
+      "because",
+      "so"
+    ],
+    "answer": 2,
+    "explanation": "「雨が降っているので傘を持って行きなさい」という理由。becauseが正解。"
+  },
+  {
+    "id": 23,
+    "level": "beginner",
+    "sentence": "I like coffee, _____ my husband likes tea.",
+    "options": [
+      "but",
+      "and",
+      "so",
+      "or"
+    ],
+    "answer": 0,
+    "explanation": "対比を表す接続詞but。「私はコーヒーが好きだが、夫は紅茶が好きだ」。"
+  },
+  {
+    "id": 24,
+    "level": "beginner",
+    "sentence": "Please call me _____ you have any questions.",
+    "options": [
+      "if",
+      "since",
+      "although",
+      "until"
+    ],
+    "answer": 0,
+    "explanation": "「質問があれば連絡してください」の条件を表すif。"
+  },
+  {
+    "id": 25,
+    "level": "beginner",
+    "sentence": "We need to leave now _____ we will be late.",
+    "options": [
+      "or",
+      "and",
+      "but",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "命令文 + or（さもないと）の構文。「今出発しないと遅れます」。"
+  },
+  {
+    "id": 26,
+    "level": "beginner",
+    "sentence": "_____ it was raining, the event continued.",
+    "options": [
+      "Although",
+      "Because",
+      "Since",
+      "If"
+    ],
+    "answer": 0,
+    "explanation": "「雨が降っていたけれども、イベントは続いた」という譲歩のAlthough。"
+  },
+  {
+    "id": 27,
+    "level": "beginner",
+    "sentence": "She studies hard _____ she wants to pass the exam.",
+    "options": [
+      "because",
+      "but",
+      "or",
+      "although"
+    ],
+    "answer": 0,
+    "explanation": "理由を表すbecause。「試験に合格したいので一生懸命勉強する」。"
+  },
+  {
+    "id": 28,
+    "level": "beginner",
+    "sentence": "Wait here _____ I come back.",
+    "options": [
+      "until",
+      "during",
+      "while",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "「私が戻るまでここで待って」の意。期間の終点を表すuntil。"
+  },
+  {
+    "id": 29,
+    "level": "beginner",
+    "sentence": "_____ you are ready, we can start the meeting.",
+    "options": [
+      "When",
+      "During",
+      "For",
+      "About"
+    ],
+    "answer": 0,
+    "explanation": "「あなたの準備ができたら会議を始められます」。節を導く接続詞When。他は前置詞。"
+  },
+  {
+    "id": 30,
+    "level": "beginner",
+    "sentence": "The store was closed, _____ I went home.",
+    "options": [
+      "so",
+      "but",
+      "or",
+      "because"
+    ],
+    "answer": 0,
+    "explanation": "結果を表すso。「店が閉まっていたので家に帰った」。"
+  },
+  {
+    "id": 31,
+    "level": "beginner",
+    "sentence": "The meeting will start _____ 10 a.m.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "時刻にはatを使います。at 10 a.m.が正解。"
+  },
+  {
+    "id": 32,
+    "level": "beginner",
+    "sentence": "I was born _____ April.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "by"
+    ],
+    "answer": 1,
+    "explanation": "月にはinを使います。in April。"
+  },
+  {
+    "id": 33,
+    "level": "beginner",
+    "sentence": "The conference will be held _____ Monday.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "to"
+    ],
+    "answer": 2,
+    "explanation": "曜日や日付にはonを使います。on Monday。"
+  },
+  {
+    "id": 34,
+    "level": "beginner",
+    "sentence": "Please submit the document _____ Friday.",
+    "options": [
+      "by",
+      "until",
+      "in",
+      "on"
+    ],
+    "answer": 0,
+    "explanation": "期限「〜までに」はby。untilは「〜までずっと」継続。"
+  },
+  {
+    "id": 35,
+    "level": "beginner",
+    "sentence": "She is very good _____ playing the piano.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "be good at ~ingで「〜が得意」。前置詞atが正解。"
+  },
+  {
+    "id": 36,
+    "level": "beginner",
+    "sentence": "Thank you _____ your help.",
+    "options": [
+      "for",
+      "to",
+      "with",
+      "of"
+    ],
+    "answer": 0,
+    "explanation": "thank A for Bで「BのことでAに感謝する」。forが正解。"
+  },
+  {
+    "id": 37,
+    "level": "beginner",
+    "sentence": "The book is _____ the table.",
+    "options": [
+      "on",
+      "in",
+      "at",
+      "by"
+    ],
+    "answer": 0,
+    "explanation": "表面に接触している状態はon。「テーブルの上に」。"
+  },
+  {
+    "id": 38,
+    "level": "beginner",
+    "sentence": "I will see you _____ the morning.",
+    "options": [
+      "in",
+      "on",
+      "at",
+      "by"
+    ],
+    "answer": 0,
+    "explanation": "in the morning（午前中に）は決まり表現。"
+  },
+  {
+    "id": 39,
+    "level": "beginner",
+    "sentence": "He works _____ a large company.",
+    "options": [
+      "for",
+      "to",
+      "with",
+      "by"
+    ],
+    "answer": 0,
+    "explanation": "work for ~で「〜に勤めている」。forが正解。"
+  },
+  {
+    "id": 40,
+    "level": "beginner",
+    "sentence": "She went to Tokyo _____ business.",
+    "options": [
+      "on",
+      "in",
+      "at",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "on businessで「仕事で」。go on businessはビジネスの定型表現。"
+  },
+  {
+    "id": 41,
+    "level": "beginner",
+    "sentence": "Could you please _____ this document to Mr. Brown?",
+    "options": [
+      "send",
+      "go",
+      "make",
+      "buy"
+    ],
+    "answer": 0,
+    "explanation": "「書類をBrown氏に送る」のでsend。goは「行く」、makeは「作る」、buyは「買う」で文脈に合いません。"
+  },
+  {
+    "id": 42,
+    "level": "beginner",
+    "sentence": "We need to _____ a decision soon.",
+    "options": [
+      "make",
+      "do",
+      "take",
+      "have"
+    ],
+    "answer": 0,
+    "explanation": "make a decision（決定する）は定型表現。do/take/have a decisionは不可。"
+  },
+  {
+    "id": 43,
+    "level": "beginner",
+    "sentence": "I would like to _____ a table for two, please.",
+    "options": [
+      "reserve",
+      "save",
+      "keep",
+      "hold"
+    ],
+    "answer": 0,
+    "explanation": "「2名分のテーブルを予約したい」のでreserve。レストランの予約はreserveを使うのが自然。"
+  },
+  {
+    "id": 44,
+    "level": "beginner",
+    "sentence": "The shop is _____ from 9 to 6.",
+    "options": [
+      "open",
+      "opening",
+      "opened",
+      "opener"
+    ],
+    "answer": 0,
+    "explanation": "「店は開いている」状態を表す形容詞open。openingは現在分詞、openedは過去分詞、openerは名詞。"
+  },
+  {
+    "id": 45,
+    "level": "beginner",
+    "sentence": "Please _____ a copy of the report to me.",
+    "options": [
+      "give",
+      "make",
+      "take",
+      "buy"
+    ],
+    "answer": 0,
+    "explanation": "「コピーを渡す」のでgive a copy。"
+  },
+  {
+    "id": 46,
+    "level": "beginner",
+    "sentence": "The train usually _____ on time.",
+    "options": [
+      "arrives",
+      "comes",
+      "reaches",
+      "gets"
+    ],
+    "answer": 0,
+    "explanation": "「列車が時間通りに到着する」はarriveが最も自然。reachは他動詞でreach the stationのように目的語が必要。"
+  },
+  {
+    "id": 47,
+    "level": "beginner",
+    "sentence": "I need to _____ some money from the bank.",
+    "options": [
+      "withdraw",
+      "take",
+      "put",
+      "give"
+    ],
+    "answer": 0,
+    "explanation": "withdraw money（お金を引き出す）が銀行用語の定型表現。"
+  },
+  {
+    "id": 48,
+    "level": "beginner",
+    "sentence": "The new product will be _____ next month.",
+    "options": [
+      "launched",
+      "started",
+      "begun",
+      "opened"
+    ],
+    "answer": 0,
+    "explanation": "「新製品が発売される」はbe launched。製品の発売はlaunchが定番。"
+  },
+  {
+    "id": 49,
+    "level": "beginner",
+    "sentence": "Please _____ your seatbelt during the flight.",
+    "options": [
+      "fasten",
+      "tie",
+      "close",
+      "open"
+    ],
+    "answer": 0,
+    "explanation": "fasten one's seatbelt（シートベルトを締める）は機内アナウンスの定型表現。"
+  },
+  {
+    "id": 50,
+    "level": "beginner",
+    "sentence": "The hotel has a beautiful _____ of the ocean.",
+    "options": [
+      "view",
+      "look",
+      "see",
+      "watch"
+    ],
+    "answer": 0,
+    "explanation": "「海の眺め」はview。a view of ~は定型表現。"
+  },
+  {
+    "id": 51,
+    "level": "intermediate",
+    "sentence": "The proposal was rejected because of its _____ to the budget.",
+    "options": [
+      "incompatible",
+      "incompatibility",
+      "incompatibly",
+      "incompatibles"
+    ],
+    "answer": 1,
+    "explanation": "前置詞of + 所有格its + 前置詞to。名詞incompatibility（不適合）が正解。形容詞incompatibleや副詞incompatiblyは入りません。"
+  },
+  {
+    "id": 52,
+    "level": "intermediate",
+    "sentence": "The CEO emphasized the _____ of meeting the deadline.",
+    "options": [
+      "important",
+      "importantly",
+      "importance",
+      "more important"
+    ],
+    "answer": 2,
+    "explanation": "定冠詞the + 名詞 + of構造。名詞importance（重要性）が正解。importantは形容詞、importantlyは副詞。"
+  },
+  {
+    "id": 53,
+    "level": "intermediate",
+    "sentence": "All employees must comply _____ with the new safety regulations.",
+    "options": [
+      "strict",
+      "stricter",
+      "strictly",
+      "strictness"
+    ],
+    "answer": 2,
+    "explanation": "動詞comply（従う）を修飾する副詞strictly（厳格に）が正解。複合動詞comply withの前後どちらにも副詞が入れます。"
+  },
+  {
+    "id": 54,
+    "level": "intermediate",
+    "sentence": "The financial report contains several _____ that need correction.",
+    "options": [
+      "inaccurate",
+      "inaccurately",
+      "inaccuracies",
+      "inaccuracy"
+    ],
+    "answer": 2,
+    "explanation": "severalの後は可算名詞の複数形。inaccuracies（不正確な点）が正解。inaccuracyは単数形。"
+  },
+  {
+    "id": 55,
+    "level": "intermediate",
+    "sentence": "Mr. Chen handled the negotiation with great _____.",
+    "options": [
+      "professional",
+      "professionally",
+      "professionalism",
+      "professionalize"
+    ],
+    "answer": 2,
+    "explanation": "with great + 名詞の形。professionalism（プロ意識）が正解。professionalは形容詞/名詞だがwith great professionalが不自然。"
+  },
+  {
+    "id": 56,
+    "level": "intermediate",
+    "sentence": "The success of the project depends _____ on team collaboration.",
+    "options": [
+      "large",
+      "larger",
+      "largely",
+      "largeness"
+    ],
+    "answer": 2,
+    "explanation": "動詞depends（依存する）を修飾する副詞largely（主に、大いに）が正解。"
+  },
+  {
+    "id": 57,
+    "level": "intermediate",
+    "sentence": "The committee made a _____ decision after long discussion.",
+    "options": [
+      "unanimity",
+      "unanimous",
+      "unanimously",
+      "unanimousness"
+    ],
+    "answer": 1,
+    "explanation": "名詞decisionを修飾する形容詞unanimous（全会一致の）。unanimityは名詞、unanimouslyは副詞。"
+  },
+  {
+    "id": 58,
+    "level": "intermediate",
+    "sentence": "Customer _____ is our top priority at this company.",
+    "options": [
+      "satisfy",
+      "satisfied",
+      "satisfaction",
+      "satisfying"
+    ],
+    "answer": 2,
+    "explanation": "is（be動詞）の主語となる名詞が必要。Customer satisfaction（顧客満足）が定型表現。"
+  },
+  {
+    "id": 59,
+    "level": "intermediate",
+    "sentence": "The new policy will be implemented _____ across all branches.",
+    "options": [
+      "uniform",
+      "uniformity",
+      "uniformly",
+      "uniforms"
+    ],
+    "answer": 2,
+    "explanation": "受動態will be implementedを修飾する副詞uniformly（統一して）が正解。"
+  },
+  {
+    "id": 60,
+    "level": "intermediate",
+    "sentence": "The manager has the _____ to approve all expenses under $500.",
+    "options": [
+      "authorize",
+      "authority",
+      "authorized",
+      "authorization"
+    ],
+    "answer": 1,
+    "explanation": "have the authority to do（〜する権限を持つ）が定型表現。authorizationは「許可（証）」で文脈に合いません。"
+  },
+  {
+    "id": 61,
+    "level": "intermediate",
+    "sentence": "By the time the manager arrives, we _____ the presentation.",
+    "options": [
+      "will finish",
+      "will have finished",
+      "have finished",
+      "finished"
+    ],
+    "answer": 1,
+    "explanation": "By the time + 現在形で未来を表す場合、主節は未来完了will have finished（完了している）。「マネージャーが到着するまでにはプレゼンを終えているだろう」。"
+  },
+  {
+    "id": 62,
+    "level": "intermediate",
+    "sentence": "If I _____ his email earlier, I would have replied yesterday.",
+    "options": [
+      "saw",
+      "had seen",
+      "have seen",
+      "see"
+    ],
+    "answer": 1,
+    "explanation": "仮定法過去完了。If S had p.p., S would have p.p.の構文。had seenが正解。"
+  },
+  {
+    "id": 63,
+    "level": "intermediate",
+    "sentence": "The new software _____ since last month without any problems.",
+    "options": [
+      "uses",
+      "has been used",
+      "is using",
+      "used"
+    ],
+    "answer": 1,
+    "explanation": "since last monthがあるので現在完了。「使われている」と受動の意味なのでhas been used（現在完了受動態）。"
+  },
+  {
+    "id": 64,
+    "level": "intermediate",
+    "sentence": "Mr. Wilson suggested that the meeting _____ postponed.",
+    "options": [
+      "is",
+      "was",
+      "be",
+      "being"
+    ],
+    "answer": 2,
+    "explanation": "suggest that S (should) + 動詞原形の仮定法現在。shouldが省略され原形beが残ります。"
+  },
+  {
+    "id": 65,
+    "level": "intermediate",
+    "sentence": "The renovation project _____ completed by the end of this year.",
+    "options": [
+      "will be",
+      "will have",
+      "is being",
+      "has been"
+    ],
+    "answer": 0,
+    "explanation": "by the end of this year（今年末までに）という未来。「完成される」受動態でwill be completed。"
+  },
+  {
+    "id": 66,
+    "level": "intermediate",
+    "sentence": "She wishes she _____ more time to prepare for the presentation.",
+    "options": [
+      "has",
+      "had",
+      "has had",
+      "having"
+    ],
+    "answer": 1,
+    "explanation": "I wish + 仮定法過去で「〜だったらいいのに」（現在の事実に反する願望）。hadが正解。"
+  },
+  {
+    "id": 67,
+    "level": "intermediate",
+    "sentence": "All applicants are required _____ a resume with their application.",
+    "options": [
+      "submit",
+      "to submit",
+      "submitting",
+      "submitted"
+    ],
+    "answer": 1,
+    "explanation": "be required to do（〜することを求められる）が定型。to submit。"
+  },
+  {
+    "id": 68,
+    "level": "intermediate",
+    "sentence": "The construction _____ for three months by next week.",
+    "options": [
+      "will be lasting",
+      "has lasted",
+      "will have lasted",
+      "is lasting"
+    ],
+    "answer": 2,
+    "explanation": "by next week + for three months → 未来までの継続「3か月間続いていることになる」未来完了will have lasted。"
+  },
+  {
+    "id": 69,
+    "level": "intermediate",
+    "sentence": "He insisted that the contract _____ signed immediately.",
+    "options": [
+      "is",
+      "was",
+      "be",
+      "to be"
+    ],
+    "answer": 2,
+    "explanation": "insist that S (should) + 原形の仮定法現在。be signed（受動態）。"
+  },
+  {
+    "id": 70,
+    "level": "intermediate",
+    "sentence": "While I _____ the report, my computer suddenly crashed.",
+    "options": [
+      "wrote",
+      "was writing",
+      "have written",
+      "write"
+    ],
+    "answer": 1,
+    "explanation": "while + 過去進行形「〜している最中に」突然のcrashedと対比。was writing。"
+  },
+  {
+    "id": 71,
+    "level": "intermediate",
+    "sentence": "_____ the price increase, our sales have remained strong.",
+    "options": [
+      "Despite",
+      "Although",
+      "However",
+      "Because"
+    ],
+    "answer": 0,
+    "explanation": "後ろが名詞句the price increaseなので前置詞despite（〜にも関わらず）。Although/Becauseは接続詞で節が必要。Howeverは副詞。"
+  },
+  {
+    "id": 72,
+    "level": "intermediate",
+    "sentence": "_____ you finish the report by Friday, you can take Monday off.",
+    "options": [
+      "As long as",
+      "Despite",
+      "In spite of",
+      "Whereas"
+    ],
+    "answer": 0,
+    "explanation": "「金曜までに報告書を仕上げる限り、月曜休んでよい」の条件。as long as（〜する限り）。"
+  },
+  {
+    "id": 73,
+    "level": "intermediate",
+    "sentence": "The flight was delayed _____ heavy fog at the airport.",
+    "options": [
+      "because",
+      "because of",
+      "since",
+      "as"
+    ],
+    "answer": 1,
+    "explanation": "後ろが名詞句heavy fogなので前置詞句because of。because/since/asは接続詞で節が必要。"
+  },
+  {
+    "id": 74,
+    "level": "intermediate",
+    "sentence": "_____ the marketing team finished the campaign on time, the sales increased.",
+    "options": [
+      "Now that",
+      "Despite",
+      "In case",
+      "Whether"
+    ],
+    "answer": 0,
+    "explanation": "now that（今や〜なので）。「キャンペーンが時間通り終わったので売上が増えた」。"
+  },
+  {
+    "id": 75,
+    "level": "intermediate",
+    "sentence": "Please bring an umbrella _____ it rains tomorrow.",
+    "options": [
+      "in case",
+      "even though",
+      "as if",
+      "because"
+    ],
+    "answer": 0,
+    "explanation": "「明日雨が降る場合に備えて」in case（〜の場合に備えて）。"
+  },
+  {
+    "id": 76,
+    "level": "intermediate",
+    "sentence": "_____ the report is finalized, please send it to the head office.",
+    "options": [
+      "Once",
+      "Despite",
+      "Even",
+      "In case of"
+    ],
+    "answer": 0,
+    "explanation": "once（いったん〜したら）。「報告書が完成したら本社に送ってください」。"
+  },
+  {
+    "id": 77,
+    "level": "intermediate",
+    "sentence": "She speaks English _____ she were a native speaker.",
+    "options": [
+      "as if",
+      "even though",
+      "because",
+      "while"
+    ],
+    "answer": 0,
+    "explanation": "as if + 仮定法「まるで〜のように」。were a native speakerの形に合う。"
+  },
+  {
+    "id": 78,
+    "level": "intermediate",
+    "sentence": "_____ the contract terms are unclear, we need further negotiation.",
+    "options": [
+      "Since",
+      "Despite",
+      "Unless",
+      "Whether"
+    ],
+    "answer": 0,
+    "explanation": "理由のsince（〜なので）。「契約条件が不明確なので、さらなる交渉が必要」。"
+  },
+  {
+    "id": 79,
+    "level": "intermediate",
+    "sentence": "We will continue the project _____ the budget is approved.",
+    "options": [
+      "provided that",
+      "in spite of",
+      "regardless of",
+      "instead of"
+    ],
+    "answer": 0,
+    "explanation": "provided that（〜という条件で）。「予算が承認される条件で、プロジェクトを続ける」。"
+  },
+  {
+    "id": 80,
+    "level": "intermediate",
+    "sentence": "_____ it rained heavily, the outdoor event was held as scheduled.",
+    "options": [
+      "Even though",
+      "Because",
+      "So that",
+      "As long as"
+    ],
+    "answer": 0,
+    "explanation": "譲歩のeven though（〜にも関わらず）。「激しく雨が降ったにも関わらず、屋外イベントは予定通り開催された」。"
+  },
+  {
+    "id": 81,
+    "level": "intermediate",
+    "sentence": "The package will arrive _____ three business days.",
+    "options": [
+      "within",
+      "until",
+      "by",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "within + 期間で「〜以内に」。within three business days（3営業日以内に）。"
+  },
+  {
+    "id": 82,
+    "level": "intermediate",
+    "sentence": "The store offers a 10% discount _____ all purchases over $100.",
+    "options": [
+      "on",
+      "in",
+      "for",
+      "to"
+    ],
+    "answer": 0,
+    "explanation": "discount on ~（〜に対する割引）が定型表現。"
+  },
+  {
+    "id": 83,
+    "level": "intermediate",
+    "sentence": "All employees must be _____ duty during business hours.",
+    "options": [
+      "on",
+      "in",
+      "at",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "on duty（勤務中）。⇔off duty（勤務外）。"
+  },
+  {
+    "id": 84,
+    "level": "intermediate",
+    "sentence": "The conference will be held _____ behalf of the international association.",
+    "options": [
+      "on",
+      "in",
+      "for",
+      "by"
+    ],
+    "answer": 0,
+    "explanation": "on behalf of（〜を代表して）が定型表現。"
+  },
+  {
+    "id": 85,
+    "level": "intermediate",
+    "sentence": "He has been working for this company _____ 2010.",
+    "options": [
+      "since",
+      "for",
+      "from",
+      "in"
+    ],
+    "answer": 0,
+    "explanation": "完了形 + since + 起点「〜以来」。sinceが正解。forは期間の長さ。"
+  },
+  {
+    "id": 86,
+    "level": "intermediate",
+    "sentence": "Please refer _____ the attached document for details.",
+    "options": [
+      "to",
+      "at",
+      "in",
+      "on"
+    ],
+    "answer": 0,
+    "explanation": "refer to ~（〜を参照する）が定型表現。"
+  },
+  {
+    "id": 87,
+    "level": "intermediate",
+    "sentence": "The new branch will open _____ the end of this quarter.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "by"
+    ],
+    "answer": 0,
+    "explanation": "at the end of ~（〜の終わりに）が定型。byは「〜までに」で意味が違います。"
+  },
+  {
+    "id": 88,
+    "level": "intermediate",
+    "sentence": "The decision was made _____ consultation with the board.",
+    "options": [
+      "after",
+      "before",
+      "during",
+      "between"
+    ],
+    "answer": 0,
+    "explanation": "「取締役会との協議の後で決定された」。afterが文脈に合います。"
+  },
+  {
+    "id": 89,
+    "level": "intermediate",
+    "sentence": "The seminar is intended _____ new employees only.",
+    "options": [
+      "for",
+      "to",
+      "with",
+      "at"
+    ],
+    "answer": 0,
+    "explanation": "be intended for ~（〜を対象としている）が定型表現。"
+  },
+  {
+    "id": 90,
+    "level": "intermediate",
+    "sentence": "He was promoted _____ his outstanding performance.",
+    "options": [
+      "due to",
+      "instead of",
+      "regardless of",
+      "in addition to"
+    ],
+    "answer": 0,
+    "explanation": "due to（〜のために、理由）。「優れた業績のため昇進した」。"
+  },
+  {
+    "id": 91,
+    "level": "intermediate",
+    "sentence": "The company plans to _____ its operations into Asian markets.",
+    "options": [
+      "expand",
+      "rise",
+      "raise",
+      "grow"
+    ],
+    "answer": 0,
+    "explanation": "expand operations（事業を拡大する）が定型表現。riseは自動詞、raiseは「上げる」、growも可能だが業務範囲ならexpandがより自然。"
+  },
+  {
+    "id": 92,
+    "level": "intermediate",
+    "sentence": "Please _____ from smoking inside the building.",
+    "options": [
+      "refrain",
+      "avoid",
+      "stop",
+      "quit"
+    ],
+    "answer": 0,
+    "explanation": "refrain from ~ing（〜を控える）が定型のフォーマル表現。掲示などで使われます。"
+  },
+  {
+    "id": 93,
+    "level": "intermediate",
+    "sentence": "All employees are expected to _____ the company's dress code.",
+    "options": [
+      "adhere to",
+      "obey with",
+      "follow up",
+      "comply"
+    ],
+    "answer": 0,
+    "explanation": "adhere to（〜を遵守する）。obeyは前置詞不要、followは動詞で前置詞なし、complyはcomply withの形。"
+  },
+  {
+    "id": 94,
+    "level": "intermediate",
+    "sentence": "The marketing team will _____ a survey to assess customer satisfaction.",
+    "options": [
+      "conduct",
+      "make",
+      "do",
+      "perform"
+    ],
+    "answer": 0,
+    "explanation": "conduct a survey（調査を実施する）が定型表現。"
+  },
+  {
+    "id": 95,
+    "level": "intermediate",
+    "sentence": "The proposal requires the manager's _____ before implementation.",
+    "options": [
+      "approval",
+      "agreement",
+      "agreement",
+      "consent"
+    ],
+    "answer": 0,
+    "explanation": "「実施前にマネージャーの承認が必要」。approval（承認）がビジネス文書での定型。"
+  },
+  {
+    "id": 96,
+    "level": "intermediate",
+    "sentence": "Our company is committed _____ providing high-quality service.",
+    "options": [
+      "to",
+      "for",
+      "with",
+      "on"
+    ],
+    "answer": 0,
+    "explanation": "be committed to ~ing（〜することに尽力する）のtoは前置詞。後ろは動名詞。"
+  },
+  {
+    "id": 97,
+    "level": "intermediate",
+    "sentence": "The new system will significantly _____ productivity.",
+    "options": [
+      "enhance",
+      "raise up",
+      "make high",
+      "lift"
+    ],
+    "answer": 0,
+    "explanation": "enhance productivity（生産性を高める）が定型ビジネス表現。"
+  },
+  {
+    "id": 98,
+    "level": "intermediate",
+    "sentence": "Please make sure to _____ the attached file before the meeting.",
+    "options": [
+      "review",
+      "look",
+      "see at",
+      "watch"
+    ],
+    "answer": 0,
+    "explanation": "review（精査する、見直す）が書類に対する自然な動詞。look at/seeはカジュアル、watchは動くもの。"
+  },
+  {
+    "id": 99,
+    "level": "intermediate",
+    "sentence": "The training program is designed to _____ employees' communication skills.",
+    "options": [
+      "improve",
+      "rise",
+      "grow up",
+      "lift up"
+    ],
+    "answer": 0,
+    "explanation": "improve skills（スキルを向上させる）が定型。"
+  },
+  {
+    "id": 100,
+    "level": "intermediate",
+    "sentence": "We need to _____ a strategy to increase market share.",
+    "options": [
+      "develop",
+      "do",
+      "make up",
+      "raise"
+    ],
+    "answer": 0,
+    "explanation": "develop a strategy（戦略を策定する）がビジネス定型表現。"
+  },
+  {
+    "id": 101,
+    "level": "advanced",
+    "sentence": "The board's decision to relocate headquarters proved to be highly _____.",
+    "options": [
+      "controversy",
+      "controversial",
+      "controversially",
+      "controversies"
+    ],
+    "answer": 1,
+    "explanation": "be動詞proved to be + 副詞highly + 形容詞 の構造。controversial（物議を醸す）が正解。controversyは名詞、controversiallyは副詞でhighlyに続けません。"
+  },
+  {
+    "id": 102,
+    "level": "advanced",
+    "sentence": "The auditor noted several _____ in the quarterly financial statements.",
+    "options": [
+      "discrepancy",
+      "discrepant",
+      "discrepancies",
+      "discrepantly"
+    ],
+    "answer": 2,
+    "explanation": "severalの後は可算名詞の複数形。discrepancies（食い違い、相違点）が正解。会計用語として頻出。"
+  },
+  {
+    "id": 103,
+    "level": "advanced",
+    "sentence": "The merger faced _____ scrutiny from regulatory authorities.",
+    "options": [
+      "intense",
+      "intensity",
+      "intensify",
+      "intensively"
+    ],
+    "answer": 0,
+    "explanation": "名詞scrutinyを修飾する形容詞intense（厳しい）。intensityは名詞、intensifyは動詞、intensivelyは副詞。"
+  },
+  {
+    "id": 104,
+    "level": "advanced",
+    "sentence": "The CEO's resignation came as a _____ shock to the entire organization.",
+    "options": [
+      "complete",
+      "completely",
+      "completion",
+      "completing"
+    ],
+    "answer": 0,
+    "explanation": "冠詞a + 形容詞 + 名詞shockの構造。形容詞complete（完全な）。completelyは副詞、completionは名詞。"
+  },
+  {
+    "id": 105,
+    "level": "advanced",
+    "sentence": "Compliance with international standards is _____ to maintaining global partnerships.",
+    "options": [
+      "essential",
+      "essentially",
+      "essence",
+      "essentials"
+    ],
+    "answer": 0,
+    "explanation": "be動詞isの補語に形容詞essential（不可欠な）。be essential to ~ingは定型表現。"
+  },
+  {
+    "id": 106,
+    "level": "advanced",
+    "sentence": "The consultant provided _____ analysis of the company's competitive position.",
+    "options": [
+      "comprehend",
+      "comprehensive",
+      "comprehension",
+      "comprehensively"
+    ],
+    "answer": 1,
+    "explanation": "名詞analysisを修飾する形容詞comprehensive（包括的な）。comprehensionは名詞、comprehensivelyは副詞。"
+  },
+  {
+    "id": 107,
+    "level": "advanced",
+    "sentence": "The negotiations were conducted with utmost _____ for all parties involved.",
+    "options": [
+      "consider",
+      "considerate",
+      "consideration",
+      "considerable"
+    ],
+    "answer": 2,
+    "explanation": "with + 形容詞 + 名詞。utmostは形容詞、considerationは名詞（配慮）。considerateは形容詞「思いやりのある」、considerableは「相当な」。"
+  },
+  {
+    "id": 108,
+    "level": "advanced",
+    "sentence": "The newly appointed director brings _____ experience in international finance.",
+    "options": [
+      "extension",
+      "extensive",
+      "extensively",
+      "extending"
+    ],
+    "answer": 1,
+    "explanation": "名詞experienceを修飾する形容詞extensive（広範な）。extensionは名詞、extensivelyは副詞。"
+  },
+  {
+    "id": 109,
+    "level": "advanced",
+    "sentence": "Investors expressed _____ over the company's declining market share.",
+    "options": [
+      "concern",
+      "concerned",
+      "concerning",
+      "concernedly"
+    ],
+    "answer": 0,
+    "explanation": "express + 名詞「〜を表明する」。concern（懸念）が名詞として正解。concernedは形容詞「心配している」、concerningは前置詞「〜について」。"
+  },
+  {
+    "id": 110,
+    "level": "advanced",
+    "sentence": "The proposal received _____ approval from all stakeholders.",
+    "options": [
+      "overwhelm",
+      "overwhelming",
+      "overwhelmingly",
+      "overwhelmed"
+    ],
+    "answer": 1,
+    "explanation": "名詞approvalを修飾する形容詞overwhelming（圧倒的な）。overwhelmingly approvedとは違って、approvalを直接修飾するのは形容詞。"
+  },
+  {
+    "id": 111,
+    "level": "advanced",
+    "sentence": "Had the board members _____ the proposal earlier, the project would already be underway.",
+    "options": [
+      "approve",
+      "approved",
+      "approving",
+      "to approve"
+    ],
+    "answer": 1,
+    "explanation": "仮定法過去完了の倒置形。If they had approved → Had they approved。approved（過去分詞）が必要。"
+  },
+  {
+    "id": 112,
+    "level": "advanced",
+    "sentence": "By the time the new policy _____ next month, all employees will have been trained.",
+    "options": [
+      "takes effect",
+      "took effect",
+      "will take effect",
+      "is taken effect"
+    ],
+    "answer": 0,
+    "explanation": "by the time + 現在形で未来を表す（時の副詞節中は現在形）。takes effect（発効する）。take effectは「効力を持つ」の定型表現。"
+  },
+  {
+    "id": 113,
+    "level": "advanced",
+    "sentence": "The contract stipulates that all payments _____ within 30 days of invoice receipt.",
+    "options": [
+      "are made",
+      "be made",
+      "will make",
+      "to be made"
+    ],
+    "answer": 1,
+    "explanation": "stipulate that S (should) + 原形の仮定法現在。受動態be made。stipulate（明記する）系の動詞では仮定法現在を取る。"
+  },
+  {
+    "id": 114,
+    "level": "advanced",
+    "sentence": "Were the merger _____ next quarter, the combined company would dominate the market.",
+    "options": [
+      "finalize",
+      "finalized",
+      "to be finalized",
+      "finalizing"
+    ],
+    "answer": 2,
+    "explanation": "仮定法未来の倒置。If the merger were to be finalized → Were the merger to be finalized。to be finalizedが正解。"
+  },
+  {
+    "id": 115,
+    "level": "advanced",
+    "sentence": "The findings of the report _____ before being submitted to the board.",
+    "options": [
+      "have been verifying",
+      "must verify",
+      "must be verified",
+      "verify"
+    ],
+    "answer": 2,
+    "explanation": "「発見事項は検証されなければならない」受動態 + 助動詞must be verified。"
+  },
+  {
+    "id": 116,
+    "level": "advanced",
+    "sentence": "The auditors have been examining the financial records since the discrepancies _____ last week.",
+    "options": [
+      "discover",
+      "were discovered",
+      "had been discovered",
+      "have discovered"
+    ],
+    "answer": 1,
+    "explanation": "「不一致が発見されて以来」受動態の過去形were discovered。sinceの後ろの起点は過去形。"
+  },
+  {
+    "id": 117,
+    "level": "advanced",
+    "sentence": "If the merger had been completed on time, our market share _____ by now.",
+    "options": [
+      "would double",
+      "would have doubled",
+      "would have been doubling",
+      "would be doubling"
+    ],
+    "answer": 1,
+    "explanation": "仮定法過去完了の帰結節would have + 過去分詞。by nowは現在を指すがhad been completedと連動して結果としての完了を表すwould have doubled。"
+  },
+  {
+    "id": 118,
+    "level": "advanced",
+    "sentence": "Senior executives recommended that the launch date _____ until further notice.",
+    "options": [
+      "postpones",
+      "is postponed",
+      "be postponed",
+      "was postponed"
+    ],
+    "answer": 2,
+    "explanation": "recommend that S (should) + 原形の仮定法現在。受動態be postponedが正解。"
+  },
+  {
+    "id": 119,
+    "level": "advanced",
+    "sentence": "Not only _____ the quarterly targets, but the team also exceeded annual goals.",
+    "options": [
+      "did they meet",
+      "they met",
+      "have they met",
+      "they have met"
+    ],
+    "answer": 0,
+    "explanation": "Not only + 倒置「〜だけでなく」。did + 主語 + 原形で過去の倒置。"
+  },
+  {
+    "id": 120,
+    "level": "advanced",
+    "sentence": "Rarely _____ such a dramatic increase in productivity within a single quarter.",
+    "options": [
+      "we see",
+      "do we see",
+      "we have seen",
+      "had we seen"
+    ],
+    "answer": 1,
+    "explanation": "rarelyなど否定語が文頭に来ると倒置。現在形ではdo + S + 原形。「これほど劇的な生産性向上を一四半期で見ることはまれだ」。"
+  },
+  {
+    "id": 121,
+    "level": "advanced",
+    "sentence": "_____ as it may seem, the new policy actually increased efficiency.",
+    "options": [
+      "Strange",
+      "Strangely",
+      "Stranger",
+      "Strangeness"
+    ],
+    "answer": 0,
+    "explanation": "形容詞 + as S may seem「〜に見えるとはいえ」の譲歩構文。strange as it may seem。"
+  },
+  {
+    "id": 122,
+    "level": "advanced",
+    "sentence": "_____ the unanimous support from the board, the CEO decided to delay the launch.",
+    "options": [
+      "Notwithstanding",
+      "Although",
+      "Whereas",
+      "Provided"
+    ],
+    "answer": 0,
+    "explanation": "後ろが名詞句なので前置詞句が必要。notwithstanding（〜にも関わらず）は前置詞。AlthoughやWhereasは接続詞で節が必要。"
+  },
+  {
+    "id": 123,
+    "level": "advanced",
+    "sentence": "_____ the negotiations have stalled, we should consider alternative options.",
+    "options": [
+      "Inasmuch as",
+      "Despite",
+      "Regardless of",
+      "Owing to"
+    ],
+    "answer": 0,
+    "explanation": "inasmuch as（〜である以上、〜なので）はフォーマルな接続詞で節を導きます。他は前置詞句で名詞しか取れません。"
+  },
+  {
+    "id": 124,
+    "level": "advanced",
+    "sentence": "The agreement will remain valid _____ both parties continue to meet their obligations.",
+    "options": [
+      "insofar as",
+      "regardless of",
+      "in spite of",
+      "due to"
+    ],
+    "answer": 0,
+    "explanation": "insofar as（〜する限りにおいて）。条件節を導く接続詞。フォーマルな表現。"
+  },
+  {
+    "id": 125,
+    "level": "advanced",
+    "sentence": "_____ the executive committee approves the budget, we will proceed with hiring.",
+    "options": [
+      "Once",
+      "In spite of",
+      "Despite",
+      "Owing to"
+    ],
+    "answer": 0,
+    "explanation": "「執行委員会が予算を承認したら採用を進める」。once（いったん〜したら）が条件節を導きます。"
+  },
+  {
+    "id": 126,
+    "level": "advanced",
+    "sentence": "_____ we anticipated some pushback, the proposal was unanimously rejected.",
+    "options": [
+      "While",
+      "Despite",
+      "Owing to",
+      "In spite of"
+    ],
+    "answer": 0,
+    "explanation": "「ある程度の反発は予想していたが、提案は全会一致で却下された」。譲歩のwhile（〜だが）。"
+  },
+  {
+    "id": 127,
+    "level": "advanced",
+    "sentence": "The merger was finalized _____ both companies had agreed on the terms.",
+    "options": [
+      "once",
+      "despite",
+      "regardless of",
+      "in case of"
+    ],
+    "answer": 0,
+    "explanation": "once（〜した後で）。「両社が条件に合意した後でM&Aは成立した」。"
+  },
+  {
+    "id": 128,
+    "level": "advanced",
+    "sentence": "Sales have improved significantly _____ we implemented the new marketing strategy.",
+    "options": [
+      "ever since",
+      "regardless of",
+      "in spite of",
+      "owing to"
+    ],
+    "answer": 0,
+    "explanation": "ever since（〜以来ずっと）は接続詞。「新しいマーケティング戦略を実施して以来、売上は大幅に伸びた」。"
+  },
+  {
+    "id": 129,
+    "level": "advanced",
+    "sentence": "_____ unforeseen circumstances arise, the project will be completed by December.",
+    "options": [
+      "Unless",
+      "Despite",
+      "In case of",
+      "Owing to"
+    ],
+    "answer": 0,
+    "explanation": "unless（〜でない限り）。「予期せぬ事態が生じない限り、12月までに完了する」。条件節を導く接続詞。"
+  },
+  {
+    "id": 130,
+    "level": "advanced",
+    "sentence": "The company will continue its expansion _____ economic conditions remain favorable.",
+    "options": [
+      "as long as",
+      "in spite of",
+      "regardless of",
+      "due to"
+    ],
+    "answer": 0,
+    "explanation": "as long as（〜である限り）。条件節を導く接続詞。「経済状況が良好である限り、拡大を続ける」。"
+  },
+  {
+    "id": 131,
+    "level": "advanced",
+    "sentence": "The conference has been postponed _____ further notice.",
+    "options": [
+      "until",
+      "by",
+      "for",
+      "since"
+    ],
+    "answer": 0,
+    "explanation": "until further notice（追って通知あるまで）は定型表現。会議延期などのアナウンスで頻出。"
+  },
+  {
+    "id": 132,
+    "level": "advanced",
+    "sentence": "The negotiation broke down _____ disagreements over compensation.",
+    "options": [
+      "over",
+      "from",
+      "of",
+      "with"
+    ],
+    "answer": 0,
+    "explanation": "over（〜をめぐって）。disagreements over ~（〜についての意見の相違）が定型。"
+  },
+  {
+    "id": 133,
+    "level": "advanced",
+    "sentence": "The merger is contingent _____ regulatory approval from both governments.",
+    "options": [
+      "upon",
+      "with",
+      "from",
+      "at"
+    ],
+    "answer": 0,
+    "explanation": "be contingent upon/on（〜次第である）が定型表現。フォーマルなビジネス文書で使われます。"
+  },
+  {
+    "id": 134,
+    "level": "advanced",
+    "sentence": "All proposals must be submitted _____ accordance with the established guidelines.",
+    "options": [
+      "in",
+      "with",
+      "by",
+      "on"
+    ],
+    "answer": 0,
+    "explanation": "in accordance with（〜に従って）が定型表現。フォーマル英語で頻出。"
+  },
+  {
+    "id": 135,
+    "level": "advanced",
+    "sentence": "The committee reached a decision _____ much deliberation.",
+    "options": [
+      "after",
+      "with",
+      "before",
+      "in"
+    ],
+    "answer": 0,
+    "explanation": "after much deliberation（多くの熟考の後で）が自然なコロケーション。"
+  },
+  {
+    "id": 136,
+    "level": "advanced",
+    "sentence": "The contract is binding _____ both parties for a period of five years.",
+    "options": [
+      "upon",
+      "with",
+      "for",
+      "to"
+    ],
+    "answer": 0,
+    "explanation": "binding upon ~（〜に対して拘束力のある）が法律用語の定型。"
+  },
+  {
+    "id": 137,
+    "level": "advanced",
+    "sentence": "The new policy was implemented _____ the recommendation of the consultants.",
+    "options": [
+      "at",
+      "from",
+      "of",
+      "in"
+    ],
+    "answer": 0,
+    "explanation": "at the recommendation of（〜の推奨により）が定型表現。"
+  },
+  {
+    "id": 138,
+    "level": "advanced",
+    "sentence": "The committee deferred the decision _____ the next quarterly meeting.",
+    "options": [
+      "until",
+      "by",
+      "on",
+      "for"
+    ],
+    "answer": 0,
+    "explanation": "defer A until B（AをBまで延期する）。「次の四半期会議まで決定を延期した」。"
+  },
+  {
+    "id": 139,
+    "level": "advanced",
+    "sentence": "Bonuses will be distributed _____ accordance with individual performance.",
+    "options": [
+      "in",
+      "with",
+      "by",
+      "to"
+    ],
+    "answer": 0,
+    "explanation": "in accordance with（〜に従って）が定型。distribute ~ in accordance with…で「…に従って配分する」。"
+  },
+  {
+    "id": 140,
+    "level": "advanced",
+    "sentence": "The new regulations will take effect _____ January 1st of next year.",
+    "options": [
+      "as of",
+      "by",
+      "until",
+      "since"
+    ],
+    "answer": 0,
+    "explanation": "as of（〜付けで、〜から）が日付に対する定型。take effect as of ~は公式アナウンスで頻出。"
+  },
+  {
+    "id": 141,
+    "level": "advanced",
+    "sentence": "The CEO's announcement _____ widespread speculation about the company's future.",
+    "options": [
+      "sparked",
+      "lit",
+      "fired",
+      "burned"
+    ],
+    "answer": 0,
+    "explanation": "spark speculation（憶測を呼ぶ）が定型表現。fireやburnは火そのもの。litは過去形だが「噂を点ける」は不自然。"
+  },
+  {
+    "id": 142,
+    "level": "advanced",
+    "sentence": "The new regulations will _____ significant changes in how we conduct business.",
+    "options": [
+      "necessitate",
+      "make necessary",
+      "need for",
+      "be needing"
+    ],
+    "answer": 0,
+    "explanation": "necessitate（必要とさせる）は他動詞でフォーマルな語。新しい規制が変化を必要とさせる、というビジネス英語の定型用法。"
+  },
+  {
+    "id": 143,
+    "level": "advanced",
+    "sentence": "The board unanimously voted to _____ the proposed acquisition.",
+    "options": [
+      "endorse",
+      "agree",
+      "approve to",
+      "consent"
+    ],
+    "answer": 0,
+    "explanation": "endorse（支持する、是認する）はvote toの後に続く正式な動詞。agreeは前置詞onが必要、approveもapprove ofまたは目的語が必要。"
+  },
+  {
+    "id": 144,
+    "level": "advanced",
+    "sentence": "The merger is expected to generate substantial _____ for both companies.",
+    "options": [
+      "synergies",
+      "syntheses",
+      "synopses",
+      "syndromes"
+    ],
+    "answer": 0,
+    "explanation": "synergies（相乗効果）はM&A文脈の頻出語。synthesesは「合成」、synopsesは「概要」、syndromesは「症候群」で意味が違います。"
+  },
+  {
+    "id": 145,
+    "level": "advanced",
+    "sentence": "The marketing team needs to _____ a strategy that resonates with younger consumers.",
+    "options": [
+      "devise",
+      "do",
+      "create up",
+      "build out"
+    ],
+    "answer": 0,
+    "explanation": "devise a strategy（戦略を考案する）はフォーマルなビジネス英語の定型。doは弱く、create upは存在しない。"
+  },
+  {
+    "id": 146,
+    "level": "advanced",
+    "sentence": "The auditors found numerous _____ in the company's accounting practices.",
+    "options": [
+      "irregularities",
+      "regulars",
+      "unevenness",
+      "irregulars"
+    ],
+    "answer": 0,
+    "explanation": "irregularities（不正、不規則な点）は会計監査用語の定型。"
+  },
+  {
+    "id": 147,
+    "level": "advanced",
+    "sentence": "The CEO emphasized the need to _____ operational costs without compromising quality.",
+    "options": [
+      "streamline",
+      "thin",
+      "narrow",
+      "shrink"
+    ],
+    "answer": 0,
+    "explanation": "streamline（合理化する、効率化する）はビジネス用語。「品質を犠牲にせずに業務コストを合理化する」。"
+  },
+  {
+    "id": 148,
+    "level": "advanced",
+    "sentence": "The new product launch has been _____ due to manufacturing issues.",
+    "options": [
+      "postponed",
+      "stayed",
+      "stopped up",
+      "hold off"
+    ],
+    "answer": 0,
+    "explanation": "postpone（延期する）が定型。stay/stop up/hold off（hold offは可だが文法的にbe hold offは不可）は不適。"
+  },
+  {
+    "id": 149,
+    "level": "advanced",
+    "sentence": "Senior management must _____ the implications of this decision carefully.",
+    "options": [
+      "weigh",
+      "lift",
+      "carry",
+      "balance out"
+    ],
+    "answer": 0,
+    "explanation": "weigh the implications/options（影響/選択肢を慎重に検討する）が定型ビジネス表現。"
+  },
+  {
+    "id": 150,
+    "level": "advanced",
+    "sentence": "The contract terms are subject to _____ pending final approval from legal counsel.",
+    "options": [
+      "revision",
+      "rewrite",
+      "redo",
+      "remake"
+    ],
+    "answer": 0,
+    "explanation": "subject to revision（修正の対象になる）は法務・契約文書の定型表現。revisionが最も自然。"
+  }
+];
+
+/* ===== 状態管理 ===== */
+const state = {
+  level: 'beginner',
+  queue: [],
+  currentIndex: 0,
+  correctCount: 0,
+  totalAnswered: 0,
+  sessionResults: { beginner: {correct:0, total:0}, intermediate: {correct:0, total:0}, advanced: {correct:0, total:0} },
+  notion: { token: '', scoreDb: '', weakDb: '' }
+};
+
+/* ===== ユーティリティ ===== */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showToast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function levelLabel(lv) {
+  return { beginner: '初級', intermediate: '中級', advanced: '上級' }[lv];
+}
+
+/* ===== Notion連携 ===== */
+function loadNotionConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('toeic_part5_notion') || '{}');
+    state.notion = { token: saved.token||'', scoreDb: saved.scoreDb||'', weakDb: saved.weakDb||'' };
+    document.getElementById('inputToken').value = state.notion.token;
+    document.getElementById('inputScoreDb').value = state.notion.scoreDb;
+    document.getElementById('inputWeakDb').value = state.notion.weakDb;
+  } catch(e) {}
+}
+
+function saveNotionConfig() {
+  state.notion.token = document.getElementById('inputToken').value.trim();
+  state.notion.scoreDb = document.getElementById('inputScoreDb').value.trim();
+  state.notion.weakDb = document.getElementById('inputWeakDb').value.trim();
+  localStorage.setItem('toeic_part5_notion', JSON.stringify(state.notion));
+  document.getElementById('settingsModal').classList.remove('show');
+  showToast('✅ Notion設定を保存しました', 'success');
+}
+
+async function notionApi(payload) {
+  if (!state.notion.token) return;
+  try {
+    const res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + state.notion.token,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      showToast('Notion送信失敗: ' + res.status, 'error');
+      console.error(err);
+    } else {
+      showToast('✅ Notionに記録しました', 'success');
+    }
+  } catch (e) {
+    showToast('Notion送信失敗: ' + e.message, 'error');
+  }
+}
+
+async function sendWeakQuestion(q, userAnswerText) {
+  if (!state.notion.weakDb || !state.notion.token) return;
+  const today = new Date().toISOString();
+  const payload = {
+    parent: { database_id: state.notion.weakDb },
+    properties: {
+      'タイトル': { title: [{ text: { content: q.sentence.slice(0, 30) } }] },
+      'Part': { select: { name: 'Part 5' } },
+      'レベル': { select: { name: levelLabel(q.level) } },
+      '問題全文': { rich_text: [{ text: { content: q.sentence } }] },
+      '自分の解答': { rich_text: [{ text: { content: userAnswerText } }] },
+      '正解': { rich_text: [{ text: { content: q.options[q.answer] } }] },
+      '解説': { rich_text: [{ text: { content: q.explanation.slice(0, 1900) } }] },
+      '間違えた日': { date: { start: today } }
+    }
+  };
+  notionApi(payload);
+}
+
+async function sendSessionScore(level, correct, total) {
+  if (!state.notion.scoreDb || !state.notion.token) return;
+  const today = new Date().toISOString();
+  const dateStr = today.slice(0, 10);
+  const rate = total > 0 ? Math.round(correct / total * 100) : 0;
+  const payload = {
+    parent: { database_id: state.notion.scoreDb },
+    properties: {
+      'タイトル': { title: [{ text: { content: `Part 5 ${levelLabel(level)} ${dateStr}` } }] },
+      'Part': { select: { name: 'Part 5' } },
+      'レベル': { select: { name: levelLabel(level) } },
+      '正答数': { number: correct },
+      '出題数': { number: total },
+      '正答率': { number: rate },
+      '学習日': { date: { start: today } }
+    }
+  };
+  notionApi(payload);
+}
+
+/* ===== 出題ロジック ===== */
+function startSession(level) {
+  state.level = level;
+  state.queue = shuffle(QUESTIONS.filter(q => q.level === level));
+  state.currentIndex = 0;
+  state.correctCount = 0;
+  state.totalAnswered = 0;
+  // タブ切替
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.level === level);
+  });
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const main = document.getElementById('mainArea');
+  if (state.currentIndex >= state.queue.length) {
+    renderSummary();
+    return;
+  }
+  const q = state.queue[state.currentIndex];
+  const total = state.queue.length;
+  const cur = state.currentIndex + 1;
+
+  // プログレス更新
+  document.getElementById('progressBar').style.width = ((cur - 1) / total * 100) + '%';
+  document.getElementById('progressText').textContent = `問題 ${cur}/${total}`;
+  document.getElementById('scoreDisplay').textContent = `${state.correctCount}/${state.totalAnswered}`;
+
+  // 空所を視覚的に強調
+  const sentenceHtml = q.sentence.replace(/_____/g, '<span class="blank">　　　</span>');
+
+  main.innerHTML = `
+    <div class="card">
+      <span class="level-badge level-${q.level}">${levelLabel(q.level)}</span>
+      <div class="question-text">${sentenceHtml}</div>
+      <div class="options" id="options">
+        ${q.options.map((opt, i) => `
+          <button class="option" data-idx="${i}">
+            <span class="letter">${String.fromCharCode(65+i)}</span>
+            <span class="opt-text">${opt}</span>
+          </button>
+        `).join('')}
+      </div>
+      <div class="explanation" id="explanation">
+        <h3>💡 解説</h3>
+        <p id="explanationText"></p>
+      </div>
+      <button class="next-btn" id="nextBtn">次の問題 →</button>
+    </div>
+  `;
+
+  document.querySelectorAll('.option').forEach(btn => {
+    btn.addEventListener('click', () => handleAnswer(parseInt(btn.dataset.idx), q));
+  });
+  document.getElementById('nextBtn').addEventListener('click', nextQuestion);
+}
+
+function handleAnswer(selectedIdx, q) {
+  const options = document.querySelectorAll('.option');
+  options.forEach(o => o.disabled = true);
+  const isCorrect = selectedIdx === q.answer;
+  state.totalAnswered++;
+  if (isCorrect) state.correctCount++;
+  // セッション結果に記録
+  state.sessionResults[q.level].total++;
+  if (isCorrect) state.sessionResults[q.level].correct++;
+
+  options.forEach((o, i) => {
+    if (i === q.answer) {
+      o.classList.add('correct');
+      o.querySelector('.opt-text').insertAdjacentHTML('afterend', '<span class="icon">✅</span>');
+    } else if (i === selectedIdx) {
+      o.classList.add('incorrect');
+      o.querySelector('.opt-text').insertAdjacentHTML('afterend', '<span class="icon">❌</span>');
+    }
+  });
+
+  document.getElementById('scoreDisplay').textContent = `${state.correctCount}/${state.totalAnswered}`;
+
+  const exp = document.getElementById('explanation');
+  document.getElementById('explanationText').textContent = q.explanation;
+  exp.classList.add('show');
+
+  document.getElementById('nextBtn').classList.add('show');
+
+  if (!isCorrect) {
+    sendWeakQuestion(q, q.options[selectedIdx]);
+  }
+}
+
+function nextQuestion() {
+  state.currentIndex++;
+  renderQuestion();
+}
+
+function renderSummary() {
+  const main = document.getElementById('mainArea');
+  const total = state.totalAnswered;
+  const correct = state.correctCount;
+  const rate = total > 0 ? Math.round(correct / total * 100) : 0;
+
+  // セッションスコア送信
+  sendSessionScore(state.level, correct, total);
+
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('progressText').textContent = `完了 ${total}/${total}`;
+
+  main.innerHTML = `
+    <div class="card summary">
+      <h2>🎉 ${levelLabel(state.level)} 完了！</h2>
+      <div class="score-big">${correct} / ${total}</div>
+      <div style="font-size:1.2rem; color:var(--muted);">正答率 ${rate}%</div>
+      <div class="summary-stats">
+        <div class="stat-row"><span>レベル</span><strong>${levelLabel(state.level)}</strong></div>
+        <div class="stat-row"><span>正答数</span><strong>${correct}問</strong></div>
+        <div class="stat-row"><span>不正解</span><strong>${total - correct}問</strong></div>
+        <div class="stat-row"><span>正答率</span><strong>${rate}%</strong></div>
+      </div>
+      <div class="summary-buttons">
+        <button class="btn-primary" id="retryBtn">🔄 もう一度</button>
+        <button class="btn-secondary" id="otherLevelBtn">別レベルへ</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('retryBtn').addEventListener('click', () => startSession(state.level));
+  document.getElementById('otherLevelBtn').addEventListener('click', () => {
+    document.querySelector('.tabs').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+/* ===== イベント ===== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => startSession(tab.dataset.level));
+});
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('settingsModal').classList.add('show');
+});
+document.getElementById('cancelSettings').addEventListener('click', () => {
+  document.getElementById('settingsModal').classList.remove('show');
+});
+document.getElementById('saveSettings').addEventListener('click', saveNotionConfig);
+
+/* ===== 初期化 ===== */
+loadNotionConfig();
+startSession('beginner');
+</script>
+</body>
+</html>
