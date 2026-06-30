@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEIC Part 7 練習</title>
+<style>
+  /* ==================== ベース ==================== */
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue","Hiragino Sans","Yu Gothic",sans-serif;
+    background:linear-gradient(135deg,#f5f7fa 0%,#e8ecf3 100%);
+    color:#1a237e;min-height:100vh;line-height:1.6;
+  }
+  /* ==================== ヘッダー ==================== */
+  header{
+    background:linear-gradient(135deg,#1a237e 0%,#283593 100%);
+    color:#fff;padding:16px 24px;box-shadow:0 4px 12px rgba(26,35,126,0.2);
+    position:sticky;top:0;z-index:100;
+  }
+  .header-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .app-title{font-size:1.4em;font-weight:700;display:flex;align-items:center;gap:8px}
+  .app-title .badge{background:#ffc107;color:#1a237e;padding:2px 10px;border-radius:12px;font-size:0.7em;font-weight:700}
+  .header-right{display:flex;align-items:center;gap:12px;font-size:0.9em}
+  .score-display{background:rgba(255,193,7,0.2);padding:6px 14px;border-radius:20px;border:1px solid #ffc107}
+  .settings-btn{background:transparent;border:1px solid #ffc107;color:#ffc107;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1em;transition:all 0.2s}
+  .settings-btn:hover{background:#ffc107;color:#1a237e}
+  /* ==================== レベルタブ ==================== */
+  .level-tabs{display:flex;gap:4px;margin-top:14px;background:rgba(0,0,0,0.15);padding:4px;border-radius:10px}
+  .level-tab{flex:1;padding:10px 14px;background:transparent;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:0.95em}
+  .level-tab.active{background:#ffc107;color:#1a237e;box-shadow:0 2px 8px rgba(255,193,7,0.4)}
+  .level-tab:hover:not(.active){background:rgba(255,255,255,0.1)}
+  /* ==================== 進捗バー ==================== */
+  .progress-wrap{margin-top:12px;display:flex;align-items:center;gap:10px;font-size:0.85em}
+  .progress-bar{flex:1;height:8px;background:rgba(0,0,0,0.2);border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#ffc107,#ffeb3b);transition:width 0.3s;width:0%}
+  /* ==================== メイン ==================== */
+  main{max-width:880px;margin:0 auto;padding:24px 16px;}
+  .passage-card{
+    background:#fff;border-radius:14px;padding:24px;margin-bottom:20px;
+    box-shadow:0 4px 16px rgba(26,35,126,0.08);border-left:5px solid #ffc107;
+  }
+  .passage-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .passage-type{background:#1a237e;color:#fff;padding:4px 12px;border-radius:10px;font-size:0.8em;font-weight:600}
+  .q-counter{color:#666;font-size:0.85em}
+  .passage-text{
+    background:#fafbfc;border:1px solid #e0e4ec;border-radius:10px;
+    padding:18px;font-family:Georgia,"Times New Roman",serif;color:#222;
+    white-space:pre-wrap;line-height:1.75;font-size:0.98em;
+  }
+  .passage-text .doc-header{font-weight:700;border-bottom:1px solid #ccc;padding-bottom:6px;margin-bottom:10px;color:#1a237e}
+  .question-card{
+    background:#fff;border-radius:14px;padding:24px;margin-bottom:16px;
+    box-shadow:0 4px 16px rgba(26,35,126,0.08);
+  }
+  .q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+  .q-number{background:#1a237e;color:#ffc107;padding:6px 14px;border-radius:10px;font-weight:700;font-size:0.9em}
+  .q-text{font-size:1.05em;font-weight:600;color:#1a237e;margin-bottom:16px;padding:10px 0;border-bottom:2px dashed #e0e4ec}
+  /* ==================== 選択肢 ==================== */
+  .options{display:flex;flex-direction:column;gap:10px}
+  .option{
+    background:#f5f7fa;border:2px solid #e0e4ec;border-radius:10px;
+    padding:14px 18px;text-align:left;cursor:pointer;font-size:1em;
+    color:#333;transition:all 0.2s;display:flex;align-items:flex-start;gap:10px;
+    font-family:inherit;line-height:1.5;
+  }
+  .option:hover:not(:disabled){background:#fff8e1;border-color:#ffc107;transform:translateX(4px)}
+  .option:disabled{cursor:default}
+  .option-label{
+    background:#1a237e;color:#ffc107;width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:0.85em;
+  }
+  .option.correct{background:#e8f5e9;border-color:#4caf50;color:#1b5e20}
+  .option.correct .option-label{background:#4caf50;color:#fff}
+  .option.wrong{background:#ffebee;border-color:#f44336;color:#b71c1c}
+  .option.wrong .option-label{background:#f44336;color:#fff}
+  .option-icon{margin-left:auto;font-size:1.2em}
+  /* ==================== 解説パネル ==================== */
+  .explanation{
+    margin-top:16px;background:linear-gradient(135deg,#fff8e1 0%,#fffde7 100%);
+    border-left:4px solid #ffc107;border-radius:8px;padding:16px;
+    animation:slideIn 0.4s ease-out;
+  }
+  @keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .explanation h4{color:#1a237e;margin-bottom:8px;font-size:1em}
+  .explanation p{color:#444;font-size:0.95em;white-space:pre-wrap}
+  .next-btn{
+    margin-top:16px;background:linear-gradient(135deg,#1a237e 0%,#283593 100%);
+    color:#ffc107;border:none;padding:12px 24px;border-radius:10px;cursor:pointer;
+    font-size:1em;font-weight:700;width:100%;transition:all 0.2s;
+  }
+  .next-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(26,35,126,0.3)}
+  /* ==================== サマリ画面 ==================== */
+  .summary{
+    background:#fff;border-radius:14px;padding:32px;text-align:center;
+    box-shadow:0 4px 16px rgba(26,35,126,0.08);
+  }
+  .summary h2{color:#1a237e;margin-bottom:20px;font-size:1.6em}
+  .score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:24px 0}
+  .score-box{background:linear-gradient(135deg,#1a237e,#283593);color:#fff;padding:20px;border-radius:12px}
+  .score-box .lv{font-size:0.9em;opacity:0.85;margin-bottom:6px}
+  .score-box .num{font-size:1.8em;font-weight:700;color:#ffc107}
+  .score-box .pct{font-size:0.85em;opacity:0.9;margin-top:4px}
+  .summary-buttons{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+  .summary-buttons button{
+    background:#1a237e;color:#ffc107;border:none;padding:12px 24px;
+    border-radius:10px;cursor:pointer;font-size:0.95em;font-weight:600;
+  }
+  .summary-buttons button:hover{background:#283593}
+  /* ==================== 設定モーダル ==================== */
+  .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:200}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:14px;padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto}
+  .modal h2{color:#1a237e;margin-bottom:16px}
+  .modal label{display:block;margin-top:14px;font-weight:600;color:#1a237e;font-size:0.95em}
+  .modal input{width:100%;padding:10px 12px;border:2px solid #e0e4ec;border-radius:8px;margin-top:6px;font-family:inherit;font-size:0.95em}
+  .modal input:focus{outline:none;border-color:#ffc107}
+  .modal-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+  .modal-buttons button{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+  .modal-buttons .save{background:#1a237e;color:#ffc107}
+  .modal-buttons .cancel{background:#e0e4ec;color:#1a237e}
+  .modal small{color:#666;font-size:0.8em;display:block;margin-top:4px}
+  /* ==================== トースト ==================== */
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:#1a237e;color:#fff;
+    padding:14px 20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    z-index:300;animation:toastIn 0.3s;max-width:340px;font-size:0.9em;
+  }
+  .toast.error{background:#b71c1c}
+  .toast.success{background:#2e7d32}
+  @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  /* ==================== レスポンシブ ==================== */
+  @media(max-width:600px){
+    .app-title{font-size:1.1em}
+    .level-tab{font-size:0.85em;padding:8px 10px}
+    .passage-card,.question-card{padding:18px}
+    .passage-text{font-size:0.92em;padding:14px}
+    .option{font-size:0.92em;padding:12px 14px}
+    .score-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div class="app-title">📖 TOEIC Part 7 練習 <span class="badge" id="levelBadge">初級</span></div>
+    <div class="header-right">
+      <div class="score-display" id="scoreDisplay">スコア: 0 / 0</div>
+      <button class="settings-btn" id="settingsBtn" title="Notion設定">⚙️</button>
+    </div>
+  </div>
+  <div class="level-tabs">
+    <button class="level-tab active" data-level="beginner">初級 (50問)</button>
+    <button class="level-tab" data-level="intermediate">中級 (50問)</button>
+    <button class="level-tab" data-level="advanced">上級 (50問)</button>
+  </div>
+  <div class="progress-wrap">
+    <span id="progressText">0 / 0</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<!-- 設定モーダル -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2>⚙️ Notion連携設定</h2>
+    <p style="color:#666;font-size:0.9em">セッションスコアと苦手問題をNotionへ自動送信します。空欄の場合は送信されません。</p>
+    <label>Notion Integration Token
+      <input type="text" id="notionToken" placeholder="secret_..." autocomplete="off">
+      <small>Notion → My integrations から取得</small>
+    </label>
+    <label>セッションスコアDB の ID
+      <input type="text" id="scoreDbId" placeholder="例: abc123def456..." autocomplete="off">
+    </label>
+    <label>苦手問題DB の ID
+      <input type="text" id="mistakeDbId" placeholder="例: xyz789..." autocomplete="off">
+    </label>
+    <div class="modal-buttons">
+      <button class="cancel" id="modalCancel">キャンセル</button>
+      <button class="save" id="modalSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== 問題データ ==================== */
+/* Part 7: シングルパッセージ + 設問2〜4問のセット形式
+   passages配列: 各要素 = { id, level, type, title, body, questions:[ {q, options, answer, explanation} ] }
+   合計150問（初級50・中級50・上級50） */
+const passages = [
+  // ============================================================
+  // 初級レベル（50問）約17パッセージ
+  // ============================================================
+  {
+    id:"b01", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Sarah Mills <s.mills@brightcafe.com>\nTo: All Staff\nDate: March 5\nSubject: New Opening Hours\n\nDear team,\n\nStarting next Monday, Bright Cafe will open at 7:00 A.M. instead of 8:00 A.M. The closing time will remain the same at 9:00 P.M. Please arrive at least 15 minutes before your shift starts.\n\nIf you have any questions, please talk to me directly.\n\nThank you,\nSarah",
+    questions:[
+      { q:"What is the purpose of the e-mail?",
+        options:["To announce a change in hours","To welcome a new employee","To report a customer complaint","To order new equipment"],
+        answer:0,
+        explanation:"件名 'New Opening Hours' と本文の 'Bright Cafe will open at 7:00 A.M. instead of 8:00 A.M.' から、営業時間の変更通知が目的。他の選択肢は本文に言及なし。" },
+      { q:"What time will the cafe open from next Monday?",
+        options:["7:00 A.M.","8:00 A.M.","9:00 A.M.","9:00 P.M."],
+        answer:0,
+        explanation:"'open at 7:00 A.M. instead of 8:00 A.M.' とあり、新しい開店時刻は7時。9:00 P.M.は閉店時刻なので不正解。" },
+      { q:"What are employees asked to do?",
+        options:["Send an e-mail to Sarah","Arrive 15 minutes before their shift","Work longer hours","Close the cafe earlier"],
+        answer:1,
+        explanation:"'Please arrive at least 15 minutes before your shift starts.' と明記。Sarahには 'talk to' とあるのでメールではない。" }
+    ]
+  },
+  {
+    id:"b02", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"NOTICE TO ALL RESIDENTS\n\nThe elevator in Building A will be out of service from Tuesday, April 12, to Thursday, April 14, for routine maintenance. During this period, please use the stairs or the elevator in Building B.\n\nWe apologize for any inconvenience.\n\nGreen Park Apartments Management",
+    questions:[
+      { q:"Who is the notice for?",
+        options:["Building workers","Apartment residents","Visitors only","Maintenance staff"],
+        answer:1,
+        explanation:"'NOTICE TO ALL RESIDENTS' から住人向け。workersやvisitorsは対象外。" },
+      { q:"How long will the elevator be out of service?",
+        options:["One day","Two days","Three days","One week"],
+        answer:2,
+        explanation:"4月12日（火）から4月14日（木）まで、計3日間。日付の数え方に注意。" },
+      { q:"What should residents do during the maintenance?",
+        options:["Move to Building B","Use the stairs or another elevator","Pay an extra fee","Contact the management"],
+        answer:1,
+        explanation:"'please use the stairs or the elevator in Building B' と明示。引っ越しや料金の話は出てこない。" }
+    ]
+  },
+  {
+    id:"b03", level:"beginner", type:"Advertisement",
+    title:"Advertisement",
+    body:"SUMMER SALE at Lotus Bookstore!\n\nGet 20% off all paperback books from July 1 to July 15. Members get an extra 5% discount with their membership card. Show this advertisement at the cash register to receive your discount.\n\nVisit us at 45 Main Street or shop online at www.lotusbooks.com.",
+    questions:[
+      { q:"What is being advertised?",
+        options:["A new bookstore","A sale on books","A membership program","A delivery service"],
+        answer:1,
+        explanation:"見出し 'SUMMER SALE' と '20% off all paperback books' から、書籍のセール広告。新店オープンの記述はない。" },
+      { q:"How can members get an extra discount?",
+        options:["By visiting the store online","By bringing a friend","By showing a membership card","By buying ten books"],
+        answer:2,
+        explanation:"'Members get an extra 5% discount with their membership card' から、会員カードを提示すれば追加割引が受けられる。" },
+      { q:"When does the sale end?",
+        options:["July 1","July 5","July 15","July 20"],
+        answer:2,
+        explanation:"'from July 1 to July 15' とあり、7月15日が最終日。" }
+    ]
+  },
+  {
+    id:"b04", level:"beginner", type:"Text Message",
+    title:"Text Message",
+    body:"From: Daniel (Manager)\nTime: 10:15 A.M.\n\nHi team, the meeting that was scheduled for 2:00 P.M. today has been moved to 3:30 P.M. We will meet in Conference Room B instead of Room A. Please bring the sales report from last month. Thanks!",
+    questions:[
+      { q:"Why did Daniel send the message?",
+        options:["To cancel the meeting","To inform staff of changes","To ask for a sales report deadline","To welcome a new team member"],
+        answer:1,
+        explanation:"会議の時間と部屋の変更を伝えるのが目的。キャンセルではなく時間変更。新人歓迎にも触れていない。" },
+      { q:"Where will the meeting be held?",
+        options:["Conference Room A","Conference Room B","The manager's office","The cafeteria"],
+        answer:1,
+        explanation:"'We will meet in Conference Room B instead of Room A' と明記。Room Aは元の場所。" },
+      { q:"What does Daniel ask the team to bring?",
+        options:["A laptop","Last month's sales report","Lunch","A camera"],
+        answer:1,
+        explanation:"'Please bring the sales report from last month' と直接指示。" }
+    ]
+  },
+  {
+    id:"b05", level:"beginner", type:"Memo",
+    title:"Memo",
+    body:"MEMO\n\nTo: All Staff\nFrom: HR Department\nDate: September 10\nSubject: Office Cleaning\n\nThe office will be cleaned this Saturday. Please clear your desk before you leave on Friday. Personal items left on the desk may be moved or thrown away. The cleaning team will start at 9:00 A.M. and finish by noon.",
+    questions:[
+      { q:"When will the cleaning take place?",
+        options:["Friday morning","Friday evening","Saturday morning","Sunday afternoon"],
+        answer:2,
+        explanation:"'this Saturday' に '9:00 A.M.' から始まると明記。土曜午前が正解。" },
+      { q:"What should employees do before Friday?",
+        options:["Buy cleaning supplies","Clear their desks","Send a report","Stay home"],
+        answer:1,
+        explanation:"'Please clear your desk before you leave on Friday' と明確に指示。" },
+      { q:"What may happen to items left on desks?",
+        options:["They will be locked","They may be moved or discarded","They will be donated","They will be photographed"],
+        answer:1,
+        explanation:"'Personal items left on the desk may be moved or thrown away' とあり、移動か廃棄。寄付には触れていない。" }
+    ]
+  },
+  {
+    id:"b06", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Customer Service <support@greenmart.com>\nTo: Karen Lee\nSubject: Your Order #45821\n\nDear Ms. Lee,\n\nThank you for your order. Your package was shipped today and should arrive within 3 to 5 business days. You can track your delivery on our website using your order number.\n\nIf you have any questions, please call us at 555-0142.\n\nGreen Mart Customer Service",
+    questions:[
+      { q:"Why was the e-mail sent?",
+        options:["To confirm payment","To notify a shipment","To request a review","To advertise a sale"],
+        answer:1,
+        explanation:"'Your package was shipped today' から、発送通知が目的。支払い確認やレビュー依頼ではない。" },
+      { q:"How can Ms. Lee track her package?",
+        options:["By calling the store","On the company's website","Through a mobile app","By visiting the store"],
+        answer:1,
+        explanation:"'You can track your delivery on our website' とウェブサイトでの追跡を案内。電話は質問用。" }
+    ]
+  },
+  {
+    id:"b07", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"CITY LIBRARY — Special Event\n\nJoin us this Sunday for a free children's reading event from 10:00 A.M. to 11:30 A.M. The event is open to children aged 4 to 8. Registration is not required, but seating is limited.\n\nFor more information, call 555-0200.",
+    questions:[
+      { q:"Who can attend the event?",
+        options:["All library members","Children aged 4 to 8","Teenagers","Adults only"],
+        answer:1,
+        explanation:"'The event is open to children aged 4 to 8' と対象年齢を明記。" },
+      { q:"What is true about the event?",
+        options:["It costs $5","Registration is necessary","Seating is limited","It lasts all day"],
+        answer:2,
+        explanation:"'seating is limited' と本文にある。Registration is not required なので登録不要、料金は free（無料）。" }
+    ]
+  },
+  {
+    id:"b08", level:"beginner", type:"Schedule",
+    title:"Schedule",
+    body:"Riverside Hotel — Weekend Activities\n\nSaturday\n9:00 A.M. — Morning Yoga (Garden)\n11:00 A.M. — Cooking Class (Kitchen)\n2:00 P.M. — Hotel Tour (Lobby)\n\nSunday\n10:00 A.M. — Bike Tour (Front Entrance)\n3:00 P.M. — Tea Tasting (Lounge)\n\nAll activities are free for hotel guests.",
+    questions:[
+      { q:"Where will the cooking class take place?",
+        options:["In the garden","In the kitchen","In the lobby","In the lounge"],
+        answer:1,
+        explanation:"'11:00 A.M. — Cooking Class (Kitchen)' から、場所はキッチン。" },
+      { q:"What is true about the activities?",
+        options:["They cost extra","They are for guests only","They are held only on Sunday","They require booking"],
+        answer:1,
+        explanation:"'free for hotel guests' から宿泊客向けで無料。費用や予約には触れず。" },
+      { q:"What activity starts at 3:00 P.M.?",
+        options:["Yoga","Bike Tour","Tea Tasting","Hotel Tour"],
+        answer:2,
+        explanation:"日曜3:00 P.M.は 'Tea Tasting (Lounge)'。" }
+    ]
+  },
+  {
+    id:"b09", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Mark Wilson\nTo: Linda Park\nSubject: Lunch Meeting\n\nHi Linda,\n\nAre you free for lunch on Thursday at 12:30 P.M.? I would like to discuss the new project with you. There is a nice Italian restaurant near our office called Bella Pasta. Let me know if it works for you.\n\nBest,\nMark",
+    questions:[
+      { q:"Why is Mark writing to Linda?",
+        options:["To cancel a project","To invite her to lunch","To recommend a hotel","To send a contract"],
+        answer:1,
+        explanation:"'Are you free for lunch on Thursday' とランチへの誘いが目的。プロジェクトの議論はランチの理由。" },
+      { q:"What does Mark suggest?",
+        options:["A morning meeting","An Italian restaurant","A new office","A long trip"],
+        answer:1,
+        explanation:"'a nice Italian restaurant near our office called Bella Pasta' と提案している。" }
+    ]
+  },
+  {
+    id:"b10", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"Parking Notice\n\nThe west parking lot will be closed on Friday for repaving. Please use the east parking lot during the day. Cars left in the west lot after 7:00 A.M. on Friday will be towed at the owner's expense.\n\nThank you for your cooperation.\nFacility Management",
+    questions:[
+      { q:"What is the notice mainly about?",
+        options:["A new parking fee","A parking lot closure","A road repair","A new building"],
+        answer:1,
+        explanation:"'The west parking lot will be closed on Friday for repaving' から駐車場の閉鎖通知。料金や新築には触れていない。" },
+      { q:"What will happen to cars left in the west lot?",
+        options:["They will be cleaned","They will be towed","They will be repainted","They will be parked free"],
+        answer:1,
+        explanation:"'will be towed at the owner's expense' とあり、レッカー移動される。" }
+    ]
+  },
+  {
+    id:"b11", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Anna Brown\nTo: Front Desk\nSubject: Room Change Request\n\nHello,\n\nI am currently staying in Room 305 until Sunday. The air conditioner in my room is too noisy. Could I please change to a quieter room? I would prefer a non-smoking room on a higher floor.\n\nThank you,\nAnna Brown",
+    questions:[
+      { q:"What is the problem in Anna's room?",
+        options:["The TV does not work","The room is too small","The air conditioner is noisy","The window is broken"],
+        answer:2,
+        explanation:"'The air conditioner in my room is too noisy' と直接的に述べられている。" },
+      { q:"What does Anna want?",
+        options:["A refund","A different room","A new TV","Free meals"],
+        answer:1,
+        explanation:"'change to a quieter room' から、部屋の変更を希望。返金や食事は要求していない。" },
+      { q:"What type of room does Anna prefer?",
+        options:["A smoking room","A room near the lobby","A non-smoking room on a higher floor","A room with two beds"],
+        answer:2,
+        explanation:"'a non-smoking room on a higher floor' と明記。" }
+    ]
+  },
+  {
+    id:"b12", level:"beginner", type:"Advertisement",
+    title:"Advertisement",
+    body:"BLUE WAVE FITNESS — Now Open!\n\nOur new fitness center is now open in downtown. We offer modern equipment, group classes, and personal training. Sign up for a one-year membership and get the first month free!\n\nVisit us at 200 River Street or call 555-0188 to schedule a tour.",
+    questions:[
+      { q:"What is the advertisement promoting?",
+        options:["A new restaurant","A fitness center","A clothing store","A travel agency"],
+        answer:1,
+        explanation:"'Our new fitness center is now open' からフィットネスセンターの宣伝。" },
+      { q:"What is the special offer?",
+        options:["A free T-shirt","A free first month","A discount on shoes","A free meal"],
+        answer:1,
+        explanation:"'get the first month free' とあり、最初の1ヶ月が無料。" }
+    ]
+  },
+  {
+    id:"b13", level:"beginner", type:"Memo",
+    title:"Memo",
+    body:"To: All Sales Staff\nFrom: Robert Kim, Sales Director\nDate: November 8\nSubject: Monthly Meeting\n\nOur next monthly meeting will be on Friday, November 15, at 2:00 P.M. in the main conference room. Please prepare a short report on your current clients. The meeting should last about one hour.",
+    questions:[
+      { q:"What should the staff prepare?",
+        options:["A budget plan","A short report on clients","A new product list","A holiday schedule"],
+        answer:1,
+        explanation:"'Please prepare a short report on your current clients' と明記。" },
+      { q:"How long will the meeting last?",
+        options:["30 minutes","About one hour","Two hours","All afternoon"],
+        answer:1,
+        explanation:"'The meeting should last about one hour' とある。" }
+    ]
+  },
+  {
+    id:"b14", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: David Chen\nTo: All Department Heads\nSubject: Office Supplies\n\nDear all,\n\nPlease send me your list of needed office supplies by Friday afternoon. I will place a single order for the whole company on Monday morning. Items requested after Friday will be ordered next month.\n\nThanks,\nDavid",
+    questions:[
+      { q:"What is David asking for?",
+        options:["A budget approval","A list of office supplies","A meeting time","A new employee"],
+        answer:1,
+        explanation:"'Please send me your list of needed office supplies' とリクエスト内容が明確。" },
+      { q:"When will the order be placed?",
+        options:["Friday afternoon","Monday morning","Next week","Next month"],
+        answer:1,
+        explanation:"'I will place a single order ... on Monday morning' とある。" }
+    ]
+  },
+  {
+    id:"b15", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"Cafeteria Update\n\nStarting Monday, the company cafeteria will offer a new breakfast menu from 7:00 A.M. to 9:30 A.M. The menu includes hot sandwiches, fruit, yogurt, and coffee. Lunch will continue to be served from 11:30 A.M. to 1:30 P.M.\n\nCafeteria Manager",
+    questions:[
+      { q:"What is new at the cafeteria?",
+        options:["A breakfast menu","A larger seating area","Free coffee","Online ordering"],
+        answer:0,
+        explanation:"'the company cafeteria will offer a new breakfast menu' から新しい朝食メニュー。コーヒーは無料とは書いていない。" },
+      { q:"What time does breakfast end?",
+        options:["7:00 A.M.","9:30 A.M.","11:30 A.M.","1:30 P.M."],
+        answer:1,
+        explanation:"'from 7:00 A.M. to 9:30 A.M.' から、9:30 A.M.が朝食終了時刻。" },
+      { q:"What is NOT on the breakfast menu?",
+        options:["Hot sandwiches","Fruit","Yogurt","Pasta"],
+        answer:3,
+        explanation:"メニューは 'hot sandwiches, fruit, yogurt, and coffee'。pastaは含まれていない。" }
+    ]
+  },
+  {
+    id:"b16", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Janet White\nTo: IT Support\nSubject: Printer Problem\n\nHi,\n\nThe printer on the second floor is not working. It shows a paper jam error, but I checked and there is no paper stuck inside. Could someone come and take a look today? It is needed for a presentation tomorrow morning.\n\nThanks,\nJanet",
+    questions:[
+      { q:"What is Janet's problem?",
+        options:["A broken computer","A printer error","A network issue","A missing file"],
+        answer:1,
+        explanation:"'The printer ... is not working' と本文に明記。コンピュータやネットワークではない。" },
+      { q:"Why does she need it fixed quickly?",
+        options:["She is leaving today","A guest is visiting","There is a presentation tomorrow","The store is closing"],
+        answer:2,
+        explanation:"'It is needed for a presentation tomorrow morning' と理由が示されている。" }
+    ]
+  },
+  {
+    id:"b17", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"Welcome to Sunset Park!\n\nPark Rules:\n- Open from 6:00 A.M. to 10:00 P.M.\n- Dogs must be on a leash\n- No bicycles on walking paths\n- Trash must be placed in bins\n\nThank you for keeping our park clean and safe.\nCity Parks Department",
+    questions:[
+      { q:"Where would this notice most likely be posted?",
+        options:["At a park entrance","Inside a restaurant","At a train station","In a hotel lobby"],
+        answer:0,
+        explanation:"公園の利用規則の掲示なので、公園の入口に貼られる可能性が高い。" },
+      { q:"What is NOT allowed in the park?",
+        options:["Walking dogs on a leash","Riding bicycles on walking paths","Using trash bins","Visiting at 9:00 A.M."],
+        answer:1,
+        explanation:"'No bicycles on walking paths' と禁止されている。犬のリード使用やゴミ箱利用は許可されている。" }
+    ]
+  },
+  {
+    id:"b18", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Sunny Travel\nTo: Mr. James Cole\nSubject: Booking Confirmation\n\nDear Mr. Cole,\n\nThank you for booking with Sunny Travel. Your flight to Vancouver is confirmed for May 20 at 8:00 A.M. Please arrive at the airport at least two hours before departure.\n\nYour hotel reservation in Vancouver is also confirmed for three nights starting May 20.\n\nSafe travels!",
+    questions:[
+      { q:"What is confirmed in the e-mail?",
+        options:["A car rental","A flight and hotel","A tour guide","A meeting room"],
+        answer:1,
+        explanation:"フライトと '3 nights' のホテルの両方が確認されている。" },
+      { q:"What time is Mr. Cole's flight?",
+        options:["6:00 A.M.","8:00 A.M.","10:00 A.M.","12:00 P.M."],
+        answer:1,
+        explanation:"'flight to Vancouver is confirmed for May 20 at 8:00 A.M.' とある。" },
+      { q:"How long will Mr. Cole stay in Vancouver?",
+        options:["One night","Two nights","Three nights","One week"],
+        answer:2,
+        explanation:"'for three nights starting May 20' から3泊。" }
+    ]
+  },
+  {
+    id:"b19", level:"beginner", type:"Notice",
+    title:"Notice",
+    body:"Health Check Reminder\n\nAll employees must complete the annual health check by June 30. You can book your appointment at the company clinic on the first floor. The check takes about 30 minutes. Please bring your employee ID.\n\nHR Department",
+    questions:[
+      { q:"What must employees do by June 30?",
+        options:["Submit a report","Complete a health check","Pay a fee","Choose a new desk"],
+        answer:1,
+        explanation:"'All employees must complete the annual health check by June 30' と明記。" },
+      { q:"Where is the clinic?",
+        options:["First floor","Second floor","Outside the building","Next to the cafeteria"],
+        answer:0,
+        explanation:"'at the company clinic on the first floor' とある。" }
+    ]
+  },
+  {
+    id:"b20", level:"beginner", type:"Email",
+    title:"E-mail",
+    body:"From: Olivia Park\nTo: Tom Harris\nSubject: Welcome to the Team!\n\nHi Tom,\n\nWelcome to Globe Marketing! Your first day is Monday, July 1. Please come to the main office at 9:00 A.M. and ask for me at the reception. I will show you around and introduce you to the team.\n\nDress code is business casual.\n\nSee you Monday!\nOlivia",
+    questions:[
+      { q:"Why did Olivia write this e-mail?",
+        options:["To offer a job","To welcome a new employee","To cancel a meeting","To ask for help"],
+        answer:1,
+        explanation:"件名と本文 'Welcome to Globe Marketing!' から、新入社員への歓迎メール。" },
+      { q:"What should Tom do when he arrives?",
+        options:["Wait in the lobby","Ask for Olivia at the reception","Go directly to his desk","Send an e-mail"],
+        answer:1,
+        explanation:"'ask for me at the reception' と指示されている。" },
+      { q:"What is the dress code?",
+        options:["Formal suit","Business casual","Uniform","Free style"],
+        answer:1,
+        explanation:"'Dress code is business casual' と明記。" }
+    ]
+  },
+  // 初級レベル 計50問終了
+
+  // ============================================================
+  // 中級レベル（50問）
+  // ============================================================
+  {
+    id:"i01", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Patricia Howell <p.howell@vertexlogistics.com>\nTo: Marcus Yang <m.yang@vertexlogistics.com>\nDate: October 12\nSubject: Warehouse Inspection\n\nDear Marcus,\n\nAs we discussed last week, the safety inspection of the Eastside warehouse is scheduled for Tuesday, October 19. Inspectors from the Regional Safety Authority will arrive at 9:00 A.M., and the inspection is expected to take most of the morning.\n\nPlease ensure that all aisles are clear of obstructions and that the emergency exits are clearly marked. The fire extinguishers should also be checked beforehand. I would appreciate it if you could send me a brief progress report by Friday so we can address any outstanding issues before the inspection.\n\nLet me know if you anticipate any difficulties.\n\nBest regards,\nPatricia",
+    questions:[
+      { q:"What is the main purpose of the e-mail?",
+        options:["To reschedule an inspection","To prepare for an upcoming inspection","To complain about safety issues","To announce a new warehouse"],
+        answer:1,
+        explanation:"本文全体が来るべき検査への準備指示。日程変更ではなく、準備依頼が主目的。" },
+      { q:"What does Patricia ask Marcus to do by Friday?",
+        options:["Repair the fire extinguishers","Send a progress report","Schedule another meeting","Submit a budget proposal"],
+        answer:1,
+        explanation:"'send me a brief progress report by Friday' と明示。修理ではなく進捗報告。" },
+      { q:"Who will conduct the inspection?",
+        options:["Patricia's team","Inspectors from the Regional Safety Authority","Marcus's assistant","The warehouse staff"],
+        answer:1,
+        explanation:"'Inspectors from the Regional Safety Authority will arrive at 9:00 A.M.' とある。" }
+    ]
+  },
+  {
+    id:"i02", level:"intermediate", type:"Article",
+    title:"Newspaper Article",
+    body:"Riverside Plaza to Undergo Major Renovation\n\nThe owners of Riverside Plaza announced yesterday that the shopping center will undergo a major renovation beginning in March. The project, expected to cost approximately $12 million, will modernize the food court, expand the parking facilities, and add a new section dedicated to local businesses.\n\nManager Helen Rivers stated that the renovation will be completed in phases to minimize disruption to current tenants and shoppers. \"We are committed to keeping at least 80 percent of the stores open at all times during the work,\" she said.\n\nThe project is expected to be completed by the end of next year.",
+    questions:[
+      { q:"What is the article mainly about?",
+        options:["The opening of a new shopping center","A planned renovation project","A decrease in shoppers","A change of ownership"],
+        answer:1,
+        explanation:"'major renovation' という改装計画が中心トピック。新規開店や所有者変更ではない。" },
+      { q:"What will NOT be included in the renovation?",
+        options:["Modernizing the food court","Expanding the parking","Adding a movie theater","Adding a section for local businesses"],
+        answer:2,
+        explanation:"映画館の追加は本文に記載がない。他の3つは明記されている。" },
+      { q:"What did Helen Rivers say about the renovation?",
+        options:["It will close all stores temporarily","Most stores will remain open","It will be done in one phase","It will start next year"],
+        answer:1,
+        explanation:"'keeping at least 80 percent of the stores open at all times' から多くの店舗は営業継続。" }
+    ]
+  },
+  {
+    id:"i03", level:"intermediate", type:"Online Chat",
+    title:"Online Chat",
+    body:"Diane Choi (9:42 A.M.): Hi Roger, are the marketing materials ready for the trade show next week?\n\nRoger Patel (9:43 A.M.): The brochures are printed, but we are still waiting on the new banners.\n\nDiane Choi (9:44 A.M.): When will the banners arrive?\n\nRoger Patel (9:45 A.M.): The supplier said by Thursday at the latest.\n\nDiane Choi (9:46 A.M.): That cuts it close. Could you call them to confirm?\n\nRoger Patel (9:47 A.M.): Sure, I'll call them now and let you know what they say.\n\nDiane Choi (9:48 A.M.): Great. We need everything packed and shipped by Friday afternoon.",
+    questions:[
+      { q:"What event are Diane and Roger preparing for?",
+        options:["A board meeting","A trade show","A staff party","A product launch"],
+        answer:1,
+        explanation:"最初の発言 'trade show next week' から展示会の準備。" },
+      { q:"At 9:46 A.M., what does Diane mean when she writes, \"That cuts it close\"?",
+        options:["The timing leaves little room to spare","The deadline has passed","The price is too high","The supplier should be changed"],
+        answer:0,
+        explanation:"'cut it close' は「時間や余裕がギリギリ」の意味。木曜着で金曜出荷では余裕がない、という文脈。" },
+      { q:"What will Roger do next?",
+        options:["Print more brochures","Call the supplier","Cancel the trade show","Ship the materials"],
+        answer:1,
+        explanation:"'I'll call them now' と返答しており、サプライヤーへの電話が次の行動。" }
+    ]
+  },
+  {
+    id:"i04", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Eleanor Briggs <e.briggs@nordicfurniture.com>\nTo: Ms. Helena Park\nSubject: Your Recent Inquiry\n\nDear Ms. Park,\n\nThank you for your interest in our handcrafted oak dining tables. The model you inquired about, the Aurora 8-seater, is currently in stock and ships within five business days. Delivery to your address would take an additional 7 to 10 days.\n\nPlease note that we are running a promotion through the end of the month: customers who purchase any dining table will receive a complimentary set of matching chair cushions, valued at $180.\n\nIf you would like to place an order or schedule a showroom visit, please reply to this e-mail or call our customer service line.\n\nKind regards,\nEleanor Briggs\nSenior Sales Consultant",
+    questions:[
+      { q:"What is included with a dining table purchase this month?",
+        options:["Free delivery","A set of cushions","A discount on chairs","An extended warranty"],
+        answer:1,
+        explanation:"'a complimentary set of matching chair cushions' と促進内容が示されている。" },
+      { q:"How long will it take for the table to arrive after shipping?",
+        options:["5 business days","7 to 10 days","Two weeks","One month"],
+        answer:1,
+        explanation:"出荷自体は5営業日、配送はさらに 7 to 10 days。設問は「出荷後」なので7-10日。" },
+      { q:"What is suggested about Ms. Park?",
+        options:["She is a regular customer","She has not yet placed an order","She visited the showroom","She wrote a review"],
+        answer:1,
+        explanation:"'If you would like to place an order' から、まだ注文していない見込み客であることが推測できる。" }
+    ]
+  },
+  {
+    id:"i05", level:"intermediate", type:"Notice",
+    title:"Notice",
+    body:"Attention All Members\n\nThe Riverside Country Club's tennis courts will undergo resurfacing from May 5 to May 18. During this time, members are welcome to use the courts at our partner facility, Westwood Sports Club, free of charge. Simply present your membership card at their reception.\n\nIn addition, the originally scheduled spring tennis tournament will be postponed until June 2. Players who have already registered do not need to re-register; their entries will be carried over automatically.\n\nWe apologize for any inconvenience and appreciate your understanding.\n\nManagement",
+    questions:[
+      { q:"Why are the tennis courts unavailable?",
+        options:["For a tournament","For resurfacing","For a member event","For weather damage repair"],
+        answer:1,
+        explanation:"'undergo resurfacing' と明示。トーナメントや天候被害ではない。" },
+      { q:"How can members continue to play tennis?",
+        options:["By paying a fee at another club","By using Westwood Sports Club for free","By practicing at home","By signing up for lessons"],
+        answer:1,
+        explanation:"'free of charge' で 'Westwood Sports Club' を使える。費用はかからない。" },
+      { q:"What is true about registered tournament players?",
+        options:["They must register again","Their registration is automatically transferred","They will receive a refund","They lose their entry"],
+        answer:1,
+        explanation:"'their entries will be carried over automatically' とあり、再登録は不要。" }
+    ]
+  },
+  {
+    id:"i06", level:"intermediate", type:"Advertisement",
+    title:"Job Advertisement",
+    body:"Marketing Coordinator — Greenleaf Foods Inc.\n\nGreenleaf Foods, a leading producer of organic snack products, is seeking an experienced Marketing Coordinator to join our growing team in Portland.\n\nKey Responsibilities:\n- Coordinate marketing campaigns across digital and print channels\n- Analyze campaign performance and prepare monthly reports\n- Collaborate with the product development team on new launches\n\nRequirements:\n- Bachelor's degree in Marketing, Business, or a related field\n- At least three years of relevant experience\n- Strong analytical and communication skills\n\nWe offer a competitive salary, comprehensive benefits, and flexible working arrangements. Interested candidates should send their résumé and a cover letter to careers@greenleaffoods.com by April 30.",
+    questions:[
+      { q:"What is one of the job responsibilities?",
+        options:["Hiring new employees","Analyzing campaign performance","Designing the company logo","Managing the cafeteria"],
+        answer:1,
+        explanation:"'Analyze campaign performance and prepare monthly reports' と業務内容にある。" },
+      { q:"What is required of applicants?",
+        options:["A master's degree","A driver's license","At least three years of experience","Fluency in Spanish"],
+        answer:2,
+        explanation:"'At least three years of relevant experience' と必須要件。" },
+      { q:"What is NOT mentioned about the company?",
+        options:["It produces organic snacks","It is based in Portland","It has international offices","It offers flexible work"],
+        answer:2,
+        explanation:"国際拠点については記載なし。他の3つは本文中に確認できる。" }
+    ]
+  },
+  {
+    id:"i07", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Theresa Wong\nTo: All Branch Managers\nSubject: Year-End Inventory\n\nDear Managers,\n\nThis is a reminder that the annual year-end inventory count will take place on December 28. All branches must remain closed to the public on that day to ensure accurate counting.\n\nPlease assign at least four staff members to participate in the inventory and ensure they receive proper training on the new inventory system before December 20. Training materials are available on the company intranet.\n\nIf you anticipate any staffing issues, please contact me directly no later than December 15 so we can arrange support from other branches.\n\nRegards,\nTheresa Wong\nOperations Director",
+    questions:[
+      { q:"What will happen on December 28?",
+        options:["A new branch will open","Branches will be closed for inventory","A training session will be held","Managers will receive bonuses"],
+        answer:1,
+        explanation:"'All branches must remain closed to the public on that day' から、棚卸しのため閉店。" },
+      { q:"What is the deadline for staff training?",
+        options:["December 15","December 20","December 28","December 31"],
+        answer:1,
+        explanation:"'training on the new inventory system before December 20' と明記。" },
+      { q:"What should managers do if they have staffing problems?",
+        options:["Hire temporary workers","Contact Theresa by December 15","Cancel the inventory","Train themselves"],
+        answer:1,
+        explanation:"'contact me directly no later than December 15' と指示されている。" }
+    ]
+  },
+  {
+    id:"i08", level:"intermediate", type:"Letter",
+    title:"Letter",
+    body:"Dear Mr. Sandoval,\n\nThank you for choosing Highland Insurance for your home coverage. Your policy, number HM-44218, has been successfully renewed for another year, effective July 1.\n\nWe noticed that your current policy does not include flood damage protection. Given the recent increase in heavy rainfall in your region, we strongly recommend considering this additional coverage. The annual premium would be only $145, and it would protect your home from potential damages that can easily exceed tens of thousands of dollars.\n\nA representative will be in touch within the next two weeks to discuss your options. In the meantime, please feel free to call our customer service line if you have any questions.\n\nSincerely,\nMarianne Tessier\nHighland Insurance",
+    questions:[
+      { q:"What is the main purpose of the letter?",
+        options:["To confirm a renewal and suggest extra coverage","To cancel a policy","To request payment","To explain a claim process"],
+        answer:0,
+        explanation:"更新確認と洪水補償の追加提案の両方が含まれる。" },
+      { q:"Why is flood damage protection recommended?",
+        options:["It is required by law","The region has had heavy rainfall recently","It is on sale this month","The policy expires soon"],
+        answer:1,
+        explanation:"'recent increase in heavy rainfall in your region' という理由が明示。" },
+      { q:"What will happen in the next two weeks?",
+        options:["The policy will expire","A representative will contact Mr. Sandoval","A payment will be processed","A claim will be filed"],
+        answer:1,
+        explanation:"'A representative will be in touch within the next two weeks' とある。" }
+    ]
+  },
+  {
+    id:"i09", level:"intermediate", type:"Memo",
+    title:"Memo",
+    body:"To: Department Heads\nFrom: Lawrence Donovan, Vice President\nDate: February 14\nSubject: New Travel Policy\n\nEffective March 1, the company will adopt a revised travel policy aimed at reducing expenses while maintaining quality. The main changes are as follows:\n\n1. All flights under five hours must be booked in economy class.\n2. Hotel stays should not exceed $180 per night unless preapproved.\n3. Receipts must be submitted within seven days of returning from a trip.\n\nDepartment heads are responsible for ensuring their teams understand these changes. A detailed FAQ document has been uploaded to the shared drive, and a briefing session will be held on February 22 at 3:00 P.M.\n\nQuestions can be directed to the Finance Department.",
+    questions:[
+      { q:"What is the purpose of the memo?",
+        options:["To announce a new travel policy","To request expense reports","To introduce new staff","To schedule vacations"],
+        answer:0,
+        explanation:"'revised travel policy' の発表が目的。" },
+      { q:"What is one of the new policies?",
+        options:["All flights must be business class","Hotels over $180/night need preapproval","Trips cannot exceed three days","All bookings are made by the manager"],
+        answer:1,
+        explanation:"'Hotel stays should not exceed $180 per night unless preapproved' と明記。" },
+      { q:"When will the briefing session be held?",
+        options:["February 14","February 22","March 1","March 7"],
+        answer:1,
+        explanation:"'a briefing session will be held on February 22 at 3:00 P.M.' とある。" }
+    ]
+  },
+  {
+    id:"i10", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Customer Relations <relations@brightlinerail.com>\nTo: Mr. Daniel Okafor\nSubject: Refund Request — Ticket #PR-90211\n\nDear Mr. Okafor,\n\nThank you for contacting Brightline Rail. We have reviewed your refund request for ticket #PR-90211, which was canceled due to the service disruption on March 4.\n\nWe are pleased to confirm that a full refund of $87.50 will be processed within 5 to 7 business days. The amount will be returned to the credit card used at the time of purchase. As a gesture of our apology, we have also added a promotional credit of $25 to your Brightline Rewards account, which can be applied to any future booking.\n\nWe sincerely regret the inconvenience caused and appreciate your continued patronage.\n\nSincerely,\nCustomer Relations Team",
+    questions:[
+      { q:"Why is the e-mail being sent?",
+        options:["To confirm a new booking","To respond to a refund request","To advertise a new route","To request feedback"],
+        answer:1,
+        explanation:"'We have reviewed your refund request' から、返金リクエストへの返信。" },
+      { q:"What additional compensation did Mr. Okafor receive?",
+        options:["A free ticket","A $25 promotional credit","A complimentary meal","A reserved seat upgrade"],
+        answer:1,
+        explanation:"'added a promotional credit of $25 to your Brightline Rewards account' と明記。" },
+      { q:"How will the refund be issued?",
+        options:["By check","To the original credit card","In store credit only","As cash at the station"],
+        answer:1,
+        explanation:"'returned to the credit card used at the time of purchase' とある。" }
+    ]
+  },
+  {
+    id:"i11", level:"intermediate", type:"Online Chat",
+    title:"Online Chat",
+    body:"Henry Lam (2:11 P.M.): Sophia, are we still on track for the Wilson account presentation tomorrow?\n\nSophia Martin (2:12 P.M.): Mostly. I just received their feedback on the draft proposal and they want a few changes.\n\nHenry Lam (2:13 P.M.): What kind of changes?\n\nSophia Martin (2:14 P.M.): They want us to emphasize the cost savings rather than the technical features.\n\nHenry Lam (2:15 P.M.): That makes sense. Can we get it done in time?\n\nSophia Martin (2:16 P.M.): If we work on it together this afternoon, yes. I can revise the slides and you handle the financial projections.\n\nHenry Lam (2:17 P.M.): Sounds good. I'll move my other tasks to tomorrow.",
+    questions:[
+      { q:"What is Sophia working on?",
+        options:["A budget report","A presentation for Wilson account","A new product launch","A staff training"],
+        answer:1,
+        explanation:"'Wilson account presentation tomorrow' が話題の中心。" },
+      { q:"What change does Wilson want?",
+        options:["More technical details","Focus on cost savings","A shorter presentation","A different speaker"],
+        answer:1,
+        explanation:"'emphasize the cost savings rather than the technical features' とある。" },
+      { q:"What will Henry do?",
+        options:["Revise the slides","Handle the financial projections","Cancel the meeting","Contact Wilson directly"],
+        answer:1,
+        explanation:"'you handle the financial projections' とSophiaが指示し、Henry が同意。" }
+    ]
+  },
+  {
+    id:"i12", level:"intermediate", type:"Article",
+    title:"Magazine Article",
+    body:"Remote Work: The New Standard?\n\nA recent survey by the Business Trends Institute found that more than 60 percent of office workers in North America now work from home at least one day a week. The trend, which gained momentum during the pandemic, shows no signs of slowing.\n\nWhile employees cite reduced commuting time and improved work-life balance as the primary benefits, employers report mixed results. Some companies have seen productivity increase, while others struggle with communication and team cohesion.\n\nMany firms are now investing in collaboration software and redesigning office spaces to support hybrid work models. \"The office is not disappearing,\" notes workplace consultant Mira Sato. \"It is becoming a place for collaboration rather than individual work.\"",
+    questions:[
+      { q:"What does the article mainly discuss?",
+        options:["The shift toward remote work","New types of offices","Travel trends","Salary increases"],
+        answer:0,
+        explanation:"記事全体がリモートワーク化のトレンドを扱っている。" },
+      { q:"What do employees say is a benefit of remote work?",
+        options:["Higher pay","Less commuting time","More vacation","Better food"],
+        answer:1,
+        explanation:"'reduced commuting time and improved work-life balance' と明示。" },
+      { q:"According to Mira Sato, what is the future role of the office?",
+        options:["A place for collaboration","A storage space","A training center","An entertainment venue"],
+        answer:0,
+        explanation:"'becoming a place for collaboration rather than individual work' という発言がそのまま該当。" }
+    ]
+  },
+  {
+    id:"i13", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Bruno Marchetti\nTo: All Event Staff\nSubject: Charity Gala — Final Preparations\n\nDear Team,\n\nWith only three days until the Annual Charity Gala, I want to thank you all for your hard work and outline a few final tasks.\n\nFirst, please confirm with the catering company that they will arrive by 4:00 P.M. on Saturday for setup. Second, the decorations team should complete the floral arrangements by Friday afternoon. Finally, make sure all volunteers have received their assignments and have a clear understanding of their roles.\n\nWe expect approximately 400 guests, including several high-profile sponsors. Let's make this our best event yet.\n\nThank you,\nBruno",
+    questions:[
+      { q:"What is the e-mail about?",
+        options:["Hiring new staff","Final preparations for a gala","Canceling an event","Booking a venue"],
+        answer:1,
+        explanation:"'Final Preparations' という件名通り、ガラの最終準備が話題。" },
+      { q:"What should the decorations team do by Friday afternoon?",
+        options:["Move tables","Complete floral arrangements","Train volunteers","Confirm catering"],
+        answer:1,
+        explanation:"'decorations team should complete the floral arrangements by Friday afternoon' と明記。" },
+      { q:"How many guests are expected?",
+        options:["About 200","About 300","About 400","About 500"],
+        answer:2,
+        explanation:"'approximately 400 guests' とある。" }
+    ]
+  },
+  {
+    id:"i14", level:"intermediate", type:"Notice",
+    title:"Public Notice",
+    body:"Public Meeting Notice — Riverside Community\n\nThe City Planning Commission will hold a public meeting on Thursday, August 22, at 6:30 P.M. at the Riverside Community Center to discuss the proposed expansion of the city's bike-path network. Residents are encouraged to attend and share their views.\n\nThe proposed plan would add 12 kilometers of new paths connecting downtown to the eastern neighborhoods. Construction is tentatively scheduled to begin next spring, pending public input and budget approval.\n\nWritten comments may also be submitted in advance to feedback@cityplanning.gov by August 19.",
+    questions:[
+      { q:"What is the purpose of the meeting?",
+        options:["To select a new mayor","To discuss a bike-path expansion","To review last year's budget","To recruit volunteers"],
+        answer:1,
+        explanation:"'discuss the proposed expansion of the city's bike-path network' と明記。" },
+      { q:"How can residents submit comments before the meeting?",
+        options:["By calling city hall","By visiting in person","By sending an e-mail","By mailing a letter"],
+        answer:2,
+        explanation:"'submitted in advance to feedback@cityplanning.gov' から、Eメール送付が可能。" },
+      { q:"When is construction expected to begin?",
+        options:["This summer","This fall","Next spring","Next winter"],
+        answer:2,
+        explanation:"'Construction is tentatively scheduled to begin next spring' とある。" }
+    ]
+  },
+  {
+    id:"i15", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Felicia Hammond <fhammond@stellarbooks.com>\nTo: Author Submissions\nSubject: Manuscript Review\n\nDear Author Submissions Team,\n\nI am writing to follow up on the manuscript I submitted on June 3, titled \"The Hidden Currents.\" I have not yet received a response and would appreciate an update on the review process.\n\nIf the manuscript is still under consideration, could you please let me know the expected timeframe for a decision? If it has already been rejected, I would be grateful for any feedback to improve my work.\n\nI understand you receive many submissions and appreciate your time.\n\nKind regards,\nFelicia Hammond",
+    questions:[
+      { q:"Why did Felicia send the e-mail?",
+        options:["To submit a new manuscript","To request an update on her submission","To complain about feedback","To accept a publishing offer"],
+        answer:1,
+        explanation:"'follow up on the manuscript I submitted' と、提出済み原稿の進捗確認が目的。" },
+      { q:"What does Felicia ask for if her manuscript is rejected?",
+        options:["A refund","Feedback","A meeting","A second submission"],
+        answer:1,
+        explanation:"'I would be grateful for any feedback to improve my work' とある。" }
+    ]
+  },
+  {
+    id:"i16", level:"intermediate", type:"Memo",
+    title:"Memo",
+    body:"To: All Staff\nFrom: Andrea Bellini, Office Manager\nDate: May 9\nSubject: Office Reorganization\n\nAs many of you have noticed, our team has grown significantly over the past year. To better accommodate everyone, we will be reorganizing the office layout next weekend.\n\nThe sales team will move to the south wing, while the marketing team will take over the current sales area. The design team will remain in its current location but will gain two additional meeting rooms.\n\nAll desks must be cleared by Friday at 5:00 P.M. The IT department will handle moving computers and phones. Please direct any questions to me.",
+    questions:[
+      { q:"What is the reason for the office reorganization?",
+        options:["A new lease agreement","The team has grown","A new office design contest","Construction work"],
+        answer:1,
+        explanation:"'our team has grown significantly over the past year' と理由が示されている。" },
+      { q:"What will the design team receive?",
+        options:["A larger office","Two additional meeting rooms","New computers","An office relocation"],
+        answer:1,
+        explanation:"'will gain two additional meeting rooms' とある。" },
+      { q:"What must employees do by Friday?",
+        options:["Submit a report","Clear their desks","Train new staff","Pack their personal belongings only"],
+        answer:1,
+        explanation:"'All desks must be cleared by Friday at 5:00 P.M.' と明記。" }
+    ]
+  },
+  {
+    id:"i17", level:"intermediate", type:"Email",
+    title:"E-mail",
+    body:"From: Reservations <reservations@maplehotel.com>\nTo: Mr. Carlos Diaz\nSubject: Reservation Update\n\nDear Mr. Diaz,\n\nThank you for your recent reservation at Maple Hotel for the nights of November 14 and 15. Unfortunately, due to an unexpected plumbing issue, the room type you originally booked (Deluxe King) will not be available.\n\nWe would like to offer you a complimentary upgrade to our Executive Suite at no additional charge. This includes complimentary breakfast and lounge access. Please confirm by November 12 whether this arrangement is acceptable.\n\nIf you would prefer to cancel, we will of course issue a full refund.\n\nSincerely,\nMaple Hotel Reservations Team",
+    questions:[
+      { q:"Why is the hotel contacting Mr. Diaz?",
+        options:["To confirm a cancellation","To inform him of a room issue and offer an upgrade","To request payment","To advertise a sale"],
+        answer:1,
+        explanation:"配管トラブルで元の部屋が使えず、アップグレードを提示している。" },
+      { q:"What is included with the Executive Suite?",
+        options:["Free parking","Breakfast and lounge access","Free internet","Spa credit"],
+        answer:1,
+        explanation:"'includes complimentary breakfast and lounge access' とある。" },
+      { q:"By when should Mr. Diaz respond?",
+        options:["November 12","November 14","November 15","November 20"],
+        answer:0,
+        explanation:"'Please confirm by November 12' と期限を示している。" }
+    ]
+  },
+  // 中級 計50問終了
+
+  // ============================================================
+  // 上級レベル（50問）
+  // ============================================================
+  {
+    id:"a01", level:"advanced", type:"Article",
+    title:"Press Release",
+    body:"FOR IMMEDIATE RELEASE\n\nQuantum Dynamics Acquires Helix Technologies in $2.4 Billion Deal\n\nQuantum Dynamics Corporation announced today that it has completed its acquisition of Helix Technologies, a leading developer of advanced semiconductor materials. The transaction, valued at approximately $2.4 billion, is expected to significantly bolster Quantum Dynamics' position in the rapidly expanding artificial intelligence chip sector.\n\nUnder the terms of the agreement, Helix's research facilities in Munich and Singapore will continue to operate independently for at least two years. However, all administrative functions will be consolidated into Quantum Dynamics' headquarters in Austin, Texas, by the end of the fiscal year.\n\nCEO Margaret Holloway emphasized that no immediate layoffs are planned, although she acknowledged that some redundancies may emerge over time. \"Our priority is integrating Helix's exceptional engineering talent while preserving the cultural strengths that made the company successful,\" she stated.\n\nIndustry analysts have responded favorably to the deal, citing the complementary nature of the two firms' product portfolios.",
+    questions:[
+      { q:"What is the main subject of the press release?",
+        options:["A new product launch","A corporate acquisition","A factory expansion","A leadership change"],
+        answer:1,
+        explanation:"見出し 'Quantum Dynamics Acquires Helix Technologies' から、企業買収のリリース。" },
+      { q:"What will happen to Helix's research facilities?",
+        options:["They will close immediately","They will operate independently for two years","They will move to Austin","They will be sold separately"],
+        answer:1,
+        explanation:"'will continue to operate independently for at least two years' と記載。" },
+      { q:"What did Margaret Holloway say about layoffs?",
+        options:["Large-scale layoffs will begin immediately","No immediate layoffs are planned but some may occur","All Helix staff will be retained permanently","Only research staff will be affected"],
+        answer:1,
+        explanation:"'no immediate layoffs are planned, although ... some redundancies may emerge over time' と慎重に発言。" },
+      { q:"What is implied about the deal's reception?",
+        options:["It is being challenged in court","Investors are skeptical","Analysts view it positively","It requires regulatory approval"],
+        answer:2,
+        explanation:"'Industry analysts have responded favorably to the deal' とポジティブな反応。" }
+    ]
+  },
+  {
+    id:"a02", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Dominic Vaughn <d.vaughn@meridianconsulting.com>\nTo: Cassandra Reyes <c.reyes@apexbiotech.com>\nSubject: Engagement Proposal — Phase II Strategic Review\n\nDear Cassandra,\n\nFollowing our preliminary discussions last month, I am pleased to submit Meridian Consulting's formal proposal for the Phase II Strategic Review of Apex Biotech's commercial operations.\n\nOur recommended scope encompasses three principal workstreams: market positioning analysis, distribution channel optimization, and a comprehensive review of pricing strategy across the Asia-Pacific region. We anticipate the engagement will require approximately 14 weeks, with deliverables presented at four milestone reviews.\n\nThe total professional fee is estimated at $480,000, exclusive of expenses, which we cap at 8 percent of fees. As discussed, we propose a staggered payment schedule tied to milestone completion rather than a fixed monthly retainer, which we believe better aligns our incentives with your outcomes.\n\nI would welcome the opportunity to walk through the proposal in detail at your convenience. Please note that the team I have assembled for this engagement is available beginning the week of October 7. To secure their availability, we would appreciate your decision by September 25.\n\nKind regards,\nDominic Vaughn\nPartner, Meridian Consulting",
+    questions:[
+      { q:"What is the purpose of the e-mail?",
+        options:["To request a project extension","To submit a consulting proposal","To finalize a contract","To resign from a project"],
+        answer:1,
+        explanation:"'submit Meridian Consulting's formal proposal' から、コンサル案件の提案書提出。" },
+      { q:"What is NOT part of the proposed scope?",
+        options:["Market positioning analysis","Distribution channel optimization","Pricing strategy review","Recruitment of new executives"],
+        answer:3,
+        explanation:"3つのワークストリームに役員採用は含まれていない。" },
+      { q:"How does Dominic propose to structure payments?",
+        options:["Fixed monthly retainer","Tied to milestone completion","Lump sum at start","Hourly billing"],
+        answer:1,
+        explanation:"'a staggered payment schedule tied to milestone completion' と提案。" },
+      { q:"Why is September 25 mentioned?",
+        options:["It is the start of the project","It is the deadline for a decision","It is when payment is due","It is the deliverable date"],
+        answer:1,
+        explanation:"'we would appreciate your decision by September 25' とチームの確保のため期限を示している。" }
+    ]
+  },
+  {
+    id:"a03", level:"advanced", type:"Article",
+    title:"Editorial",
+    body:"Why the New Tariff Framework Misses the Mark\n\nThe newly announced tariff framework, while undoubtedly well-intentioned, fundamentally misunderstands the complexity of contemporary supply chains. By imposing uniform duties on a broad category of imported components, policymakers appear to assume that domestic alternatives can scale rapidly enough to absorb displaced demand. The evidence, however, suggests otherwise.\n\nDomestic manufacturers, having ceded much of this segment over the past two decades, lack both the production capacity and specialized expertise required to fill the gap in the short term. Industry estimates indicate that ramping up domestic output to meaningful levels would require, at minimum, three to five years of sustained capital investment—precisely the kind of investment that becomes harder to justify when end-product prices rise sharply and consumer demand falters.\n\nA more nuanced approach would have been to introduce tariffs on a phased basis, paired with targeted subsidies for domestic capacity expansion. Such a framework would have given producers time to invest and consumers time to adjust. Instead, the current policy risks producing the worst of both outcomes: higher prices for buyers and stagnant production from a sector still unprepared to meet demand.",
+    questions:[
+      { q:"What is the author's main argument?",
+        options:["Tariffs should be raised further","The new tariff framework is poorly designed","Tariffs should be abolished entirely","Domestic manufacturing is already strong"],
+        answer:1,
+        explanation:"題名と本文全体が新枠組みを批判している。撤廃や引き上げ主張ではない。" },
+      { q:"Why does the author think domestic manufacturers cannot meet demand?",
+        options:["They lack workers willing to work","They lack capacity and specialized expertise","They prefer to export their products","They are blocked by regulations"],
+        answer:1,
+        explanation:"'lack both the production capacity and specialized expertise' と理由を述べている。" },
+      { q:"What alternative does the author propose?",
+        options:["A complete ban on imports","Phased tariffs paired with subsidies","A consumer education campaign","A new trade treaty"],
+        answer:1,
+        explanation:"'phased basis, paired with targeted subsidies' という提案がある。" },
+      { q:"The word \"nuanced\" in paragraph 3 is closest in meaning to",
+        options:["abrupt","sophisticated","unpopular","temporary"],
+        answer:1,
+        explanation:"'nuanced' は「細やかな・繊細で洗練された」の意。 'sophisticated' が最も近い。" }
+    ]
+  },
+  {
+    id:"a04", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Beatrice Lindqvist <b.lindqvist@northstarequity.com>\nTo: Internal Investment Committee\nSubject: Recommendation — Project Helios\n\nColleagues,\n\nAfter four weeks of due diligence, I am writing to set out my recommendation regarding Project Helios, the proposed minority investment in solar developer Aureon Energy.\n\nMy conclusion is that we should proceed, but on revised terms. Aureon's pipeline of utility-scale projects is genuinely impressive, and management has demonstrated unusual discipline in capital allocation. However, the requested $75 million valuation premium is, in my view, predicated on growth assumptions that do not adequately account for likely regulatory headwinds in two of their key markets.\n\nI propose we counter at an enterprise value of $310 million (versus the asking $385 million), with the difference made up through performance-based milestones tied to permit approvals and commissioning timelines. This structure protects our downside if regulatory delays materialize while preserving meaningful upside if Aureon executes against its plan.\n\nI would also recommend insisting on board observation rights and quarterly access to project-level operating data, neither of which appears in the current term sheet. These additions are particularly important given the early stage of several flagship projects.\n\nHappy to discuss further at Thursday's meeting.\n\nBeatrice",
+    questions:[
+      { q:"What is Beatrice's overall recommendation?",
+        options:["Reject the investment outright","Proceed but on revised terms","Postpone the decision indefinitely","Accept the original terms"],
+        answer:1,
+        explanation:"'we should proceed, but on revised terms' と明示。原条件のままではなく修正提案。" },
+      { q:"What concern does she raise about the original valuation?",
+        options:["It ignores regulatory headwinds","It is too low for the market","It excludes the pipeline","It penalizes management"],
+        answer:0,
+        explanation:"'do not adequately account for likely regulatory headwinds' と懸念を述べている。" },
+      { q:"What does Beatrice propose to add to the term sheet?",
+        options:["A non-compete clause","Board observation rights and data access","An exclusive license","Personal guarantees"],
+        answer:1,
+        explanation:"'board observation rights and quarterly access to project-level operating data' と追記したい項目を列挙。" },
+      { q:"What does Beatrice imply about Aureon's management?",
+        options:["They are inexperienced","They allocate capital with unusual discipline","They are resistant to investment","They have a poor reputation"],
+        answer:1,
+        explanation:"'unusual discipline in capital allocation' と評価している。" }
+    ]
+  },
+  {
+    id:"a05", level:"advanced", type:"Notice",
+    title:"Regulatory Notice",
+    body:"NOTICE OF AMENDED FILING REQUIREMENTS\n\nThe Securities Oversight Bureau (SOB) hereby notifies all registered investment advisers of amendments to Form RA-7, effective for the reporting period ending December 31. The principal changes are summarized below.\n\nFirst, advisers managing more than $250 million in client assets must now disclose, on a counterparty-by-counterparty basis, any derivative exposures exceeding 2 percent of assets under management. Aggregate disclosure, which had been permitted under the prior framework, will no longer satisfy the reporting standard.\n\nSecond, the definition of \"related person\" has been broadened to encompass any individual or entity that exercises material influence over investment decisions, whether or not such influence is exercised through a formal advisory role.\n\nFinally, the filing deadline has been advanced from March 31 to February 28. Advisers unable to meet the new deadline may request a one-time extension of up to 30 days, but such requests must be submitted no later than February 14 and must be accompanied by a written justification.\n\nNon-compliance may result in enforcement action, including fines and registration suspension. Advisers should consult counsel as needed.",
+    questions:[
+      { q:"What is the purpose of the notice?",
+        options:["To announce new licensing fees","To inform advisers of amended filing rules","To recruit examiners","To celebrate an anniversary"],
+        answer:1,
+        explanation:"'amendments to Form RA-7' を周知することが目的。" },
+      { q:"What change applies to large advisers' derivative reporting?",
+        options:["Aggregate reporting is now sufficient","Counterparty-by-counterparty disclosure is required","Derivatives no longer need to be reported","Reports are only due every two years"],
+        answer:1,
+        explanation:"'counterparty-by-counterparty basis' での開示が必要となり、'Aggregate disclosure ... will no longer satisfy' とある。" },
+      { q:"How has the definition of \"related person\" changed?",
+        options:["It has been narrowed","It has been broadened","It has been removed","It is unchanged"],
+        answer:1,
+        explanation:"'has been broadened to encompass' と拡大。" },
+      { q:"What must accompany a request for an extension?",
+        options:["A filing fee","A written justification","An auditor's report","An adviser's résumé"],
+        answer:1,
+        explanation:"'must be accompanied by a written justification' と要件を明示。" }
+    ]
+  },
+  {
+    id:"a06", level:"advanced", type:"Article",
+    title:"Industry Report",
+    body:"The Shifting Economics of Commercial Real Estate\n\nThe commercial real estate sector is undergoing a structural recalibration whose implications extend well beyond the headline vacancy statistics. While much commentary has focused on the declining demand for traditional office space, a more interesting story is unfolding in the secondary and tertiary markets, where landlords are demonstrating a creativity that was largely absent during the long bull run that preceded the recent downturn.\n\nIn cities such as Cincinnati, Pittsburgh, and Indianapolis, owners of dated Class B and Class C properties are pursuing conversion strategies—most commonly to multifamily residential, but increasingly to mixed-use formats incorporating life-sciences laboratories, light industrial, or even data center capacity. These conversions are rarely straightforward; floor-plate dimensions, mechanical systems, and zoning rules all conspire against easy adaptation. Yet the alternative—prolonged vacancy followed by eventual distressed sale—has become so unattractive that landlords are willing to absorb significant upfront cost.\n\nWhat is striking is how few of these projects rely on public subsidy. Sophisticated capital partners, particularly mid-sized private equity funds with longer hold horizons than the traditional five-to-seven-year windows, are providing the patient money these transformations require. This suggests that the next phase of urban redevelopment may be driven less by city planning departments than by a generation of investors willing to underwrite slower, more complex returns.",
+    questions:[
+      { q:"What is the main focus of the report?",
+        options:["Declining office demand in major cities","Adaptive reuse trends in secondary markets","New construction in suburban areas","Rising commercial rents nationwide"],
+        answer:1,
+        explanation:"中盤以降が二次・三次市場の用途転換に集中している。一次市場の話は対比として登場するのみ。" },
+      { q:"What is one challenge of the conversion projects?",
+        options:["Lack of demand for housing","Floor-plate dimensions and zoning rules","Excessive public subsidies","Investor disinterest"],
+        answer:1,
+        explanation:"'floor-plate dimensions, mechanical systems, and zoning rules all conspire against easy adaptation' と困難な要素を挙げている。" },
+      { q:"What is notable about how these conversions are financed?",
+        options:["They rely heavily on government grants","They rely on patient private equity capital","They are funded by individual savers","They are funded by foreign banks"],
+        answer:1,
+        explanation:"'Sophisticated capital partners, particularly mid-sized private equity funds' とあり、'rarely rely on public subsidy' とも明記。" },
+      { q:"The phrase \"patient money\" in the third paragraph most nearly means",
+        options:["Cautious lending","Capital with a long investment horizon","Funding from small investors","Aggressive short-term investing"],
+        answer:1,
+        explanation:"前文に 'longer hold horizons' とあり、長期保有を前提とした資本を指す。" }
+    ]
+  },
+  {
+    id:"a07", level:"advanced", type:"Memo",
+    title:"Internal Memorandum",
+    body:"INTERNAL MEMORANDUM — PRIVILEGED AND CONFIDENTIAL\n\nTo: Executive Leadership Team\nFrom: Office of the General Counsel\nDate: September 18\nRe: Preliminary Findings — Vendor Onboarding Review\n\nFollowing the inquiries raised at the August audit committee meeting, the Office of the General Counsel has completed its preliminary review of the vendor onboarding process. We present below our headline findings and a recommended course of action. A full report will follow within ten business days.\n\nFirst, our review confirms that the onboarding workflow, as currently implemented, does not consistently capture conflict-of-interest disclosures from vendor principals. While the procurement manual nominally requires such disclosures, the relevant prompts in our procurement software were disabled during the system migration last year and have not been restored. As a result, an estimated 38 percent of vendors onboarded since the migration lack any conflict disclosure on file.\n\nSecond, sanctions screening, while operationally robust, is not being repeated at the intervals required under our internal policy. The policy contemplates quarterly re-screening of all active vendors; in practice, re-screening has occurred only at contract renewal.\n\nWe recommend, at minimum, (i) immediate restoration of the disabled conflict prompts, (ii) a retroactive collection of disclosures from the affected vendor cohort, and (iii) implementation of automated quarterly sanctions re-screening. We do not, at this stage, recommend voluntary disclosure to regulators, though we will reassess this position once the full report is complete.\n\nQuestions may be directed to the undersigned.",
+    questions:[
+      { q:"What prompted the legal review?",
+        options:["A regulatory investigation","Inquiries from the audit committee","A whistleblower complaint","A client lawsuit"],
+        answer:1,
+        explanation:"'Following the inquiries raised at the August audit committee meeting' とある。" },
+      { q:"What is the main flaw identified in the onboarding process?",
+        options:["Vendors are paid too quickly","Conflict-of-interest disclosures are not consistently captured","Vendors lack proper insurance","Contract terms are unclear"],
+        answer:1,
+        explanation:"'does not consistently capture conflict-of-interest disclosures' と問題点を明示。" },
+      { q:"Why are sanctions screenings not being conducted as required?",
+        options:["They are only done at contract renewal","They are done weekly instead","The software cannot perform them","Vendors refuse to provide data"],
+        answer:0,
+        explanation:"'in practice, re-screening has occurred only at contract renewal' と実態を述べている。" },
+      { q:"What does the memo NOT recommend at this stage?",
+        options:["Restoring disabled software prompts","Retroactive disclosure collection","Voluntary disclosure to regulators","Automated quarterly re-screening"],
+        answer:2,
+        explanation:"'We do not ... recommend voluntary disclosure to regulators' と明記されている。" }
+    ]
+  },
+  {
+    id:"a08", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Aldous Pemberton <a.pemberton@orionresearch.com>\nTo: Research Subscribers\nSubject: Q3 Outlook — Semiconductors\n\nDear Subscribers,\n\nOur Q3 outlook for the semiconductor sector reflects a more cautious posture than the consensus, though we remain constructive on a longer horizon. Three considerations underpin our view.\n\nFirst, while AI-driven demand for advanced logic and high-bandwidth memory remains robust, the broader analog and power-management segments are exhibiting clear signs of inventory correction. Channel-check data from our Asia desk suggests that distributor inventories have risen for three consecutive months, a pattern that historically precedes a 10 to 15 percent revision to consensus revenue estimates over the subsequent two quarters.\n\nSecond, capital expenditure guidance from the major foundries appears increasingly bifurcated. Leading-edge investment continues largely unabated, but mature-node capacity additions—announced with considerable fanfare during the 2023 shortage—are being quietly scaled back. We expect this divergence to widen, which has implications for the equipment suppliers we cover, particularly those with disproportionate exposure to legacy node tooling.\n\nThird, we caution that policy risk remains underpriced. Recent export-control adjustments have so far proved more bark than bite, but the trajectory of administrative action is unambiguous. Companies whose revenue depends heavily on a single jurisdiction face elevated risk, which we do not believe is reflected in current valuations.\n\nDespite these near-term concerns, we maintain our positive long-term thesis. The structural drivers—electrification, AI acceleration, and edge compute proliferation—remain intact, and we view weakness in the coming quarters as an opportunity to build positions in the highest-quality names at more attractive entry points.\n\nRegards,\nAldous Pemberton\nHead of Semiconductor Research",
+    questions:[
+      { q:"What is the author's overall view in the near term?",
+        options:["More bullish than consensus","More cautious than consensus","Identical to consensus","No clear view"],
+        answer:1,
+        explanation:"'a more cautious posture than the consensus' と冒頭で述べている。" },
+      { q:"What sign of inventory correction is mentioned?",
+        options:["Falling factory utilization","Distributor inventories rising for three months","Mass layoffs at foundries","Spot prices crashing"],
+        answer:1,
+        explanation:"'distributor inventories have risen for three consecutive months' と具体的データを示している。" },
+      { q:"What does the author say about mature-node capacity?",
+        options:["It is being expanded aggressively","It is being quietly scaled back","It is no longer profitable","It is being relocated to Europe"],
+        answer:1,
+        explanation:"'mature-node capacity additions ... are being quietly scaled back' と明記。" },
+      { q:"How does the author describe his long-term view?",
+        options:["Negative due to policy risk","Neutral pending more data","Positive, based on structural drivers","Dependent on next year's elections"],
+        answer:2,
+        explanation:"'maintain our positive long-term thesis ... structural drivers ... remain intact' とポジティブ。" }
+    ]
+  },
+  {
+    id:"a09", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Elena Voskresenskaya <evosk@continental-arch.com>\nTo: Harold Wexler\nSubject: Tendering Strategy — Brookhaven Civic Center\n\nHarold,\n\nI have been thinking about our position on the Brookhaven Civic Center tender, and I want to share a few concerns before we commit to the approach you outlined yesterday.\n\nThe project brief, as written, is unusually prescriptive about programmatic elements that I suspect will prove unworkable at the proposed budget. The auditorium specification alone, with its 1,400-seat capacity and the acoustic standards referenced in Appendix C, is difficult to reconcile with the $48 million construction allowance—particularly when one accounts for the site conditions revealed in last week's geotechnical report. My back-of-the-envelope numbers suggest we would need to either compromise on the acoustic standard or absorb a meaningful overrun.\n\nRather than submit a bid that papers over these tensions, I would propose we use the question-and-answer period to surface them explicitly. If the client is open to a value-engineered alternative—perhaps an 1,100-seat configuration with the option to expand—we can submit competitively. If they are not, we may be better served by declining to bid and preserving our reputation for honest delivery. I would rather lose this opportunity than win and disappoint.\n\nI realize this departs from the more aggressive posture you favored, and I am open to discussing it further. Are you free for thirty minutes on Tuesday morning?\n\nElena",
+    questions:[
+      { q:"Why does Elena have concerns about the tender?",
+        options:["The deadline is too short","The brief specifications cannot be met within budget","Her firm lacks the necessary experience","The client has a poor payment history"],
+        answer:1,
+        explanation:"'unusually prescriptive about programmatic elements ... unworkable at the proposed budget' と懸念を述べる。" },
+      { q:"What alternative does Elena suggest?",
+        options:["Reducing the budget","Submitting a value-engineered alternative with smaller capacity","Recruiting more architects","Filing a complaint with the city"],
+        answer:1,
+        explanation:"'a value-engineered alternative—perhaps an 1,100-seat configuration' と提案。" },
+      { q:"What does Elena imply she would rather do than win and disappoint?",
+        options:["Negotiate the contract terms","Decline to bid","Subcontract the work","Postpone the project"],
+        answer:1,
+        explanation:"'we may be better served by declining to bid' とあり、入札辞退も視野に入れている。" },
+      { q:"What does Elena ask Harold to do?",
+        options:["Send her the geotechnical report","Meet on Tuesday morning","Approve a higher budget","Resign from the project"],
+        answer:1,
+        explanation:"'Are you free for thirty minutes on Tuesday morning?' と最後で問いかけている。" }
+    ]
+  },
+  {
+    id:"a10", level:"advanced", type:"Article",
+    title:"Magazine Feature",
+    body:"The Quiet Resurgence of Specialty Coffee\n\nA decade ago, the conventional wisdom held that specialty coffee had peaked. Margins were under pressure, real estate costs had become prohibitive in the very neighborhoods that gave the movement its character, and the rise of high-quality grocery-store offerings appeared to have eliminated the experiential premium that independent roasters had long charged. The smart money predicted consolidation, and to a degree that prediction proved correct: a handful of regional chains absorbed dozens of single-location operators between 2018 and 2022.\n\nWhat the smart money did not anticipate was the second wave. Beginning around 2023, a new cohort of operators began opening shops in unfashionable secondary markets—not as outposts of celebrated coastal brands, but as locally rooted enterprises with distinct sensibilities. These businesses share several characteristics: they emphasize direct trade relationships with growers, they tend to operate at smaller footprints with limited seating, and they have largely eschewed the venture-capital-backed growth models that defined the prior generation. Many are profitable from year one, though their unit economics are modest by the standards their predecessors set.\n\nWhat is remarkable is not their commercial viability but the cultural shift they represent. Where the first wave promised to transform daily ritual through superior product, the second wave promises something more modest: a well-made cup in a place that knows its customers. Whether that proposition can support the next decade of expansion remains to be seen. The early indicators—steady same-store growth, low employee turnover, and a willingness on the part of operators to forgo aggressive expansion—suggest it might.",
+    questions:[
+      { q:"What was the conventional wisdom about specialty coffee a decade ago?",
+        options:["That it was poised for rapid expansion","That it had peaked and would consolidate","That it would be banned by regulators","That it would shift overseas"],
+        answer:1,
+        explanation:"'had peaked' と 'predicted consolidation' から、ピークアウトと統合の予測。" },
+      { q:"What is one characteristic of the second-wave operators?",
+        options:["They rely on venture-capital backing","They emphasize direct trade with growers","They focus on large suburban locations","They are typically owned by large chains"],
+        answer:1,
+        explanation:"'emphasize direct trade relationships with growers' とある。" },
+      { q:"How does the author describe the unit economics of the new operators?",
+        options:["Spectacular","Modest","Loss-making","Volatile"],
+        answer:1,
+        explanation:"'profitable from year one, though their unit economics are modest' と評価。" },
+      { q:"What does the author imply about the future of the second wave?",
+        options:["It is destined to fail","Its long-term success is uncertain but plausible","It will be absorbed by larger chains within years","It depends entirely on government support"],
+        answer:1,
+        explanation:"'remains to be seen ... suggest it might' から、可能性ありだが断定はしていない。" }
+    ]
+  },
+  {
+    id:"a11", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Dr. Imogen Ashworth <i.ashworth@thoroughbredinstitute.org>\nTo: Grant Review Committee\nSubject: Application 2026-114 — Review and Recommendation\n\nDear Committee Members,\n\nI have completed my review of Application 2026-114, submitted by Dr. Ravi Chakraborty's lab for funding under our Emerging Technologies Initiative. The proposal seeks $1.8 million over three years to develop a novel imaging modality for early-stage detection of pancreatic ductal adenocarcinoma. I recommend funding, with reservations that I detail below.\n\nThe scientific merit of the proposal is substantial. The preliminary data, particularly the validation experiments in the murine model, demonstrate a clear sensitivity advantage over existing approaches at the stage where intervention would be most clinically meaningful. The technical approach is innovative without being speculative, and the principal investigator's track record in adjacent areas inspires confidence in execution.\n\nMy reservations are twofold. First, the proposed budget for clinical translation activities in Year 3 appears underestimated. The proposal allocates $220,000 for regulatory consultation and initial Phase I planning, which is substantially below what comparable projects have required. I would suggest that the committee request a revised Year 3 budget or, alternatively, structure the award as two years with an option for a third contingent upon translational milestones.\n\nSecond, the proposal does not address how the lab will protect intellectual property, an omission that is increasingly material given the commercial implications of the proposed technology. I recommend that any award be conditioned on the lab's compliance with our standard IP framework.\n\nNotwithstanding these reservations, I believe this is among the strongest proposals in the current cycle and warrants the committee's support.\n\nRespectfully,\nDr. Imogen Ashworth",
+    questions:[
+      { q:"What is Dr. Ashworth's overall recommendation?",
+        options:["Reject the application","Fund with reservations","Postpone the decision","Refer it to another committee"],
+        answer:1,
+        explanation:"'I recommend funding, with reservations' と明示。" },
+      { q:"What aspect of the application does Dr. Ashworth praise?",
+        options:["The cost-benefit ratio","The preliminary scientific data","The number of collaborators","The communications plan"],
+        answer:1,
+        explanation:"'The preliminary data ... demonstrate a clear sensitivity advantage' と評価している。" },
+      { q:"What is the first reservation raised?",
+        options:["The PI lacks experience","Year 3 translation budget is underestimated","The lab is in the wrong country","The methodology is unsound"],
+        answer:1,
+        explanation:"'budget for clinical translation activities in Year 3 appears underestimated' とある。" },
+      { q:"What is one of Dr. Ashworth's suggestions?",
+        options:["Reduce the award amount by half","Condition the award on IP framework compliance","Reassign the PI","Require open-access publication only"],
+        answer:1,
+        explanation:"'any award be conditioned on the lab's compliance with our standard IP framework' と提案。" }
+    ]
+  },
+  {
+    id:"a12", level:"advanced", type:"Article",
+    title:"Industry Analysis",
+    body:"Logistics in the Age of Reshoring\n\nThe term \"reshoring\" has acquired the status of a slogan in recent years, deployed by politicians and corporate communicators with a confidence that often outruns the underlying data. Yet beneath the rhetoric, a more nuanced reality is taking shape—one that logistics operators ignore at considerable peril.\n\nThe gross numbers are, in fact, modest. According to a recent analysis by the Trade Policy Institute, manufacturing employment repatriated to North America since 2021 represents less than 4 percent of the total jobs that migrated offshore during the preceding two decades. Headline announcements of \"reshoring victories\" frequently involve facilities that would have been built domestically in any case, or that represent additions to existing offshore capacity rather than substitutions for it.\n\nWhat is changing more meaningfully is the geography of where production occurs within North America, and—critically for logistics planners—the inland routing patterns that result. New facilities are concentrating not in the traditional manufacturing belt, where infrastructure exists but labor markets are tight and electricity costs are climbing, but in a southeastern crescent stretching from central Texas through Tennessee and into the Carolinas. This shift has profound implications for trucking, rail, and warehousing networks that were designed around different demand centers.\n\nLogistics operators who have begun to reposition their assets accordingly are quietly building a durable competitive advantage. Those who continue to plan around the geography of 2015—and there are more of them than industry conferences would suggest—will find themselves, within five years, serving routes that no longer exist while missing the routes that have replaced them.",
+    questions:[
+      { q:"What is the author's view of reshoring as a concept?",
+        options:["Its scale is overstated by political rhetoric","It is having an unprecedented impact","It is a fabrication of journalists","It is irrelevant to logistics"],
+        answer:0,
+        explanation:"'confidence that often outruns the underlying data' および '4 percent' という小さな実態から、レトリックの誇張を指摘。" },
+      { q:"According to the article, where is new manufacturing concentrating?",
+        options:["The traditional manufacturing belt","The southeastern crescent","The Pacific Northwest","Coastal California"],
+        answer:1,
+        explanation:"'a southeastern crescent stretching from central Texas through Tennessee and into the Carolinas' と明記。" },
+      { q:"What risk do logistics operators face if they don't adapt?",
+        options:["Serving routes that no longer exist","Bankruptcy within one year","Government penalties","Litigation by shippers"],
+        answer:0,
+        explanation:"'serving routes that no longer exist while missing the routes that have replaced them' と警告。" },
+      { q:"The word \"nuanced\" in paragraph 1 most nearly means",
+        options:["complicated and subtle","easily understood","exaggerated","old-fashioned"],
+        answer:0,
+        explanation:"'nuanced' は「微妙で込み入った・繊細な」の意味。'complicated and subtle' が最も近い。" }
+    ]
+  },
+  {
+    id:"a13", level:"advanced", type:"Email",
+    title:"E-mail",
+    body:"From: Felipe Castañeda <fcastaneda@andesconsulting.com>\nTo: Procurement Working Group\nSubject: Vendor Consolidation — Preliminary Recommendation\n\nColleagues,\n\nFollowing six weeks of analysis, I am circulating a preliminary recommendation regarding the proposed consolidation of our IT services vendor pool. To recap, the working group was tasked with evaluating whether reducing our current panel of seventeen vendors to a smaller number of strategic partners would yield meaningful efficiencies without compromising service resilience.\n\nThe short answer is yes, but with important qualifications. Our analysis suggests that consolidation to roughly six to eight strategic vendors could generate annual savings in the range of $4.2 to $5.8 million, primarily through volume discounting and reduced administrative overhead. However, these savings are contingent on retaining genuine competitive tension among the surviving vendors—a condition that becomes harder to maintain as the panel shrinks.\n\nI would caution strongly against the more aggressive variant favored by some members of the group, which would reduce the panel to three vendors. While the projected savings under that scenario are superficially attractive (approximately $7.4 million annually), our resilience analysis indicates an unacceptable concentration of operational risk. Single-vendor failures, geopolitical disruptions, and pricing renegotiations would all become significantly more impactful with so few alternatives.\n\nI propose we proceed with the six-to-eight vendor target and revisit the analysis in eighteen months, by which time we will have empirical data on the realized savings and any operational issues that have emerged.\n\nFelipe",
+    questions:[
+      { q:"What is Felipe's primary recommendation?",
+        options:["Maintain all seventeen vendors","Consolidate to six to eight strategic vendors","Reduce to three strategic vendors","Outsource all IT services"],
+        answer:1,
+        explanation:"'I propose we proceed with the six-to-eight vendor target' と明示。" },
+      { q:"Why does Felipe oppose reducing the panel to three vendors?",
+        options:["The vendors would be reluctant","Operational risk concentration would be unacceptable","Costs would actually rise","Internal staff would object"],
+        answer:1,
+        explanation:"'an unacceptable concentration of operational risk' と理由を述べる。" }
+    ]
+  },
+  // 上級 計50問終了
+]; // passages 配列終了
+
+/* ==================== グローバル状態 ==================== */
+let currentLevel = "beginner";
+let currentPassageIndex = 0;
+let currentQuestionIndex = 0;
+let correctCount = 0;
+let totalAnswered = 0;
+let answeredFlags = []; // 各パッセージの各問題が回答済みかどうか
+let levelPassages = []; // 現在のレベルのパッセージ（シャッフル済み）
+
+/* ==================== Fisher-Yates シャッフル ==================== */
+function shuffle(array){
+  const a = array.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* ==================== レベルの問題数カウント ==================== */
+function countQuestionsInLevel(level){
+  return passages.filter(p=>p.level===level).reduce((sum,p)=>sum+p.questions.length, 0);
+}
+
+/* ==================== レベル切替 ==================== */
+function switchLevel(level){
+  currentLevel = level;
+  currentPassageIndex = 0;
+  currentQuestionIndex = 0;
+  correctCount = 0;
+  totalAnswered = 0;
+  levelPassages = shuffle(passages.filter(p=>p.level===level));
+  answeredFlags = levelPassages.map(p=>p.questions.map(()=>false));
+  document.querySelectorAll(".level-tab").forEach(t=>{
+    t.classList.toggle("active", t.dataset.level===level);
+  });
+  document.getElementById("levelBadge").textContent =
+    level==="beginner" ? "初級" : level==="intermediate" ? "中級" : "上級";
+  render();
+}
+
+/* ==================== レンダリング ==================== */
+function render(){
+  const main = document.getElementById("main");
+  // 終了判定
+  if(currentPassageIndex >= levelPassages.length){
+    showSummary();
+    return;
+  }
+  const passage = levelPassages[currentPassageIndex];
+  const totalQ = countQuestionsInLevel(currentLevel);
+  // ヘッダー更新
+  document.getElementById("scoreDisplay").textContent = `スコア: ${correctCount} / ${totalAnswered}`;
+  const progress = (totalAnswered / totalQ) * 100;
+  document.getElementById("progressFill").style.width = progress + "%";
+  document.getElementById("progressText").textContent = `${totalAnswered} / ${totalQ}`;
+  // パッセージ＋設問群を描画
+  let html = `
+    <div class="passage-card">
+      <div class="passage-meta">
+        <span class="passage-type">${passage.type}</span>
+        <span class="q-counter">パッセージ ${currentPassageIndex+1} / ${levelPassages.length}</span>
+      </div>
+      <div class="passage-text">${escapeHtml(passage.body)}</div>
+    </div>
+  `;
+  // 各設問
+  passage.questions.forEach((q, qi)=>{
+    const answered = answeredFlags[currentPassageIndex][qi];
+    html += renderQuestion(passage, q, qi, answered);
+  });
+  main.innerHTML = html;
+  // 選択肢クリックイベント
+  document.querySelectorAll(".option").forEach(btn=>{
+    btn.addEventListener("click", onOptionClick);
+  });
+  // 次へボタン
+  document.querySelectorAll(".next-btn").forEach(btn=>{
+    btn.addEventListener("click", goNext);
+  });
+  // スクロールトップ
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function renderQuestion(passage, q, qi, answered){
+  const labels = ["A","B","C","D"];
+  let optionsHtml = q.options.map((opt, oi)=>{
+    let cls = "option";
+    let icon = "";
+    if(answered){
+      if(oi === q.answer){ cls += " correct"; icon = '<span class="option-icon">✅</span>'; }
+      else if(answered.selected === oi){ cls += " wrong"; icon = '<span class="option-icon">❌</span>'; }
+    }
+    return `<button class="${cls}" data-qi="${qi}" data-oi="${oi}" ${answered?'disabled':''}>
+      <span class="option-label">${labels[oi]}</span>
+      <span>${escapeHtml(opt)}</span>
+      ${icon}
+    </button>`;
+  }).join("");
+  let explanationHtml = "";
+  if(answered){
+    explanationHtml = `
+      <div class="explanation">
+        <h4>📘 解説</h4>
+        <p>${escapeHtml(q.explanation)}</p>
+        ${qi === passage.questions.length-1 ? `<button class="next-btn">次のパッセージへ ▶</button>` : ""}
+      </div>
+    `;
+  }
+  return `
+    <div class="question-card" data-qi="${qi}">
+      <div class="q-header">
+        <span class="q-number">Q${qi+1}</span>
+      </div>
+      <div class="q-text">${escapeHtml(q.q)}</div>
+      <div class="options">${optionsHtml}</div>
+      ${explanationHtml}
+    </div>
+  `;
+}
+
+/* ==================== HTMLエスケープ ==================== */
+function escapeHtml(str){
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+/* ==================== 選択肢クリック処理 ==================== */
+function onOptionClick(e){
+  const btn = e.currentTarget;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+  const passage = levelPassages[currentPassageIndex];
+  const q = passage.questions[qi];
+  // すでに回答済みなら無視
+  if(answeredFlags[currentPassageIndex][qi]) return;
+  const isCorrect = (oi === q.answer);
+  answeredFlags[currentPassageIndex][qi] = { selected: oi, correct: isCorrect };
+  totalAnswered++;
+  if(isCorrect) correctCount++;
+  // 不正解時 → Notion苦手DB送信
+  if(!isCorrect) sendMistakeToNotion(passage, q, oi);
+  render();
+}
+
+/* ==================== 次へ ==================== */
+function goNext(){
+  currentPassageIndex++;
+  currentQuestionIndex = 0;
+  render();
+}
+
+/* ==================== サマリ画面 ==================== */
+function showSummary(){
+  const totalQ = countQuestionsInLevel(currentLevel);
+  const pct = totalQ ? Math.round((correctCount/totalQ)*100) : 0;
+  const levelName = currentLevel==="beginner" ? "初級" : currentLevel==="intermediate" ? "中級" : "上級";
+  document.getElementById("main").innerHTML = `
+    <div class="summary">
+      <h2>🎉 セッション完了！</h2>
+      <p>お疲れさまでした！結果は以下のとおりです。</p>
+      <div class="score-grid">
+        <div class="score-box">
+          <div class="lv">${levelName}</div>
+          <div class="num">${correctCount} / ${totalQ}</div>
+          <div class="pct">正答率 ${pct}%</div>
+        </div>
+      </div>
+      <div class="summary-buttons">
+        <button onclick="switchLevel('${currentLevel}')">🔄 もう一度</button>
+        <button onclick="switchLevel('beginner')">初級へ</button>
+        <button onclick="switchLevel('intermediate')">中級へ</button>
+        <button onclick="switchLevel('advanced')">上級へ</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("progressFill").style.width = "100%";
+  document.getElementById("progressText").textContent = `${totalAnswered} / ${totalQ}`;
+  document.getElementById("scoreDisplay").textContent = `スコア: ${correctCount} / ${totalAnswered}`;
+  // Notionスコア送信
+  sendScoreToNotion(correctCount, totalQ, pct, levelName);
+}
+
+/* ==================== Notion連携 ==================== */
+function getNotionConfig(){
+  return {
+    token: localStorage.getItem("notion_token") || "",
+    scoreDb: localStorage.getItem("notion_score_db") || "",
+    mistakeDb: localStorage.getItem("notion_mistake_db") || ""
+  };
+}
+
+async function sendMistakeToNotion(passage, q, selectedIndex){
+  const cfg = getNotionConfig();
+  if(!cfg.token || !cfg.mistakeDb) return;
+  const levelName = currentLevel==="beginner" ? "初級" : currentLevel==="intermediate" ? "中級" : "上級";
+  const titleText = (q.q.slice(0,30));
+  const body = {
+    parent: { database_id: cfg.mistakeDb },
+    properties: {
+      "タイトル": { title: [{ text: { content: titleText } }] },
+      "Part": { select: { name: "Part 7" } },
+      "レベル": { select: { name: levelName } },
+      "問題全文": { rich_text: [{ text: { content: (passage.body+"\n\nQ: "+q.q).slice(0,1900) } }] },
+      "自分の解答": { rich_text: [{ text: { content: q.options[selectedIndex].slice(0,1900) } }] },
+      "正解": { rich_text: [{ text: { content: q.options[q.answer].slice(0,1900) } }] },
+      "解説": { rich_text: [{ text: { content: q.explanation.slice(0,1900) } }] },
+      "間違えた日": { date: { start: new Date().toISOString() } }
+    }
+  };
+  try{
+    const res = await fetch("https://api.notion.com/v1/pages", {
+      method:"POST",
+      headers:{
+        "Authorization":"Bearer "+cfg.token,
+        "Notion-Version":"2022-06-28",
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const errTxt = await res.text();
+      showToast("Notion送信失敗: "+errTxt.slice(0,80), "error");
+    } else {
+      showToast("✅ 苦手問題を記録しました", "success");
+    }
+  } catch(e){
+    showToast("Notion送信失敗: "+e.message, "error");
+  }
+}
+
+async function sendScoreToNotion(correct, total, pct, levelName){
+  const cfg = getNotionConfig();
+  if(!cfg.token || !cfg.scoreDb) return;
+  const today = new Date().toISOString().slice(0,10);
+  const body = {
+    parent: { database_id: cfg.scoreDb },
+    properties: {
+      "タイトル": { title: [{ text: { content: `Part 7 ${levelName} ${today}` } }] },
+      "Part": { select: { name: "Part 7" } },
+      "レベル": { select: { name: levelName } },
+      "正答数": { number: correct },
+      "出題数": { number: total },
+      "正答率": { number: pct },
+      "学習日": { date: { start: new Date().toISOString() } }
+    }
+  };
+  try{
+    const res = await fetch("https://api.notion.com/v1/pages", {
+      method:"POST",
+      headers:{
+        "Authorization":"Bearer "+cfg.token,
+        "Notion-Version":"2022-06-28",
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const errTxt = await res.text();
+      showToast("スコア送信失敗: "+errTxt.slice(0,80), "error");
+    } else {
+      showToast("✅ Notionに記録しました", "success");
+    }
+  } catch(e){
+    showToast("スコア送信失敗: "+e.message, "error");
+  }
+}
+
+/* ==================== トースト通知 ==================== */
+function showToast(msg, type){
+  const t = document.createElement("div");
+  t.className = "toast " + (type||"");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transform="translateY(20px)"; }, 1800);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+/* ==================== 設定モーダル ==================== */
+function openSettings(){
+  document.getElementById("notionToken").value = localStorage.getItem("notion_token") || "";
+  document.getElementById("scoreDbId").value = localStorage.getItem("notion_score_db") || "";
+  document.getElementById("mistakeDbId").value = localStorage.getItem("notion_mistake_db") || "";
+  document.getElementById("modalBg").classList.add("show");
+}
+function closeSettings(){
+  document.getElementById("modalBg").classList.remove("show");
+}
+function saveSettings(){
+  localStorage.setItem("notion_token", document.getElementById("notionToken").value.trim());
+  localStorage.setItem("notion_score_db", document.getElementById("scoreDbId").value.trim());
+  localStorage.setItem("notion_mistake_db", document.getElementById("mistakeDbId").value.trim());
+  closeSettings();
+  showToast("✅ 設定を保存しました", "success");
+}
+
+/* ==================== 初期化 ==================== */
+document.querySelectorAll(".level-tab").forEach(t=>{
+  t.addEventListener("click", ()=>switchLevel(t.dataset.level));
+});
+document.getElementById("settingsBtn").addEventListener("click", openSettings);
+document.getElementById("modalCancel").addEventListener("click", closeSettings);
+document.getElementById("modalSave").addEventListener("click", saveSettings);
+document.getElementById("modalBg").addEventListener("click", (e)=>{
+  if(e.target.id==="modalBg") closeSettings();
+});
+
+// 初回起動
+switchLevel("beginner");
+</script>
+</body>
+</html>
