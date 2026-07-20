@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>中国語学習アプリ 第1-6課</title>
+<style>
+  :root{
+    --bg:#FAF7F0;
+    --amber:#F4B400;
+    --blue:#1A73E8;
+    --red:#D93025;
+    --green:#34A853;
+    --char:#1F2937;
+    --gray:#e5e7eb;
+    --gray2:#9ca3af;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--char);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;line-height:1.5}
+  header{background:var(--blue);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  header h1{margin:0;font-size:18px;font-weight:700}
+  .tabs{display:flex;background:#fff;border-bottom:2px solid var(--gray);position:sticky;top:44px;z-index:99}
+  .tab{flex:1;padding:14px 4px;text-align:center;font-weight:600;color:var(--gray2);cursor:pointer;border-bottom:3px solid transparent;font-size:14px;user-select:none}
+  .tab.active{color:var(--blue);border-bottom-color:var(--amber);background:#fff}
+  .panel{padding:12px}
+  .filter-bar{background:#fff;border-radius:10px;padding:10px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+  .filter-row:last-child{margin-bottom:0}
+  .filter-label{font-size:12px;color:var(--gray2);font-weight:600;margin-right:4px}
+  .chip{padding:6px 10px;background:var(--gray);border:none;border-radius:16px;font-size:12px;cursor:pointer;color:var(--char);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+  .chip.active{background:var(--blue);color:#fff}
+  .chip .badge{background:rgba(0,0,0,.15);padding:1px 6px;border-radius:8px;font-size:10px}
+  .chip.active .badge{background:rgba(255,255,255,.25)}
+  .search-box{width:100%;padding:10px 12px;border:2px solid var(--gray);border-radius:8px;font-size:14px;background:#fff}
+  .search-box:focus{outline:none;border-color:var(--blue)}
+  button.btn{padding:8px 14px;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px}
+  .btn-primary{background:var(--blue);color:#fff}
+  .btn-amber{background:var(--amber);color:#1F2937}
+  .btn-red{background:var(--red);color:#fff}
+  .btn-green{background:var(--green);color:#fff}
+  .btn-outline{background:#fff;color:var(--char);border:1.5px solid var(--gray)}
+  /* 単語一覧 */
+  .word-list{display:flex;flex-direction:column;gap:8px}
+  .word-item{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--gray)}
+  .word-item.st-none{border-left-color:var(--gray2)}
+  .word-item.st-no{border-left-color:var(--red)}
+  .word-item.st-maybe{border-left-color:var(--amber)}
+  .word-item.st-ok{border-left-color:var(--green)}
+  .word-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .word-hanzi{font-size:22px;font-weight:700;color:var(--char)}
+  .word-pinyin{font-size:14px;color:var(--blue);margin-top:2px}
+  .word-jp{font-size:14px;color:var(--char);margin-top:4px}
+  .word-lesson{font-size:11px;color:var(--gray2);font-weight:600}
+  .word-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .icon-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--gray);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;padding:0}
+  .icon-btn.active-fav{background:var(--amber);color:#fff}
+  .icon-btn.st-btn{width:auto;padding:0 12px;border-radius:16px;font-size:14px;height:32px;gap:4px}
+  .icon-btn.st-btn.active{color:#fff}
+  .icon-btn.st-btn.active[data-s="no"]{background:var(--red)}
+  .icon-btn.st-btn.active[data-s="maybe"]{background:var(--amber)}
+  .icon-btn.st-btn.active[data-s="ok"]{background:var(--green)}
+  /* フラッシュカード */
+  .flashcard-container{max-width:500px;margin:0 auto;padding:20px 0}
+  .progress-bar{height:6px;background:var(--gray);border-radius:3px;overflow:hidden;margin-bottom:16px}
+  .progress-fill{height:100%;background:var(--blue);transition:width .3s}
+  .card-info{text-align:center;color:var(--gray2);font-size:13px;margin-bottom:10px}
+  .card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.1);min-height:320px;padding:24px;cursor:pointer;position:relative;transition:transform .3s;user-select:none}
+  .card:active{transform:scale(.98)}
+  .card-side{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:280px}
+  .card-hanzi{font-size:56px;font-weight:700;color:var(--char);margin-bottom:8px;word-break:break-all}
+  .card-pinyin{font-size:22px;color:var(--blue);font-weight:600;margin-bottom:10px}
+  .card-jp{font-size:20px;color:var(--char);margin-bottom:16px}
+  .card-example{background:var(--bg);border-radius:10px;padding:12px;margin-top:12px;width:100%;font-size:14px;text-align:left}
+  .card-example .ex-zh{font-size:16px;font-weight:600;margin-bottom:2px}
+  .card-example .ex-py{color:var(--blue);font-size:12px;margin-bottom:4px}
+  .card-example .ex-jp{color:var(--char);font-size:13px}
+  .card-hint{color:var(--gray2);font-size:12px;margin-top:16px}
+  .card-controls{display:flex;justify-content:space-between;gap:6px;margin-top:16px;flex-wrap:wrap}
+  .card-controls button{flex:1;min-width:70px}
+  .card-actions-row{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+  /* リスニング */
+  .listen-container{max-width:500px;margin:0 auto;padding:20px 0}
+  .listen-card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:24px;text-align:center}
+  .listen-play{background:var(--blue);color:#fff;border:none;width:80px;height:80px;border-radius:50%;font-size:36px;cursor:pointer;margin:16px auto;display:flex;align-items:center;justify-content:center}
+  .listen-play:active{transform:scale(.95)}
+  .listen-info{color:var(--gray2);font-size:13px;margin:8px 0}
+  .listen-status{background:var(--bg);border-radius:8px;padding:10px;margin:12px 0;font-size:13px}
+  .listen-answer{background:var(--bg);border-radius:10px;padding:16px;margin:12px 0;display:none}
+  .listen-answer.show{display:block}
+  .listen-answer .a-hanzi{font-size:32px;font-weight:700;margin-bottom:6px}
+  .listen-answer .a-pinyin{font-size:18px;color:var(--blue);margin-bottom:6px}
+  .listen-answer .a-jp{font-size:15px}
+  .listen-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+  .score-board{display:flex;justify-content:space-around;background:var(--blue);color:#fff;border-radius:10px;padding:12px;margin-bottom:12px}
+  .score-item{text-align:center}
+  .score-num{font-size:24px;font-weight:700}
+  .score-label{font-size:11px;opacity:.9}
+  /* 課選択パネル */
+  .lesson-panel{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;display:none;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .lesson-panel.show{display:block}
+  .lesson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin:8px 0}
+  .lesson-check{padding:8px;background:var(--gray);border-radius:6px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;user-select:none}
+  .lesson-check.checked{background:var(--blue);color:#fff}
+  .lesson-actions{display:flex;gap:6px;margin-top:8px}
+  .lesson-actions button{flex:1}
+  /* Empty */
+  .empty{text-align:center;padding:40px 20px;color:var(--gray2)}
+  /* Utility */
+  .hidden{display:none !important}
+  @media (min-width:768px){
+    .panel{padding:20px;max-width:900px;margin:0 auto}
+    .card-hanzi{font-size:72px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🀄 中国語学習アプリ 第1-6課</h1>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-mode="list">📋 単語一覧</div>
+  <div class="tab" data-mode="flash">🎴 フラッシュ</div>
+  <div class="tab" data-mode="test">🎧 リスニング</div>
+</div>
+
+<div class="panel">
+  <!-- 共通フィルタ -->
+  <div class="filter-bar">
+    <div class="filter-row">
+      <button class="chip" id="lessonToggleBtn">📚 課選択 <span class="badge" id="lessonBadge">6</span></button>
+      <button class="chip" id="favToggleBtn">⭐ お気に入りのみ</button>
+      <span class="filter-label" style="margin-left:auto">🔊</span>
+      <button class="chip active" data-speed="0.7">遅</button>
+      <button class="chip" data-speed="1.0">普</button>
+      <button class="chip" data-speed="1.3">速</button>
+    </div>
+    <div class="lesson-panel" id="lessonPanel">
+      <div class="lesson-grid" id="lessonGrid"></div>
+      <div class="lesson-actions">
+        <button class="btn btn-outline" id="lessonAllBtn">全課</button>
+        <button class="btn btn-outline" id="lessonClearBtn">クリア</button>
+        <button class="btn btn-primary" id="lessonOkBtn">決定</button>
+      </div>
+    </div>
+    <div class="filter-row" id="statusFilterRow">
+      <button class="chip active" data-status="all">📋 一覧 <span class="badge" id="badge-all">0</span></button>
+      <button class="chip" data-status="none">🆕 未学習 <span class="badge" id="badge-none">0</span></button>
+      <button class="chip" data-status="no">❌ 覚えてない <span class="badge" id="badge-no">0</span></button>
+      <button class="chip" data-status="maybe">⚠️ 怪しい <span class="badge" id="badge-maybe">0</span></button>
+      <button class="chip" data-status="ok">✅ 完璧 <span class="badge" id="badge-ok">0</span></button>
+    </div>
+  </div>
+
+  <!-- モード1: 単語一覧 -->
+  <div id="mode-list">
+    <input type="text" class="search-box" id="searchBox" placeholder="🔍 簡体字・ピンイン・日本語で検索">
+    <div class="word-list" id="wordList" style="margin-top:10px"></div>
+  </div>
+
+  <!-- モード2: フラッシュカード -->
+  <div id="mode-flash" class="hidden">
+    <div class="flashcard-container">
+      <div class="progress-bar"><div class="progress-fill" id="flashProgress"></div></div>
+      <div class="card-info" id="flashInfo">0 / 0</div>
+      <div class="card" id="flashCard">
+        <div class="card-side" id="flashSide"></div>
+      </div>
+      <div class="card-actions-row">
+        <button class="icon-btn" id="flashSpeak" title="発音 (P)">🔊</button>
+        <button class="icon-btn" id="flashFav" title="お気に入り (F)">⭐</button>
+        <button class="icon-btn st-btn" data-s="no" id="flashStNo" title="覚えてない (Q)">❌</button>
+        <button class="icon-btn st-btn" data-s="maybe" id="flashStMaybe" title="怪しい (W)">⚠️</button>
+        <button class="icon-btn st-btn" data-s="ok" id="flashStOk" title="完璧 (E)">✅</button>
+      </div>
+      <div class="card-controls">
+        <button class="btn btn-outline" id="flashPrev">◀ 前へ</button>
+        <button class="btn btn-primary" id="flashAuto">▶ 自動</button>
+        <button class="btn btn-outline" id="flashShuffle">🔀</button>
+        <button class="btn btn-outline" id="flashReset">🔄</button>
+        <button class="btn btn-outline" id="flashNext">次へ ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- モード3: リスニングテスト -->
+  <div id="mode-test" class="hidden">
+    <div class="listen-container">
+      <div class="score-board">
+        <div class="score-item"><div class="score-num" id="scoreCorrect">0</div><div class="score-label">✓正解</div></div>
+        <div class="score-item"><div class="score-num" id="scoreWrong">0</div><div class="score-label">✗不正解</div></div>
+        <div class="score-item"><div class="score-num" id="scoreRate">0%</div><div class="score-label">正答率</div></div>
+      </div>
+      <div class="listen-card">
+        <div class="listen-info" id="listenInfo">問題 0 / 0</div>
+        <button class="listen-play" id="listenPlay">▶</button>
+        <div class="listen-status">音声を聞いて簡体字とピンインを書き取ろう<br>スペースキーで答えを見る</div>
+        <div class="listen-answer" id="listenAnswer">
+          <div class="a-hanzi" id="ansHanzi"></div>
+          <div class="a-pinyin" id="ansPinyin"></div>
+          <div class="a-jp" id="ansJp"></div>
+          <div class="card-example" id="ansExample" style="margin-top:10px"></div>
+        </div>
+        <div class="listen-buttons">
+          <button class="btn btn-amber" id="listenShow">👁 答えを見る (Space)</button>
+          <button class="btn btn-green" id="listenCorrect">✓ 正解 (C)</button>
+          <button class="btn btn-red" id="listenWrong">✗ 不正解 (W)</button>
+        </div>
+        <div class="listen-buttons" style="margin-top:6px">
+          <button class="btn btn-outline" id="listenNext">次の問題 ▶</button>
+          <button class="btn btn-outline" id="listenShuffle">🔀 シャッフル</button>
+          <button class="btn btn-outline" id="listenResetScore">スコアリセット</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ データ ============ */
+const VOCAB = [
+  // 第1課 自己紹介
+  {l:1,h:"自我介绍",p:"zìwǒ jièshào",j:"自己紹介する",eh:"我来自我介绍一下。",ep:"Wǒ lái zìwǒ jièshào yíxià.",ej:"私が自己紹介します。"},
+  {l:1,h:"一下",p:"yíxià",j:"ちょっと（〜する）",eh:"请等一下。",ep:"Qǐng děng yíxià.",ej:"ちょっと待ってください。"},
+  {l:1,h:"双",p:"shuāng",j:"2つの",eh:"我有一双新鞋。",ep:"Wǒ yǒu yì shuāng xīn xié.",ej:"新しい靴を一足持っています。"},
+  {l:1,h:"彩色",p:"cǎisè",j:"カラー、さまざまな色",eh:"这是一张彩色照片。",ep:"Zhè shì yì zhāng cǎisè zhàopiàn.",ej:"これはカラー写真です。"},
+  {l:1,h:"芳香",p:"fāngxiāng",j:"香りがよい",eh:"这朵花很芳香。",ep:"Zhè duǒ huā hěn fāngxiāng.",ej:"この花はとても香りがよい。"},
+  {l:1,h:"出生",p:"chūshēng",j:"生まれる",eh:"我出生在东京。",ep:"Wǒ chūshēng zài Dōngjīng.",ej:"私は東京で生まれました。"},
+  {l:1,h:"白羊座",p:"báiyángzuò",j:"おひつじ座",eh:"我是白羊座的。",ep:"Wǒ shì báiyángzuò de.",ej:"私はおひつじ座です。"},
+  {l:1,h:"交朋友",p:"jiāo péngyou",j:"友だちになる、友だち付き合いをする",eh:"我想跟你交朋友。",ep:"Wǒ xiǎng gēn nǐ jiāo péngyou.",ej:"あなたと友達になりたい。"},
+  {l:1,h:"发音",p:"fāyīn",j:"発音",eh:"你的发音很好。",ep:"Nǐ de fāyīn hěn hǎo.",ej:"あなたの発音はとても良い。"},
+  {l:1,h:"聊天儿",p:"liáotiānr",j:"おしゃべりをする",eh:"我们一起聊天儿吧。",ep:"Wǒmen yìqǐ liáotiānr ba.",ej:"一緒におしゃべりしよう。"},
+
+  // 第2課 出身・住まい
+  {l:2,h:"大概",p:"dàgài",j:"だいたい、およそ",eh:"从这儿到学校大概十分钟。",ep:"Cóng zhèr dào xuéxiào dàgài shí fēnzhōng.",ej:"ここから学校までだいたい10分。"},
+  {l:2,h:"环境",p:"huánjìng",j:"環境",eh:"这里的环境很好。",ep:"Zhèli de huánjìng hěn hǎo.",ej:"ここの環境はとても良い。"},
+  {l:2,h:"公里",p:"gōnglǐ",j:"キロメートル",eh:"我家离学校三公里。",ep:"Wǒ jiā lí xuéxiào sān gōnglǐ.",ej:"家は学校から3キロです。"},
+  {l:2,h:"独特",p:"dútè",j:"独特である、特有の",eh:"这个城市有独特的风景。",ep:"Zhège chéngshì yǒu dútè de fēngjǐng.",ej:"この街には独特の風景がある。"},
+  {l:2,h:"中华街",p:"Zhōnghuájiē",j:"中華街",eh:"我常去中华街吃饭。",ep:"Wǒ cháng qù Zhōnghuájiē chī fàn.",ej:"よく中華街に食事に行きます。"},
+  {l:2,h:"感受到",p:"gǎnshòudào",j:"〜を感じる",eh:"我感受到了你的热情。",ep:"Wǒ gǎnshòudào le nǐ de rèqíng.",ej:"あなたの熱意を感じました。"},
+  {l:2,h:"风土",p:"fēngtǔ",j:"風土",eh:"这里的风土跟日本不一样。",ep:"Zhèli de fēngtǔ gēn Rìběn bù yíyàng.",ej:"ここの風土は日本と違う。"},
+  {l:2,h:"毕业",p:"bìyè",j:"卒業する",eh:"我明年毕业。",ep:"Wǒ míngnián bìyè.",ej:"私は来年卒業します。"},
+  {l:2,h:"以后",p:"yǐhòu",j:"以後、〜の後",eh:"毕业以后我想去中国。",ep:"Bìyè yǐhòu wǒ xiǎng qù Zhōngguó.",ej:"卒業後、中国へ行きたい。"},
+  {l:2,h:"离开",p:"líkāi",j:"離れる",eh:"我八点离开家。",ep:"Wǒ bā diǎn líkāi jiā.",ej:"私は8時に家を出ます。"},
+  {l:2,h:"住在",p:"zhùzài",j:"〜に住む",eh:"我住在东京。",ep:"Wǒ zhùzài Dōngjīng.",ej:"私は東京に住んでいます。"},
+  {l:2,h:"郊区",p:"jiāoqū",j:"郊外",eh:"我住在东京的郊区。",ep:"Wǒ zhùzài Dōngjīng de jiāoqū.",ej:"東京の郊外に住んでいます。"},
+  {l:2,h:"附近",p:"fùjìn",j:"付近、近所",eh:"我家附近有一家超市。",ep:"Wǒ jiā fùjìn yǒu yì jiā chāoshì.",ej:"家の近くにスーパーがある。"},
+  {l:2,h:"经常",p:"jīngcháng",j:"いつも、常に",eh:"我经常喝咖啡。",ep:"Wǒ jīngcháng hē kāfēi.",ej:"私はよくコーヒーを飲みます。"},
+  {l:2,h:"欢迎",p:"huānyíng",j:"歓迎する",eh:"欢迎你来我家。",ep:"Huānyíng nǐ lái wǒ jiā.",ej:"我が家へようこそ。"},
+  {l:2,h:"做客",p:"zuòkè",j:"客になる",eh:"明天他来我家做客。",ep:"Míngtiān tā lái wǒ jiā zuòkè.",ej:"明日彼が我が家に来ます。"},
+
+  // 第3課 趣味・運動
+  {l:3,h:"爱好",p:"àihào",j:"趣味",eh:"我的爱好是看书。",ep:"Wǒ de àihào shì kàn shū.",ej:"私の趣味は読書です。"},
+  {l:3,h:"室内",p:"shìnèi",j:"インドア",eh:"我喜欢室内运动。",ep:"Wǒ xǐhuan shìnèi yùndòng.",ej:"私はインドアスポーツが好きです。"},
+  {l:3,h:"户外",p:"hùwài",j:"アウトドア",eh:"户外活动很有意思。",ep:"Hùwài huódòng hěn yǒuyìsi.",ej:"アウトドア活動は面白い。"},
+  {l:3,h:"打太极拳",p:"dǎ tàijíquán",j:"太極拳をする",eh:"爷爷每天早上打太极拳。",ep:"Yéye měitiān zǎoshang dǎ tàijíquán.",ej:"祖父は毎朝太極拳をします。"},
+  {l:3,h:"健身房",p:"jiànshēnfáng",j:"トレーニング・ジム",eh:"我常去健身房。",ep:"Wǒ cháng qù jiànshēnfáng.",ej:"私はよくジムに行きます。"},
+  {l:3,h:"习惯",p:"xíguàn",j:"習慣",eh:"我习惯早起。",ep:"Wǒ xíguàn zǎo qǐ.",ej:"私は早起きの習慣がある。"},
+  {l:3,h:"已经",p:"yǐjīng",j:"すでに",eh:"我已经吃过了。",ep:"Wǒ yǐjīng chī guo le.",ej:"私はもう食べました。"},
+  {l:3,h:"保持",p:"bǎochí",j:"持ち続ける、保つ",eh:"请保持安静。",ep:"Qǐng bǎochí ānjìng.",ej:"静かにしてください。"},
+  {l:3,h:"锻炼",p:"duànliàn",j:"鍛える",eh:"我每天锻炼身体。",ep:"Wǒ měitiān duànliàn shēntǐ.",ej:"毎日体を鍛えます。"},
+  {l:3,h:"放松",p:"fàngsōng",j:"リラックスさせる",eh:"听音乐可以放松心情。",ep:"Tīng yīnyuè kěyǐ fàngsōng xīnqíng.",ej:"音楽を聴くとリラックスできる。"},
+  {l:3,h:"尽量",p:"jǐnliàng",j:"できるだけ",eh:"我尽量早点儿睡。",ep:"Wǒ jǐnliàng zǎo diǎnr shuì.",ej:"できるだけ早く寝るようにします。"},
+  {l:3,h:"省",p:"shěng",j:"節約する",eh:"我想省点儿钱。",ep:"Wǒ xiǎng shěng diǎnr qián.",ej:"少しお金を節約したい。"},
+  {l:3,h:"选",p:"xuǎn",j:"選ぶ",eh:"你选哪个？",ep:"Nǐ xuǎn nǎge?",ej:"どれを選ぶ？"},
+  {l:3,h:"标准",p:"biāozhǔn",j:"基準",eh:"你的中文很标准。",ep:"Nǐ de Zhōngwén hěn biāozhǔn.",ej:"あなたの中国語は標準的です。"},
+  {l:3,h:"选择",p:"xuǎnzé",j:"選ぶ",eh:"我做了一个新的选择。",ep:"Wǒ zuò le yí ge xīn de xuǎnzé.",ej:"新しい選択をしました。"},
+  {l:3,h:"畅饮",p:"chàngyǐn",j:"心行くまで飲む、飲み放題",eh:"这家店晚上可以畅饮啤酒。",ep:"Zhè jiā diàn wǎnshang kěyǐ chàngyǐn píjiǔ.",ej:"この店は夜ビールが飲み放題。"},
+  {l:3,h:"甜品",p:"tiánpǐn",j:"スイーツ",eh:"这家店的甜品很好吃。",ep:"Zhè jiā diàn de tiánpǐn hěn hǎochī.",ej:"この店のスイーツは美味しい。"},
+  {l:3,h:"种类",p:"zhǒnglèi",j:"種類",eh:"这里的水果种类很多。",ep:"Zhèli de shuǐguǒ zhǒnglèi hěn duō.",ej:"ここは果物の種類が多い。"},
+  {l:3,h:"丰富",p:"fēngfù",j:"豊富である",eh:"他的经验很丰富。",ep:"Tā de jīngyàn hěn fēngfù.",ej:"彼の経験は豊富です。"},
+  {l:3,h:"场所",p:"chǎngsuǒ",j:"場所",eh:"这是一个安静的场所。",ep:"Zhè shì yí ge ānjìng de chǎngsuǒ.",ej:"ここは静かな場所です。"},
+
+  // 第4課 SNS・連絡
+  {l:4,h:"联系",p:"liánxì",j:"連絡する",eh:"请跟我联系。",ep:"Qǐng gēn wǒ liánxì.",ej:"私に連絡してください。"},
+  {l:4,h:"邮件",p:"yóujiàn",j:"メール",eh:"我给你发了一封邮件。",ep:"Wǒ gěi nǐ fā le yì fēng yóujiàn.",ej:"メールを送りました。"},
+  {l:4,h:"轻松",p:"qīngsōng",j:"気楽である",eh:"今天的工作很轻松。",ep:"Jīntiān de gōngzuò hěn qīngsōng.",ej:"今日の仕事は楽だ。"},
+  {l:4,h:"发送",p:"fāsòng",j:"送信する",eh:"请把文件发送给我。",ep:"Qǐng bǎ wénjiàn fāsòng gěi wǒ.",ej:"ファイルを送ってください。"},
+  {l:4,h:"贴图",p:"tiētú",j:"スタンプ",eh:"我喜欢用这个贴图。",ep:"Wǒ xǐhuan yòng zhège tiētú.",ej:"このスタンプを使うのが好きです。"},
+  {l:4,h:"聊",p:"liáo",j:"おしゃべりをする",eh:"我们一起聊聊吧。",ep:"Wǒmen yìqǐ liáoliao ba.",ej:"一緒に話そう。"},
+  {l:4,h:"离不开",p:"líbukāi",j:"離れられない",eh:"现在我们离不开手机。",ep:"Xiànzài wǒmen líbukāi shǒujī.",ej:"今、私たちはスマホから離れられない。"},
+  {l:4,h:"社交网",p:"shèjiāowǎng",j:"SNS",eh:"我每天都用社交网。",ep:"Wǒ měitiān dōu yòng shèjiāowǎng.",ej:"毎日SNSを使う。"},
+  {l:4,h:"推特",p:"Tuītè",j:"Twitter",eh:"你有推特吗？",ep:"Nǐ yǒu Tuītè ma?",ej:"Twitterやってる？"},
+  {l:4,h:"脸书",p:"Liǎnshū",j:"Facebook",eh:"我在脸书上找到了朋友。",ep:"Wǒ zài Liǎnshū shàng zhǎodào le péngyou.",ej:"Facebookで友達を見つけた。"},
+  {l:4,h:"照片墙",p:"Zhàopianqiáng",j:"Instagram",eh:"她常在照片墙上发照片。",ep:"Tā cháng zài Zhàopianqiáng shàng fā zhàopiàn.",ej:"彼女はよくInstagramに写真を載せる。"},
+  {l:4,h:"随时随地",p:"suí shí suí dì",j:"いつでもどこでも",eh:"现在随时随地都可以上网。",ep:"Xiànzài suí shí suí dì dōu kěyǐ shàng wǎng.",ej:"今はいつでもどこでもネットできる。"},
+  {l:4,h:"记录",p:"jìlù",j:"記録する",eh:"请记录一下今天的事情。",ep:"Qǐng jìlù yíxià jīntiān de shìqing.",ej:"今日のことを記録してください。"},
+  {l:4,h:"然后",p:"ránhòu",j:"その後、それから",eh:"我先吃饭，然后看电视。",ep:"Wǒ xiān chī fàn, ránhòu kàn diànshì.",ej:"先に食事して、それからテレビを見る。"},
+  {l:4,h:"分享",p:"fēnxiǎng",j:"シェアする、分かち合う",eh:"我想跟你分享一个好消息。",ep:"Wǒ xiǎng gēn nǐ fēnxiǎng yí ge hǎo xiāoxi.",ej:"良いニュースをシェアしたい。"},
+  {l:4,h:"记",p:"jì",j:"書き留める",eh:"请你记一下我的电话号码。",ep:"Qǐng nǐ jì yíxià wǒ de diànhuà hàomǎ.",ej:"私の電話番号を書き留めて。"},
+  {l:4,h:"微信",p:"Wēixìn",j:"WeChat（中国のSNSアプリ）",eh:"你用微信吗？",ep:"Nǐ yòng Wēixìn ma?",ej:"WeChat使いますか？"},
+  {l:4,h:"微信号",p:"Wēixìnhào",j:"WeChatのアカウント",eh:"请告诉我你的微信号。",ep:"Qǐng gàosu wǒ nǐ de Wēixìnhào.",ej:"WeChat IDを教えてください。"},
+  {l:4,h:"扫",p:"sǎo",j:"スキャンする",eh:"请扫这个二维码。",ep:"Qǐng sǎo zhège èrwéimǎ.",ej:"このQRコードをスキャンして。"},
+  {l:4,h:"二维码",p:"èrwéimǎ",j:"QRコード",eh:"这个二维码怎么扫？",ep:"Zhège èrwéimǎ zěnme sǎo?",ej:"このQRコードはどうやってスキャンする？"},
+
+  // 第5課 予定・買い物
+  {l:5,h:"打扫",p:"dǎsǎo",j:"掃除をする",eh:"我今天要打扫房间。",ep:"Wǒ jīntiān yào dǎsǎo fángjiān.",ej:"今日は部屋を掃除します。"},
+  {l:5,h:"该",p:"gāi",j:"〜すべきである、〜する必要がある",eh:"你该睡觉了。",ep:"Nǐ gāi shuìjiào le.",ej:"もう寝るべきだ。"},
+  {l:5,h:"另外",p:"lìngwài",j:"別に、ほかに",eh:"我还有另外一个问题。",ep:"Wǒ hái yǒu lìngwài yí ge wèntí.",ej:"もう一つ別の質問があります。"},
+  {l:5,h:"胖",p:"pàng",j:"太っている",eh:"我最近有点儿胖了。",ep:"Wǒ zuìjìn yǒudiǎnr pàng le.",ej:"最近少し太った。"},
+  {l:5,h:"减肥",p:"jiǎnféi",j:"ダイエットをする",eh:"我想减肥。",ep:"Wǒ xiǎng jiǎnféi.",ej:"ダイエットしたい。"},
+  {l:5,h:"准备",p:"zhǔnbèi",j:"準備する",eh:"我在准备考试。",ep:"Wǒ zài zhǔnbèi kǎoshì.",ej:"試験の準備をしています。"},
+  {l:5,h:"美发店",p:"měifàdiàn",j:"美容院",eh:"我明天去美发店。",ep:"Wǒ míngtiān qù měifàdiàn.",ej:"明日美容院に行きます。"},
+  {l:5,h:"剪头发",p:"jiǎn tóufa",j:"髪を切る",eh:"我想剪头发。",ep:"Wǒ xiǎng jiǎn tóufa.",ej:"髪を切りたい。"},
+  {l:5,h:"逛街",p:"guàngjiē",j:"街をぶらぶらする",eh:"周末我常去逛街。",ep:"Zhōumò wǒ cháng qù guàngjiē.",ej:"週末はよく街をぶらぶらします。"},
+  {l:5,h:"购物",p:"gòuwù",j:"買い物をする",eh:"我喜欢在网上购物。",ep:"Wǒ xǐhuan zài wǎng shàng gòuwù.",ej:"ネットで買い物するのが好きです。"},
+  {l:5,h:"下周一",p:"xià zhōuyī",j:"次の月曜日",eh:"下周一见。",ep:"Xià zhōuyī jiàn.",ej:"来週の月曜に会いましょう。"},
+  {l:5,h:"好好儿",p:"hǎohāor",j:"よく、ちゃんと",eh:"你好好儿休息吧。",ep:"Nǐ hǎohāor xiūxi ba.",ej:"ゆっくり休んでね。"},
+  {l:5,h:"功课",p:"gōngkè",j:"勉強",eh:"今天的功课很多。",ep:"Jīntiān de gōngkè hěn duō.",ej:"今日の宿題は多い。"},
+  {l:5,h:"过年",p:"guònián",j:"年を越す",eh:"我想回家过年。",ep:"Wǒ xiǎng huí jiā guònián.",ej:"実家で年越ししたい。"},
+  {l:5,h:"计划",p:"jìhuà",j:"計画",eh:"你有什么计划？",ep:"Nǐ yǒu shénme jìhuà?",ej:"どんな予定がある？"},
+
+  // 第6課 旅行・おもてなし
+  {l:6,h:"新干线",p:"Xīngànxiàn",j:"新幹線",eh:"我坐新干线去大阪。",ep:"Wǒ zuò Xīngànxiàn qù Dàbǎn.",ej:"新幹線で大阪に行きます。"},
+  {l:6,h:"面包车",p:"miànbāochē",j:"マイクロバス",eh:"我们坐面包车去。",ep:"Wǒmen zuò miànbāochē qù.",ej:"マイクロバスで行きます。"},
+  {l:6,h:"接",p:"jiē",j:"迎える",eh:"我去机场接你。",ep:"Wǒ qù jīchǎng jiē nǐ.",ej:"空港に迎えに行きます。"},
+  {l:6,h:"住",p:"zhù",j:"泊まる",eh:"我住在一家小旅馆。",ep:"Wǒ zhù zài yì jiā xiǎo lǚguǎn.",ej:"小さな旅館に泊まっています。"},
+  {l:6,h:"典型",p:"diǎnxíng",j:"典型的である",eh:"这是典型的日本菜。",ep:"Zhè shì diǎnxíng de Rìběn cài.",ej:"これは典型的な日本料理です。"},
+  {l:6,h:"旅馆",p:"lǚguǎn",j:"旅館",eh:"这家旅馆很干净。",ep:"Zhè jiā lǚguǎn hěn gānjìng.",ej:"この旅館はきれいです。"},
+  {l:6,h:"榻榻米",p:"tàtàmǐ",j:"畳",eh:"我第一次睡榻榻米。",ep:"Wǒ dì yī cì shuì tàtàmǐ.",ej:"初めて畳の上で寝ました。"},
+  {l:6,h:"晚餐",p:"wǎncān",j:"夕食",eh:"晚餐我们吃了寿司。",ep:"Wǎncān wǒmen chī le shòusī.",ej:"夕食に寿司を食べました。"},
+  {l:6,h:"丰盛",p:"fēngshèng",j:"盛りだくさんである",eh:"这顿晚餐真丰盛。",ep:"Zhè dùn wǎncān zhēn fēngshèng.",ej:"この夕食は本当に豪華だ。"},
+  {l:6,h:"充分",p:"chōngfèn",j:"充分に",eh:"我们要充分休息。",ep:"Wǒmen yào chōngfèn xiūxi.",ej:"充分に休まなければ。"},
+  {l:6,h:"享受",p:"xiǎngshòu",j:"享受する、味わう",eh:"我很享受这个假期。",ep:"Wǒ hěn xiǎngshòu zhège jiàqī.",ej:"この休暇を満喫している。"},
+  {l:6,h:"热情",p:"rèqíng",j:"心がこもっている",eh:"中国人很热情。",ep:"Zhōngguórén hěn rèqíng.",ej:"中国人はとても親切だ。"},
+  {l:6,h:"接待",p:"jiēdài",j:"接待する",eh:"谢谢您的接待。",ep:"Xièxie nín de jiēdài.",ej:"おもてなしありがとうございます。"},
+  {l:6,h:"曾经",p:"céngjīng",j:"かつて",eh:"我曾经去过北京。",ep:"Wǒ céngjīng qù guo Běijīng.",ej:"かつて北京に行ったことがあります。"},
+  {l:6,h:"新加坡",p:"Xīnjiāpō",j:"シンガポール",eh:"新加坡的天气很热。",ep:"Xīnjiāpō de tiānqì hěn rè.",ej:"シンガポールは暑い。"},
+  {l:6,h:"当地人",p:"dāngdìrén",j:"現地の人",eh:"我们跟当地人聊天儿。",ep:"Wǒmen gēn dāngdìrén liáotiānr.",ej:"現地の人とおしゃべりします。"},
+  {l:6,h:"可",p:"kě",j:"しかし",eh:"我想去，可我没时间。",ep:"Wǒ xiǎng qù, kě wǒ méi shíjiān.",ej:"行きたいけど時間がない。"},
+  {l:6,h:"至今",p:"zhìjīn",j:"今でも、今に至るまで",eh:"我至今还记得那件事。",ep:"Wǒ zhìjīn hái jìde nà jiàn shì.",ej:"今もあのことを覚えている。"},
+  {l:6,h:"记",p:"jì",j:"記憶する",eh:"我还记得他的样子。",ep:"Wǒ hái jìde tā de yàngzi.",ej:"彼の姿を覚えている。"},
+  {l:6,h:"作为",p:"zuòwéi",j:"〜とする、〜とみなす",eh:"作为学生，我应该努力学习。",ep:"Zuòwéi xuésheng, wǒ yīnggāi nǔlì xuéxí.",ej:"学生として努力すべきだ。"},
+  {l:6,h:"纪念",p:"jìniàn",j:"記念",eh:"这是一个值得纪念的日子。",ep:"Zhè shì yí ge zhíde jìniàn de rìzi.",ej:"記念すべき日だ。"},
+  {l:6,h:"拍",p:"pāi",j:"（写真や動画を）撮る",eh:"我们一起拍张照吧。",ep:"Wǒmen yìqǐ pāi zhāng zhào ba.",ej:"一緒に写真を撮ろう。"},
+];
+
+// 各単語にIDを付与（同じ簡体字が違う課にあるので lesson+hanzi+idx をキーに）
+VOCAB.forEach((w,i)=>{ w.id = `${w.l}-${w.h}-${i}`; });
+
+const LESSONS = [...new Set(VOCAB.map(v=>v.l))].sort((a,b)=>a-b);
+
+/* ============ ストレージ ============ */
+const SKEY = "zh_app_v1";
+const state = {
+  favorites: {},      // {id:true}
+  status: {},         // {id: "no"|"maybe"|"ok"}
+  score: {correct:0, wrong:0},
+  selectedLessons: LESSONS.slice(),
+  speed: 0.7,
+  statusFilter: "all",
+  favOnly: false,
+  mode: "list",
+  flashIdx: 0,
+  flashSide: 0,       // 0=表, 1=裏
+  testIdx: 0,
+  testOrder: [],
+  flashOrder: [],
+};
+function save(){ localStorage.setItem(SKEY, JSON.stringify({
+  favorites:state.favorites, status:state.status, score:state.score,
+  selectedLessons:state.selectedLessons, speed:state.speed
+})); }
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SKEY)||"{}");
+    Object.assign(state, s);
+    if(!state.favorites) state.favorites={};
+    if(!state.status) state.status={};
+    if(!state.score) state.score={correct:0,wrong:0};
+    if(!Array.isArray(state.selectedLessons)) state.selectedLessons=LESSONS.slice();
+  }catch(e){}
+}
+load();
+
+/* ============ 発音 (Web Speech API) ============ */
+let zhVoice = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  zhVoice = vs.find(v=>/zh(-|_)?(CN|Hans)/i.test(v.lang))
+         || vs.find(v=>/zh/i.test(v.lang))
+         || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+let voiceAlerted = false;
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "zh-CN";
+  u.rate = state.speed;
+  if(zhVoice) u.voice = zhVoice;
+  else if(!voiceAlerted){
+    voiceAlerted = true;
+    setTimeout(()=>{
+      alert("中国語の音声が見つかりません。\n\n【iPhone/iPad】\n設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 中国語 → 追加\n\n【Mac】\nシステム設定 → アクセシビリティ → 読み上げコンテンツ → システムの声 → 中国語を追加\n\n【Windows】\n設定 → 時刻と言語 → 音声認識 → 音声を管理 → 中国語(簡体字)を追加\n\n【Android】\n設定 → 言語と入力 → テキスト読み上げ → 言語で中国語を追加");
+    },100);
+  }
+  speechSynthesis.speak(u);
+}
+
+/* ============ フィルタ ============ */
+function getStatus(id){ return state.status[id] || "none"; }
+function filteredWords(searchText=""){
+  const q = (searchText||"").toLowerCase().trim();
+  return VOCAB.filter(w=>{
+    if(!state.selectedLessons.includes(w.l)) return false;
+    if(state.favOnly && !state.favorites[w.id]) return false;
+    if(state.statusFilter!=="all"){
+      if(getStatus(w.id)!==state.statusFilter) return false;
+    }
+    if(q){
+      const hay = (w.h+" "+w.p+" "+w.j).toLowerCase();
+      // 声調記号を落とした ピンインでも検索できるように
+      const pyPlain = w.p.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+      if(!hay.includes(q) && !pyPlain.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+/* ============ 描画: 課選択 ============ */
+function renderLessonGrid(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = "";
+  LESSONS.forEach(l=>{
+    const div = document.createElement('div');
+    div.className = 'lesson-check' + (state.selectedLessons.includes(l)?' checked':'');
+    div.textContent = "第"+l+"課";
+    div.dataset.l = l;
+    div.onclick = ()=>{
+      const ll = +div.dataset.l;
+      if(state.selectedLessons.includes(ll)){
+        state.selectedLessons = state.selectedLessons.filter(x=>x!==ll);
+      } else {
+        state.selectedLessons.push(ll);
+      }
+      div.classList.toggle('checked');
+    };
+    grid.appendChild(div);
+  });
+}
+
+/* ============ 描画: 単語一覧 ============ */
+function renderList(){
+  const list = document.getElementById('wordList');
+  const q = document.getElementById('searchBox').value;
+  const words = filteredWords(q);
+  if(words.length===0){
+    list.innerHTML = '<div class="empty">該当する単語がありません</div>';
+    return;
+  }
+  list.innerHTML = words.map(w=>{
+    const st = getStatus(w.id);
+    const stClass = st==="none"?"st-none":("st-"+st);
+    const isFav = !!state.favorites[w.id];
+    return `<div class="word-item ${stClass}" data-id="${w.id}">
+      <div class="word-top">
+        <div>
+          <div class="word-lesson">第${w.l}課</div>
+          <div class="word-hanzi">${w.h}</div>
+          <div class="word-pinyin">${w.p}</div>
+          <div class="word-jp">${w.j}</div>
+        </div>
+      </div>
+      <div class="word-actions">
+        <button class="icon-btn" data-act="speak">🔊</button>
+        <button class="icon-btn ${isFav?'active-fav':''}" data-act="fav">⭐</button>
+        <button class="icon-btn st-btn ${st==='no'?'active':''}" data-s="no" data-act="st">❌</button>
+        <button class="icon-btn st-btn ${st==='maybe'?'active':''}" data-s="maybe" data-act="st">⚠️</button>
+        <button class="icon-btn st-btn ${st==='ok'?'active':''}" data-s="ok" data-act="st">✅</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+document.getElementById('wordList').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-act]');
+  if(!btn) return;
+  const item = btn.closest('.word-item');
+  const id = item.dataset.id;
+  const w = VOCAB.find(x=>x.id===id);
+  const act = btn.dataset.act;
+  if(act==="speak"){ speak(w.h); }
+  else if(act==="fav"){
+    state.favorites[id] = !state.favorites[id];
+    if(!state.favorites[id]) delete state.favorites[id];
+    save(); renderList(); renderBadges();
+  }
+  else if(act==="st"){
+    const s = btn.dataset.s;
+    if(state.status[id]===s){ delete state.status[id]; }
+    else { state.status[id] = s; }
+    save(); renderList(); renderBadges();
+  }
+});
+
+/* ============ 描画: バッジ ============ */
+function renderBadges(){
+  const words = VOCAB.filter(w=>state.selectedLessons.includes(w.l) && (!state.favOnly || state.favorites[w.id]));
+  const cnt = {all:words.length, none:0, no:0, maybe:0, ok:0};
+  words.forEach(w=>{ cnt[getStatus(w.id)]++; });
+  document.getElementById('badge-all').textContent = cnt.all;
+  document.getElementById('badge-none').textContent = cnt.none;
+  document.getElementById('badge-no').textContent = cnt.no;
+  document.getElementById('badge-maybe').textContent = cnt.maybe;
+  document.getElementById('badge-ok').textContent = cnt.ok;
+  document.getElementById('lessonBadge').textContent = state.selectedLessons.length;
+}
+
+/* ============ フラッシュカード ============ */
+function shuffleArr(a){ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+function buildFlashOrder(){
+  state.flashOrder = filteredWords().map(w=>w.id);
+  state.flashIdx = Math.min(state.flashIdx, Math.max(0,state.flashOrder.length-1));
+  if(state.flashIdx<0) state.flashIdx = 0;
+  state.flashSide = 0;
+}
+function currentFlash(){
+  if(state.flashOrder.length===0) return null;
+  const id = state.flashOrder[state.flashIdx];
+  return VOCAB.find(w=>w.id===id);
+}
+function renderFlash(){
+  buildFlashOrderIfEmpty();
+  const w = currentFlash();
+  const side = document.getElementById('flashSide');
+  const info = document.getElementById('flashInfo');
+  const prog = document.getElementById('flashProgress');
+  if(!w){
+    side.innerHTML = '<div class="empty">単語がありません<br>フィルタを見直してください</div>';
+    info.textContent = "0 / 0";
+    prog.style.width = "0%";
+    document.getElementById('flashFav').classList.remove('active-fav');
+    return;
+  }
+  const total = state.flashOrder.length;
+  const idx = state.flashIdx;
+  info.textContent = `第${w.l}課 ・ ${idx+1} / ${total}`;
+  prog.style.width = ((idx+1)/total*100)+"%";
+  const st = getStatus(w.id);
+  if(state.flashSide===0){
+    side.innerHTML = `<div class="card-hanzi">${w.h}</div>
+      <div class="card-hint">タップで裏面 ・ Space</div>`;
+  } else {
+    side.innerHTML = `<div class="card-pinyin">${w.p}</div>
+      <div class="card-jp">${w.j}</div>
+      <div class="card-example">
+        <div class="ex-zh">${w.eh}</div>
+        <div class="ex-py">${w.ep}</div>
+        <div class="ex-jp">${w.ej}</div>
+      </div>`;
+  }
+  // お気に入り/ステータスボタン
+  document.getElementById('flashFav').classList.toggle('active-fav', !!state.favorites[w.id]);
+  ['no','maybe','ok'].forEach(s=>{
+    const btn = document.getElementById('flashSt'+s.charAt(0).toUpperCase()+s.slice(1));
+    btn.classList.toggle('active', st===s);
+  });
+}
+function buildFlashOrderIfEmpty(){
+  if(state.flashOrder.length===0 || !state.flashOrder.every(id=>VOCAB.some(w=>w.id===id && filteredWords().some(fw=>fw.id===id)))){
+    buildFlashOrder();
+  }
+}
+document.getElementById('flashCard').onclick = ()=>{
+  if(!currentFlash()) return;
+  state.flashSide = 1 - state.flashSide;
+  renderFlash();
+};
+document.getElementById('flashPrev').onclick = ()=>{ if(state.flashOrder.length===0) return; state.flashIdx=(state.flashIdx-1+state.flashOrder.length)%state.flashOrder.length; state.flashSide=0; renderFlash(); };
+document.getElementById('flashNext').onclick = ()=>{ if(state.flashOrder.length===0) return; state.flashIdx=(state.flashIdx+1)%state.flashOrder.length; state.flashSide=0; renderFlash(); };
+document.getElementById('flashShuffle').onclick = ()=>{ state.flashOrder = shuffleArr(state.flashOrder); state.flashIdx=0; state.flashSide=0; renderFlash(); };
+document.getElementById('flashReset').onclick = ()=>{ buildFlashOrder(); renderFlash(); };
+document.getElementById('flashSpeak').onclick = ()=>{ const w=currentFlash(); if(w) speak(w.h); };
+document.getElementById('flashFav').onclick = ()=>{
+  const w = currentFlash(); if(!w) return;
+  state.favorites[w.id] = !state.favorites[w.id];
+  if(!state.favorites[w.id]) delete state.favorites[w.id];
+  save(); renderFlash(); renderBadges();
+};
+['No','Maybe','Ok'].forEach(k=>{
+  document.getElementById('flashSt'+k).onclick = ()=>{
+    const w = currentFlash(); if(!w) return;
+    const s = k.toLowerCase();
+    if(state.status[w.id]===s) delete state.status[w.id];
+    else state.status[w.id] = s;
+    save(); renderFlash(); renderBadges();
+  };
+});
+
+// 自動再生
+let autoTimer = null, autoStage = 0;
+function autoToggle(){
+  const btn = document.getElementById('flashAuto');
+  if(autoTimer){
+    clearInterval(autoTimer); autoTimer=null;
+    btn.textContent="▶ 自動"; btn.classList.remove('btn-red'); btn.classList.add('btn-primary');
+    return;
+  }
+  btn.textContent="⏸ 停止"; btn.classList.remove('btn-primary'); btn.classList.add('btn-red');
+  const w = currentFlash();
+  if(w){ speak(w.h); }
+  autoStage = 0;
+  autoTimer = setInterval(()=>{
+    autoStage++;
+    if(autoStage%2===1){
+      state.flashSide = 1;
+      renderFlash();
+    } else {
+      state.flashIdx = (state.flashIdx+1) % state.flashOrder.length;
+      state.flashSide = 0;
+      renderFlash();
+      const w = currentFlash();
+      if(w) speak(w.h);
+    }
+  }, 4000);
+}
+document.getElementById('flashAuto').onclick = autoToggle;
+
+/* ============ リスニングテスト ============ */
+function buildTestOrder(){
+  state.testOrder = shuffleArr(filteredWords().map(w=>w.id));
+  state.testIdx = 0;
+  document.getElementById('listenAnswer').classList.remove('show');
+}
+function currentTest(){
+  if(state.testOrder.length===0) return null;
+  const id = state.testOrder[state.testIdx];
+  return VOCAB.find(w=>w.id===id);
+}
+function renderTest(){
+  const words = filteredWords();
+  if(state.testOrder.length===0 || state.testOrder.length!==words.length){
+    buildTestOrder();
+  }
+  const w = currentTest();
+  const info = document.getElementById('listenInfo');
+  const ans = document.getElementById('listenAnswer');
+  if(!w){
+    info.textContent = "単語がありません";
+    ans.classList.remove('show');
+    return;
+  }
+  info.textContent = `問題 ${state.testIdx+1} / ${state.testOrder.length} ・ 第${w.l}課`;
+  document.getElementById('ansHanzi').textContent = w.h;
+  document.getElementById('ansPinyin').textContent = w.p;
+  document.getElementById('ansJp').textContent = w.j;
+  document.getElementById('ansExample').innerHTML = `<div class="ex-zh">${w.eh}</div><div class="ex-py">${w.ep}</div><div class="ex-jp">${w.ej}</div>`;
+  renderScore();
+}
+function renderScore(){
+  document.getElementById('scoreCorrect').textContent = state.score.correct;
+  document.getElementById('scoreWrong').textContent = state.score.wrong;
+  const total = state.score.correct + state.score.wrong;
+  document.getElementById('scoreRate').textContent = total===0? "0%" : Math.round(state.score.correct/total*100)+"%";
+}
+function nextTest(){
+  document.getElementById('listenAnswer').classList.remove('show');
+  if(state.testOrder.length===0) return;
+  state.testIdx = (state.testIdx+1) % state.testOrder.length;
+  renderTest();
+  const w = currentTest();
+  if(w) setTimeout(()=>speak(w.h), 300);
+}
+document.getElementById('listenPlay').onclick = ()=>{ const w=currentTest(); if(w) speak(w.h); };
+document.getElementById('listenShow').onclick = ()=>{
+  document.getElementById('listenAnswer').classList.add('show');
+};
+document.getElementById('listenCorrect').onclick = ()=>{
+  const w = currentTest(); if(!w) return;
+  state.score.correct++;
+  // ステータス昇格
+  const cur = getStatus(w.id);
+  if(cur==="no") state.status[w.id]="maybe";
+  else if(cur==="maybe") state.status[w.id]="ok";
+  else if(cur==="none" || cur==="ok") state.status[w.id]="ok";
+  save(); renderScore(); renderBadges(); nextTest();
+};
+document.getElementById('listenWrong').onclick = ()=>{
+  const w = currentTest(); if(!w) return;
+  state.score.wrong++;
+  state.status[w.id] = "no";
+  state.favorites[w.id] = true;
+  save(); renderScore(); renderBadges(); nextTest();
+};
+document.getElementById('listenNext').onclick = nextTest;
+document.getElementById('listenShuffle').onclick = ()=>{ buildTestOrder(); renderTest(); };
+document.getElementById('listenResetScore').onclick = ()=>{ state.score={correct:0,wrong:0}; save(); renderScore(); };
+
+/* ============ タブ ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=> setMode(t.dataset.mode);
+});
+function setMode(m){
+  state.mode = m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===m));
+  document.getElementById('mode-list').classList.toggle('hidden', m!=='list');
+  document.getElementById('mode-flash').classList.toggle('hidden', m!=='flash');
+  document.getElementById('mode-test').classList.toggle('hidden', m!=='test');
+  document.getElementById('statusFilterRow').style.display = (m==='test')?'none':'';
+  document.getElementById('searchBox') && (document.getElementById('searchBox').style.display = (m==='list')?'':'none');
+  if(m==='flash'){ buildFlashOrder(); renderFlash(); }
+  if(m==='test'){ buildTestOrder(); renderTest(); }
+  if(m==='list'){ renderList(); }
+  renderBadges();
+}
+
+/* ============ フィルタボタン ============ */
+// 課選択
+document.getElementById('lessonToggleBtn').onclick = ()=>{
+  document.getElementById('lessonPanel').classList.toggle('show');
+};
+document.getElementById('lessonAllBtn').onclick = ()=>{
+  state.selectedLessons = LESSONS.slice();
+  renderLessonGrid();
+};
+document.getElementById('lessonClearBtn').onclick = ()=>{
+  state.selectedLessons = [];
+  renderLessonGrid();
+};
+document.getElementById('lessonOkBtn').onclick = ()=>{
+  document.getElementById('lessonPanel').classList.remove('show');
+  save();
+  buildFlashOrder(); buildTestOrder();
+  renderAll();
+};
+// お気に入りトグル
+document.getElementById('favToggleBtn').onclick = ()=>{
+  state.favOnly = !state.favOnly;
+  document.getElementById('favToggleBtn').classList.toggle('active', state.favOnly);
+  buildFlashOrder(); buildTestOrder();
+  renderAll();
+};
+// 速度
+document.querySelectorAll('.chip[data-speed]').forEach(b=>{
+  b.onclick = ()=>{
+    state.speed = parseFloat(b.dataset.speed);
+    document.querySelectorAll('.chip[data-speed]').forEach(x=>x.classList.toggle('active', x===b));
+    save();
+  };
+});
+// ステータスフィルタ
+document.querySelectorAll('#statusFilterRow .chip').forEach(b=>{
+  b.onclick = ()=>{
+    state.statusFilter = b.dataset.status;
+    document.querySelectorAll('#statusFilterRow .chip').forEach(x=>x.classList.toggle('active', x===b));
+    buildFlashOrder();
+    renderAll();
+  };
+});
+document.getElementById('searchBox').oninput = ()=> renderList();
+
+/* ============ キーボードショートカット ============ */
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  const k = e.key.toLowerCase();
+  if(k==='1'){ setMode('list'); return; }
+  if(k==='2'){ setMode('flash'); return; }
+  if(k==='3'){ setMode('test'); return; }
+  if(state.mode==='flash'){
+    if(k==='arrowleft'){ e.preventDefault(); document.getElementById('flashPrev').click(); }
+    if(k==='arrowright'){ e.preventDefault(); document.getElementById('flashNext').click(); }
+    if(k===' '){ e.preventDefault(); document.getElementById('flashCard').click(); }
+    if(k==='p'){ document.getElementById('flashSpeak').click(); }
+    if(k==='s'){ document.getElementById('flashShuffle').click(); }
+    if(k==='f'){ document.getElementById('flashFav').click(); }
+    if(k==='q'){ document.getElementById('flashStNo').click(); }
+    if(k==='w'){ document.getElementById('flashStMaybe').click(); }
+    if(k==='e'){ document.getElementById('flashStOk').click(); }
+  }
+  if(state.mode==='test'){
+    if(k===' '){ e.preventDefault(); document.getElementById('listenShow').click(); }
+    if(k==='p'){ document.getElementById('listenPlay').click(); }
+    if(k==='s'){ document.getElementById('listenShuffle').click(); }
+    if(k==='c'){ document.getElementById('listenCorrect').click(); }
+    if(k==='w'){ document.getElementById('listenWrong').click(); }
+    if(k==='arrowright'){ document.getElementById('listenNext').click(); }
+  }
+});
+
+/* ============ 初期化 ============ */
+function renderAll(){
+  renderList();
+  renderBadges();
+  if(state.mode==='flash') renderFlash();
+  if(state.mode==='test') renderTest();
+}
+document.getElementById('favToggleBtn').classList.toggle('active', state.favOnly);
+document.querySelectorAll('.chip[data-speed]').forEach(b=> b.classList.toggle('active', parseFloat(b.dataset.speed)===state.speed));
+renderLessonGrid();
+renderAll();
+</script>
+</body>
+</html>
